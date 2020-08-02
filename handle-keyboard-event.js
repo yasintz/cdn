@@ -1,4 +1,4 @@
-/* eslint-disable */
+// Release 0.0.1
 var keys = {
     8: 'backspace',
     9: 'tab',
