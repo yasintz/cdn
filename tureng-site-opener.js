@@ -62,16 +62,18 @@ function onTextSelected(selectedText) {
 
 function main() {
   window.addEventListener('mouseup', (event) => {
-    if (event.target === TurengSiteOpener) {
-      return;
-    }
-
+    const isTurengElement = event.target === TurengSiteOpener;
     const selection = getSelectionText().trim();
-    if (selection) {
+    if (!isTurengElement && selection) {
       onTextSelected(selection);
     } else {
       if (document.body.contains(TurengSiteOpener) && event.which === 1) {
-        TurengSiteOpener.remove();
+        setTimeout(
+          () => {
+            TurengSiteOpener.remove();
+          },
+          isTurengElement ? 75 : 0
+        );
       }
     }
   });
