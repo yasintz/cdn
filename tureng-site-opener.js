@@ -47,10 +47,16 @@ function onTextSelected(selectedText) {
 
   document.body.appendChild(buildElement(selectedText));
   setTimeout(() => {
-    const mediumAlert = document.getElementsByClassName('s t wx u wy wz va')[0];
-    if (mediumAlert) {
-      mediumAlert.style.display = 'none';
-    }
+    const mediumAlert = [
+      's t zi u zj zk va',
+      's t wx u wy wz va',
+    ].map((className) => document.getElementsByClassName(className));
+
+    mediumAlert.forEach((items) => {
+      Array.from(items).forEach((item) => {
+        item.style.display = 'none';
+      });
+    });
   }, 10);
 }
 
