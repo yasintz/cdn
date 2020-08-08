@@ -2,6 +2,7 @@ const mousePosition = { x: 0, y: 0 };
 
 const ALIGMENT_LEFT = 60;
 const ALIGMENT_TOP = 30;
+const isMediumPage = window.location.href.indexOf('medium') === 8;
 
 const TURENG_SITE_OPENER_CLASSNAME = 'tureng-site-opener-xxx';
 const TurengSiteOpener = document.createElement('a');
@@ -32,6 +33,9 @@ function buildElement(searchText) {
   const { x, y } = mousePosition;
 
   TurengSiteOpener.style.top = (y < ALIGMENT_TOP ? y : y - ALIGMENT_TOP) + 'px';
+  if (isMediumPage) {
+    TurengSiteOpener.style.top = y + ALIGMENT_TOP + 'px';
+  }
   TurengSiteOpener.style.left =
     (x < ALIGMENT_LEFT ? x + 350 : x - ALIGMENT_LEFT) + 'px';
   TurengSiteOpener.href = `https://tureng.com/tr/turkce-ingilizce/${searchText}`;
@@ -46,18 +50,6 @@ function onTextSelected(selectedText) {
   }
 
   document.body.appendChild(buildElement(selectedText));
-  setTimeout(() => {
-    const mediumAlert = [
-      's t zi u zj zk va',
-      's t wx u wy wz va',
-    ].map((className) => document.getElementsByClassName(className));
-
-    mediumAlert.forEach((items) => {
-      Array.from(items).forEach((item) => {
-        item.style.display = 'none';
-      });
-    });
-  }, 10);
 }
 
 function main() {
