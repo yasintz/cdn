@@ -42,7 +42,9 @@ function loadScript(url, cb, type) {
     document.head.appendChild(scriptTag);
 
     setTimeout(() => {
+      if(cb) {
       cb();
+      }
     }, 10);
   });
 }
