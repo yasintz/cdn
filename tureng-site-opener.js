@@ -1,13 +1,18 @@
-
 const mousePosition = { x: 0, y: 0 };
 
+const TURENG_SITE_OPENER_CLASSNAME = 'tureng-site-opener-xxx';
 const TurengSiteOpener = document.createElement('a');
+TurengSiteOpener.classList.add(TURENG_SITE_OPENER_CLASSNAME);
+
+loadCss(`
+.${TURENG_SITE_OPENER_CLASSNAME}{
+  background-color: #ddd;
+  border: 1px solid #ddd;
+  position: absolute;
+}
+`);
+
 TurengSiteOpener.innerHTML = 'Tureng';
-TurengSiteOpener.style.backgroundColor = '#ddd';
-TurengSiteOpener.style.borderColor = '#ddd';
-TurengSiteOpener.style.border = '1px';
-TurengSiteOpener.style.borderStyle = 'solid';
-TurengSiteOpener.style.position = 'absolute';
 TurengSiteOpener.target = '_blank';
 
 function getSelectionText() {
