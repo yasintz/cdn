@@ -38,7 +38,7 @@ function loadScript(url, cb, type) {
     return;
   }
   fetchContent(url, (responseText) => {
-    scriptTag.innerHTML = this.responseText;
+    scriptTag.innerHTML = responseText;
     document.head.appendChild(scriptTag);
 
     setTimeout(() => {
