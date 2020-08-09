@@ -24,6 +24,11 @@ function fetchContent(url, cb) {
 
 function loadScript(url, cb, type) {
   const scriptTag = document.createElement('script');
+
+  function removeScript() {
+    scriptTag.remove();
+  }
+
   scriptTag.async = !0;
   scriptTag.charset = 'utf-8';
 
@@ -42,15 +47,21 @@ function loadScript(url, cb, type) {
     document.head.appendChild(scriptTag);
 
     setTimeout(() => {
-      if(cb) {
-      cb();
+      if (cb) {
+        cb();
       }
     }, 10);
   });
+
+  return removeScript;
 }
 
 function loadCss(urlOrContent) {
   const style = document.createElement('style');
+
+  function removeStyle() {
+    style.remove();
+  }
 
   if (validURL(urlOrContent)) {
     fetchContent(urlOrContent, (responseText) => {
@@ -61,4 +72,6 @@ function loadCss(urlOrContent) {
     style.innerHTML = urlOrContent;
     document.head.appendChild(style);
   }
+
+  return removeStyle;
 }
