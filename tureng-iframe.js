@@ -88,12 +88,23 @@ function tooltip(bodyElement, iframeElement) {
 }
 
 function buildBodyForIframe() {
-  const RIGHT_WIDTH = 800;
   const LEFT_ITEM_ID = 'left_tureng_xx';
   const RIGHT_ITEM_ID = 'right_tureng_xx';
+  const INPUT_ID = 'input_xx';
+  const IFRAME_ID = 'iframe_xx';
 
-  const copyOfBodyElement = document.body.cloneNode(true);
+  const input = document.createElement('input');
+  const newBody = document.createElement('body');
+  const right = document.createElement('div');
   const left = document.createElement('div');
+  const copyOfBodyElement = document.body.cloneNode(true);
+  const iframe = document.createElement('iframe');
+
+  iframe.src = 'https://tureng.com/tr/turkce-ingilizce/hello';
+  iframe.id = IFRAME_ID;
+  input.id = INPUT_ID;
+  left.id = LEFT_ITEM_ID;
+  right.id = RIGHT_ITEM_ID;
 
   while (copyOfBodyElement.firstChild) {
     left.appendChild(copyOfBodyElement.firstChild);
@@ -112,14 +123,17 @@ function buildBodyForIframe() {
     );
   }
 
-  const newBody = document.createElement('body');
+  right.appendChild(iframe);
+  newBody.appendChild(input);
+  newBody.appendChild(left);
+  newBody.appendChild(right);
 
-  const right = document.createElement('div');
+  Array.from(document.body.childNodes).forEach((item) => item.remove());
 
-  const iframe = document.createElement('iframe');
-  iframe.src = 'https://tureng.com/tr/turkce-ingilizce/hello';
+  document.body = newBody;
 
-  loadCss(`
+  function getCssContent(turengSize) {
+    return `
     body{
       display: flex;
       overflow-y: hidden;
@@ -127,35 +141,43 @@ function buildBodyForIframe() {
       padding: 20px;
     }
     #${LEFT_ITEM_ID}{
-      width: calc(100% - ${RIGHT_WIDTH}px); 
-      height: 100vh;
+      width: calc(100% - ${turengSize}px); 
+      height: calc(95vh - 20px);
       overflow-y: auto;
       overflow-x: auto;
     }
 
     #${RIGHT_ITEM_ID}
     {
-      width: ${RIGHT_WIDTH}px;
-      height: 100vh;
+      width: ${turengSize}px;
+      height: calc(95vh - 20px);
       overflow-y: hidden;
       overflow-x: hidden;
     }
-    iframe{
+
+    #${INPUT_ID}{
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      z-index: 99999999;
+      width: 33px;
+      height: 16px;
+    }
+
+    #${IFRAME_ID}{
       width: 100%;
       height: 100%;
     }
-  `);
+  `;
+  }
 
-  right.appendChild(iframe);
+  let removeLoadedStyle = loadCss(getCssContent(window.innerWidth / 2));
 
-  left.id = LEFT_ITEM_ID;
-  right.id = RIGHT_ITEM_ID;
-  newBody.appendChild(left);
-  newBody.appendChild(right);
-
-  Array.from(document.body.childNodes).forEach((item) => item.remove());
-
-  document.body = newBody;
+  input.onchange = (e) => {
+    const newSize = parseInt(e.target.value);
+    removeLoadedStyle();
+    removeLoadedStyle = loadCss(getCssContent(newSize));
+  };
 
   return { iframe, newBody: left };
 }
@@ -171,3 +193,15 @@ function TurengIframe() {
     main();
   }
 }
+$l(() => {
+  loadScript(
+    'https://raw.githubusercontent.com/yasintz/cdn/master/handle-keyboard-event.js',
+    () => {
+      keyboardListener(({ t, withAlt, withCtrl }) => {
+        if (withCtrl && withAlt && t) {
+          TurengIframe();
+        }
+      });
+    }
+  );
+});
