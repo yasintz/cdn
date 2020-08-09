@@ -162,6 +162,11 @@ function buildBodyForIframe() {
       z-index: 99999999;
       width: 33px;
       height: 16px;
+      opacity: 0.5;
+    }
+
+    #${INPUT_ID}:hover{
+      opacity: 1;
     }
 
     #${IFRAME_ID}{
