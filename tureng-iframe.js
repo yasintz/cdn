@@ -3,7 +3,6 @@ function tooltip(bodyElement, iframeElement) {
 
   const ALIGMENT_LEFT = 60;
   const ALIGMENT_TOP = 30;
-  const isMediumPage = window.location.href.indexOf('medium') === 8;
 
   const TURENG_SITE_OPENER_CLASSNAME = 'tureng-site-opener-xxx';
   const TurengSiteOpener = document.createElement('button');
@@ -33,12 +32,8 @@ function tooltip(bodyElement, iframeElement) {
     const { x, y } = mousePosition;
 
     const position = {
-      top: isMediumPage
-        ? y + ALIGMENT_TOP
-        : y < ALIGMENT_TOP
-        ? y
-        : y - ALIGMENT_TOP,
-      left: x < ALIGMENT_LEFT ? x + 350 : x - ALIGMENT_LEFT,
+      top: y < ALIGMENT_TOP ? y : y - ALIGMENT_TOP,
+      left: x < ALIGMENT_LEFT ? x + ALIGMENT_LEFT : x - ALIGMENT_LEFT,
     };
 
     TurengSiteOpener.style.top = position.top + 'px';
