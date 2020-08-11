@@ -3,11 +3,11 @@ function interval(cb, timeout) {
     interval: null
   };
 
-  const clearInterval = () => {
+  const remove = () => {
     clearInterval(intervalStore.interval);
   };
 
   intervalStore.interval = setInterval(() => {
-    cb(clearInterval);
+    cb(remove);
   }, timeout);
 }
