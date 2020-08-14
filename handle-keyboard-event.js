@@ -135,7 +135,7 @@ window.keyboardListener = (() => {
   }
 
   keyboardListener.emitAll = (obj) => {
-    cb(obj);
+    listeners.forEach(cb=>cb(obj));
   };
 
   return keyboardListener;
