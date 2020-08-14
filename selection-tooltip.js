@@ -1,23 +1,30 @@
 function selectionTooltip({ content, onClick, isShown }) {
   const mousePosition = { x: 0, y: 0 };
 
-  const ALIGMENT_LEFT = 60;
-  const ALIGMENT_TOP = 30;
+  const ALIGMENT_LEFT = 65;
+  const ALIGMENT_TOP = 35;
   const isMediumPage = window.location.href.indexOf('medium') === 8;
 
   let selectedWord = '';
 
   const SELECTION_TOOLTIP_CLASSNAME = 'selection-tooltip-xx';
-  const selectionTooltipElement = document.createElement('button');
+  const selectionTooltipElement = document.createElement('div');
   selectionTooltipElement.classList.add(SELECTION_TOOLTIP_CLASSNAME);
 
   loadCss(`
-    .${SELECTION_TOOLTIP_CLASSNAME}{
-    background-color: #ddd;
-    border: 1px solid #ddd;
-    position: absolute;
-    }
-  `);
+      .${SELECTION_TOOLTIP_CLASSNAME}{
+        position: absolute;
+        background-color: #ddd;
+        border: 1px solid #000;
+        border-radius: 8px;
+        padding: 2.5px;
+        cursor: pointer;
+      }
+      .${SELECTION_TOOLTIP_CLASSNAME}:active{
+        background-color: #767676;
+        color: white;
+      }
+    `);
 
   selectionTooltipElement.innerHTML = content;
   selectionTooltipElement.onclick = () => onClick(selectedWord);
@@ -87,9 +94,9 @@ function selectionTooltip({ content, onClick, isShown }) {
 }
 
 /* 
-selectionTooltip({
-  content: 'Tureng',
-  onClick: (searchText) => {},
-  isShown: (selectedText) => selectedText.split(' ').length === 1,
-});
- */
+  selectionTooltip({
+    content: 'Tureng',
+    onClick: (searchText) => {},
+    isShown: (selectedText) => selectedText.split(' ').length === 1,
+  });
+   */
