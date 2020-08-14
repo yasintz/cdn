@@ -1,4 +1,4 @@
-[loadScript, loasCss] = (() => {
+[loadScript, loadCss] = (() => {
   function validURL(str) {
     var pattern = new RegExp(
       '^(https?:\\/\\/)?' + // protocol
@@ -34,10 +34,11 @@
   }
 
   function loadScript(url, cb, type) {
-    const _hasScript = hasScript();
+    const _hasScript = hasScript(url);
 
     if (_hasScript) {
-      cb();
+      if (cb) cb();
+      return;
     }
 
     const scriptTag = document.createElement('script');
@@ -54,9 +55,7 @@
       scriptTag.src = url;
       document.head.appendChild(scriptTag);
       scriptTag.onload = () => {
-        if (cb) {
-          cb();
-        }
+        if (cb) cb();
       };
       return;
     }
