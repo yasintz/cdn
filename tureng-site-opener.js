@@ -108,7 +108,7 @@ function createTurengDispatcherListener() {
       keyboardListener(({ t, withAlt, withCtrl }) => {
         if (withCtrl && withAlt && t) {
           loadScript(
-            'https://zn-socket.vercel.app/socket.io/socket.io.js',
+            'https://global-sockets.herokuapp.com/socket.io/socket.io.js',
             () => {
               const socket = io();
               turengTooltip((word) => {
