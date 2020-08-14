@@ -8,7 +8,7 @@ function selectionTooltip({ content, onClick, isShown }) {
   let selectedWord = '';
 
   const SELECTION_TOOLTIP_CLASSNAME = 'selection-tooltip-xx';
-  const selectionTooltipElement = document.createElement('div');
+  const selectionTooltipElement = document.createElement('button');
   selectionTooltipElement.classList.add(SELECTION_TOOLTIP_CLASSNAME);
 
   loadCss(`
