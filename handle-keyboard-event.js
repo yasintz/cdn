@@ -130,12 +130,17 @@ window.keyboardListener = (() => {
   const listeners = [];
 
   function keyboardListener(cb, listenerName = 'keydown') {
+    const fn = handleKeyboardEvent(cb);
     listeners.push(cb);
-    window.addEventListener(listenerName, handleKeyboardEvent(cb));
+    window.addEventListener(listenerName, fn);
+
+    return () => {
+      window.removeEventListener(listenerName, fn);
+    };
   }
 
   keyboardListener.emitAll = (obj) => {
-    listeners.forEach(cb=>cb(obj));
+    listeners.forEach((cb) => cb(obj));
   };
 
   return keyboardListener;
