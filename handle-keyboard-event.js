@@ -1,4 +1,4 @@
-window.keyboardListener = (() => {
+const { handleKeyboardEvent, keyboardListener } = (() => {
   var keys = {
       8: 'backspace',
       9: 'tab',
@@ -143,5 +143,8 @@ window.keyboardListener = (() => {
     listeners.forEach((cb) => cb(obj));
   };
 
-  return keyboardListener;
+  return { keyboardListener, handleKeyboardEvent };
 })();
+
+window.keyboardListener = keyboardListener;
+window.handleKeyboardEvent = handleKeyboardEvent;
