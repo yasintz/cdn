@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script>
-  module = {};
-</script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script
   src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
@@ -17,9 +14,10 @@
 
 <!-- use the latest vue-select release -->
 <script src="https://unpkg.com/vue-select@latest"></script>
-<link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
-
-<script src="https://unpkg.com/ms@2.1.3/index.js"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/vue-select@latest/dist/vue-select.css"
+/>
 
 <script
   src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js"
@@ -42,10 +40,7 @@
   crossorigin="anonymous"
 ></script>
 
-<script>
-  ms = module.exports;
-</script>
-
+<script src="https://cdn.rawgit.com/Keyang/node-csvtojson/master/browser/csvtojson.min.js"></script>
     <title>Document</title>
     <style>
   .add-section,
@@ -136,6 +131,222 @@
 </div>
 
     <script>
+      class SheetBest {
+  id;
+
+  static getUrl =
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vR55z3vNbbvJ6ajiQtAH5BxcFZ1fvOf6Etf5NPNWTEg-mC6roODCgP-i151cYUEeWzEto46HGISKvoY/pub?gid=0&single=true&output=csv';
+
+  static updateUrl =
+    'https://sheet.best/api/sheets/dfeba6a6-511a-4ccb-8aff-4eb34df96157';
+
+  constructor(id) {
+    this.id = id;
+  }
+
+  get = async () => {
+    const all = await fetch(SheetBest.getUrl)
+      .then((i) => i.text())
+      .then((r) => window.csv().fromString(r));
+
+    console.log({ all });
+    const db = all.find((i) => i.id === this.id) || { id: this.id, json: '{}' };
+
+    return JSON.parse(db.json);
+  };
+
+  update = (json) => {
+    console.log({ json, update: true });
+    return fetch(SheetBest.updateUrl + `/id/${this.id}`, {
+      method: 'PATCH',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        json,
+      }),
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.length === 0) {
+          console.log({ json, post: true });
+          return fetch(SheetBest.updateUrl, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ json, id: this.id }),
+          });
+        }
+      });
+  };
+}
+
+      /**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var w = d * 7;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+ms = function (val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isFinite(val)) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'weeks':
+    case 'week':
+    case 'w':
+      return n * w;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (msAbs >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (msAbs >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (msAbs >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return plural(ms, msAbs, d, 'day');
+  }
+  if (msAbs >= h) {
+    return plural(ms, msAbs, h, 'hour');
+  }
+  if (msAbs >= m) {
+    return plural(ms, msAbs, m, 'minute');
+  }
+  if (msAbs >= s) {
+    return plural(ms, msAbs, s, 'second');
+  }
+  return ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, msAbs, n, name) {
+  var isPlural = msAbs >= n * 1.5;
+  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
+}
+
       class Queue {
   constructor() {
     this.queue = [];
@@ -203,6 +414,78 @@
   }
 }
 
+      async function getTimezoneList() {
+  const lsKey = 'LocalStorage:Timer.js.timezone';
+  const timezoneListUrl =
+    'https://raw.githubusercontent.com/dmfilipenko/timezones.json/ac0682e3af4c4d6153f7ae16705ced4967c4c6a8/timezones.json';
+  let persistStr = localStorage.getItem(lsKey);
+
+  if (!persistStr) {
+    const timezoneJson = await axios.get(timezoneListUrl).then((d) => d.data);
+    localStorage.setItem(lsKey, JSON.stringify(timezoneJson));
+    return timezoneJson;
+  }
+
+  return JSON.parse(persistStr);
+}
+
+      class Database {
+  constructor(user) {
+    this.sheetBest = new SheetBest(user);
+    this.localStorageKey = `Timer.js:${user}`;
+  }
+
+  _getFromApi = async () => {
+    const data = await this.sheetBest.get();
+
+    data.timezone = await getTimezoneList();
+
+    localStorage.setItem(
+      this.localStorageKey,
+      JSON.stringify({ data, time: new Date() })
+    );
+
+    return data;
+  };
+
+  _update = throttle(
+    async (data) => {
+      await this.sheetBest.update({ ...data, timezone: undefined });
+    },
+    ms('10 second'),
+    true
+  );
+
+  update = async (data) => {
+    await this._update(data);
+    const persistStr = localStorage.getItem(this.localStorageKey);
+
+    const { time } = JSON.parse(persistStr || '{}');
+
+    localStorage.setItem(this.localStorageKey, JSON.stringify({ data, time }));
+  };
+
+  get = async () => {
+    const persistStr = localStorage.getItem(this.localStorageKey);
+    if (!persistStr) {
+      return this._getFromApi();
+    }
+
+    const { data, time } = JSON.parse(persistStr);
+
+    if (
+      Date.now() - new Date(time) > ms('10 second') ||
+      !window.timerJsInitLoaded
+    ) {
+      window.timerJsInitLoaded = true;
+      return this._getFromApi();
+    }
+
+    return data;
+  };
+}
+
+
       function throttle(func, timeFrame, async) {
   var lastTime = 0;
   let debounce = undefined;
@@ -231,82 +514,6 @@ function convertTZ(date, tzString) {
       timeZone: tzString,
     })
   );
-}
-
-async function getTimezoneList() {
-  const lsKey = 'LocalStorage:Timer.js.timezone';
-  const timezoneListUrl =
-    'https://raw.githubusercontent.com/dmfilipenko/timezones.json/ac0682e3af4c4d6153f7ae16705ced4967c4c6a8/timezones.json';
-  let persistStr = localStorage.getItem(lsKey);
-
-  if (!persistStr) {
-    const timezoneJson = await axios.get(timezoneListUrl).then((d) => d.data);
-    localStorage.setItem(lsKey, JSON.stringify(timezoneJson));
-    return timezoneJson;
-  }
-
-  return JSON.parse(persistStr);
-}
-
-const jsonBlobUrl =
-  'https://www.jsonblob.com/api/27a481ce-746a-11eb-a6ca-c72150f848f7';
-
-class Database {
-  constructor(user) {
-    this.user = user;
-    this.localStorageKey = `Timer.js:${user}`;
-  }
-
-  getRawData = () => axios.get(jsonBlobUrl).then((d) => d.data);
-
-  _getFromJsonBlob = async () => {
-    const data = (await this.getRawData())[this.user] || {};
-
-    data.timezone = await getTimezoneList();
-
-    localStorage.setItem(
-      this.localStorageKey,
-      JSON.stringify({ data, time: new Date() })
-    );
-
-    return data;
-  };
-
-  get = async () => {
-    const persistStr = localStorage.getItem(this.localStorageKey);
-    if (!persistStr) {
-      return this._getFromJsonBlob();
-    }
-
-    const { data, time } = JSON.parse(persistStr);
-
-    if (Date.now() - new Date(time) > ms('10 second')) {
-      return this._getFromJsonBlob();
-    }
-
-    return data;
-  };
-
-  _update = throttle(
-    async (data) => {
-      const prev = await this.getRawData();
-      axios.put(jsonBlobUrl, {
-        ...prev,
-        [this.user]: { ...data, timezone: undefined },
-      });
-    },
-    ms('10 second'),
-    true
-  );
-
-  update = async (data) => {
-    await this._update(data);
-    const persistStr = localStorage.getItem(this.localStorageKey);
-
-    const { time } = JSON.parse(persistStr || '{}');
-
-    localStorage.setItem(this.localStorageKey, JSON.stringify({ data, time }));
-  };
 }
 
       const TimeComponent = {
