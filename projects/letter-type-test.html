@@ -167,8 +167,11 @@
             count--;
             timer.innerHTML = count;
             if (count === 0) {
-              alert(`Toplam Dogru Sayisi: ${trueWords.length}`);
               clearInterval(interval);
+              interval = null;
+              count = 60;
+              timer.innerHTML = count;
+              alert(`Toplam Dogru Sayisi: ${trueWords.length}`);
             }
           }, 1000);
         }
