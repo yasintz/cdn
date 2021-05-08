@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: calc(100% - 32px);
+        height: calc(100% - 32px);
+        padding: 16px;
+      }
+      #timer {
+        font-size: 24px;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 16px;
+      }
+      #key {
+        color: #4a4a49;
+        width: 16%;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12vw;
+        margin: 0 auto;
+        user-select: none;
+        margin-bottom: 16px;
+        border: 3px solid #ddd;
+      }
+      #key div {
+        position: absolute;
+        background-color: green;
+      }
+
+      #key:after {
+        content: '';
+        display: block;
+        padding-bottom: 100%;
+      }
+      img {
+        user-select: none;
+        object-fit: contain;
+        height: 57vh;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="key"></div>
+    <div id="timer">60</div>
+    <img
+      id="img"
+      src="https://user-images.githubusercontent.com/36041339/117550993-fa1a5e80-b04b-11eb-874d-8907cacb31e7.png"
+    />
+
+    <script>
+      const img = document.getElementById('img');
+      const key = document.getElementById('key');
+      const timer = document.getElementById('timer');
+
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+      const getRandom = () => chars[Math.floor(Math.random() * chars.length)];
+
+      const trueWords = [];
+
+      let selectedChar;
+
+      function handleNext() {
+        const newChar = getRandom();
+        if (newChar === selectedChar) {
+          handleNext();
+          return;
+        }
+
+        selectedChar = newChar;
+        key.innerHTML = selectedChar;
+      }
+      handleNext();
+
+      let interval;
+      let count = 60;
+
+      document.addEventListener('keydown', (event) => {
+        if (!interval) {
+          interval = setInterval(() => {
+            count--;
+            timer.innerHTML = count;
+            if (count === 0) {
+              alert(`Toplam Dogru Sayisi: ${trueWords.length}`);
+              clearInterval(interval);
+            }
+          }, 1000);
+        }
+
+        const isTrue = event.key.toLowerCase() === selectedChar.toLowerCase();
+
+        if (isTrue) {
+          key.style.borderColor = '#ddd';
+          key.style.color = '#4a4a49';
+          trueWords.push(selectedChar);
+
+          handleNext();
+        } else {
+          key.style.borderColor = '#8a0b08';
+          key.style.color = '#8a0b08';
+        }
+      });
+    </script>
+  </body>
+</html>
