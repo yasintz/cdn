@@ -48,10 +48,14 @@
         background-color: #5d3698;
         box-shadow: none;
       }
+      body.hide {
+        pointer-events: none;
+        opacity: 0.5;
+      }
     </style>
   </head>
-  <body>
-    <div onclick="increase()" class="btn" id="increase">Arttir</div>
+  <body class="hide">
+    <div onclick="increase()" class="btn" id="increase">-</div>
     <div onclick="random()" class="btn" id="random">Random</div>
 
     <script>
@@ -77,35 +81,35 @@
         },
       };
 
-      function increase() {
-        _count++;
-        count.set(_count);
-        increaseButton.innerText = `Arttir ${_count}`;
-      }
+      function print(c) {
+        const page = Math.floor(c / WORD_COUNT_PER_PAGE) + 1;
+        const wordIndex = c % WORD_COUNT_PER_PAGE || WORD_COUNT_PER_PAGE;
 
-      function _random() {
-        const max = Math.floor(_count - _count * 0.15);
-
-        const rndInt = Math.floor(Math.random() * max) + 1;
-        const page = Math.floor(rndInt / WORD_COUNT_PER_PAGE) + 1;
-        const wordIndex = rndInt % WORD_COUNT_PER_PAGE || WORD_COUNT_PER_PAGE;
-
-        return [`${page}. sayfa ${wordIndex}. soru`, rndInt];
+        return `${page}. sayfa ${wordIndex}. soru`;
       }
 
       function random() {
+        const max = Math.floor(_count - _count * 0.15);
+
         const messages = Array(3)
           .fill(0)
-          .map(_random)
-          .sort((a, b) => a[1] - b[1])
-          .map((a) => a[0]);
+          .map(() => Math.floor(Math.random() * max) + 1)
+          .sort((a, b) => a - b)
+          .map(print);
 
         alert(messages.join('\n'));
       }
 
+      function increase() {
+        _count++;
+        count.set(_count);
+        increaseButton.innerText = `${print(_count)} +`;
+      }
+
       count.get().then((count) => {
         _count = count;
-        increaseButton.innerText = `Arttir ${count}`;
+        increaseButton.innerText = `${print(count)}`;
+        document.body.classList.remove('hide');
       });
     </script>
   </body>
