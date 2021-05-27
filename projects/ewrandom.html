@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      body {
+        background-color: #182952;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 18px);
+      }
+      .btn {
+        background-color: #7045af;
+        color: white;
+        padding: 24px;
+        min-width: 120px;
+        max-width: 200px;
+        font-size: 24px;
+        font-weight: bold;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 16px;
+      }
+
+      .btn:active {
+        background-color: #5d3698;
+        box-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div onclick="increase()" class="btn" id="increase">Arttir</div>
+    <div onclick="random()" class="btn" id="random">Random</div>
+
+    <script>
+      const url = 'https://api.npoint.io/04043f16a9775a48c8ca';
+      const WORD_COUNT_PER_PAGE = 8;
+
+      const increaseButton = document.getElementById('increase');
+      const randomButton = document.getElementById('increase');
+
+      let _count = 0;
+
+      const count = {
+        get() {
+          return fetch(url)
+            .then((i) => i.json())
+            .then((i) => i.count);
+        },
+        set(val) {
+          return fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ count: val }),
+          }).then((i) => i.json);
+        },
+      };
+
+      function increase() {
+        _count++;
+        count.set(_count);
+        increaseButton.innerText = `Arttir ${_count}`;
+      }
+
+      function random() {
+        const rndInt = Math.floor(Math.random() * _count) + 1;
+        const page = Math.floor(rndInt / WORD_COUNT_PER_PAGE) + 1;
+        const wordIndex = rndInt % WORD_COUNT_PER_PAGE || WORD_COUNT_PER_PAGE;
+
+        alert(`${page}. sayfa ${wordIndex}. soru - ${rndInt}`);
+      }
+
+      count.get().then((count) => {
+        _count = count;
+        increaseButton.innerText = `Arttir ${count}`;
+      });
+    </script>
+  </body>
+</html>
