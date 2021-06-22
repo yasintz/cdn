@@ -77,13 +77,14 @@
   <body class="hide">
     <div onclick="increase()" class="btn" id="increase">-</div>
     <div onclick="random()" class="btn" id="random">Random</div>
+    <div onclick="edit()" class="btn" id="edit">Duzenle</div>
 
     <script>
       const url = 'https://api.npoint.io/04043f16a9775a48c8ca';
       const WORD_COUNT_PER_PAGE = 8;
 
       const increaseButton = document.getElementById('increase');
-      const randomButton = document.getElementById('increase');
+      const randomButton = document.getElementById('random');
 
       let _count = 0;
 
@@ -97,19 +98,34 @@
           return fetch(url, {
             method: 'POST',
             body: JSON.stringify({ count: val }),
-          }).then((i) => i.json);
+          }).then((i) => i.json());
         },
       };
 
       function print(c) {
-        const page = Math.floor(c / WORD_COUNT_PER_PAGE) + 1;
-        const wordIndex = c % WORD_COUNT_PER_PAGE || WORD_COUNT_PER_PAGE;
+        const page = Math.floor(c / WORD_COUNT_PER_PAGE) + 2;
+        const wordIndex = c % WORD_COUNT_PER_PAGE || 1;
 
         return `${page}. sayfa ${wordIndex}. soru`;
       }
+      function edit() {
+        let value = prompt('Sayi gir');
+        if (value !== null) {
+          let newCount = 0;
+          if (value.indexOf('.') > -1) {
+            const [page, c] = value.split('.');
+            newCount = (parseInt(page, 10) - 2) * WORD_COUNT_PER_PAGE + parseInt(c, 10);
+          } else {
+            newCount = parseInt(value);
+          }
+          count.set(newCount);
+          _count = newCount;
+          increaseButton.innerText = `${print(_count)} +`;
+        }
+      }
 
       function random() {
-        const max = Math.floor(_count - _count * 0.15);
+        const max = Math.floor(_count);
 
         const messages = Array(3)
           .fill(0)
