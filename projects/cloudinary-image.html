@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #list {
+        border-bottom: 1px solid #ddd;
+        height: 220px;
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+      }
+      .list-item {
+        min-width: 224px;
+        max-width: 224px;
+        padding: 16px 8px 8px 8px;
+        height: calc(100% - 24px);
+        overflow-y: auto;
+        border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .list-item > div {
+        margin-bottom: 12px;
+      }
+      .list-item > span.icon {
+        width: 14px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: rgba(250, 235, 215, 1);
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 2px;
+        transition: transform 0.3s ease;
+        user-select: none;
+      }
+
+      .list-item > span.icon:hover {
+        transform: scale(1.3);
+      }
+
+      .list-item > span.closer {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+      }
+      .list-item > span.add {
+        position: absolute;
+        top: 8px;
+        right: 30px;
+      }
+      .list-section {
+        display: flex;
+        flex-direction: column;
+      }
+      .list-section > span {
+        color: gray;
+        font-size: 14px;
+      }
+      #full-url {
+        margin: 12px 0;
+        text-decoration: none;
+      }
+      #full-url > span {
+        border-radius: 4px;
+        color: white;
+        margin-right: 2px;
+        padding: 1px 2px;
+      }
+      img {
+        object-fit: contain;
+        width: 97%;
+        border-radius: 8px;
+        height: 100%;
+        margin-bottom: 12px;
+        filter: drop-shadow(0px 10px 25px rgba(0, 0, 0, 0.1));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button onclick="addListItem()">Add</button>
+      <div id="list"></div>
+      <a id="full-url" target="_blank"></a>
+      <img id="img" />
+    </div>
+    <script>
+      const listElement = document.getElementById("list");
+      const imgElement = document.getElementById("img");
+      const fullUrlElement = document.getElementById("full-url");
+
+      const getId = () =>
+        "i_" +
+        Math.random()
+          .toString()
+          .substring(2);
+
+      function buildFromData(data) {
+        console.log({ data });
+        let photoUrl = "";
+        const urlPath = data
+          .map(listItem =>
+            listItem
+              .map(section => {
+                if (
+                  ["#", "photoUrl", "photo-url", "photo url"].indexOf(
+                    section.param.toLowerCase()
+                  ) > -1
+                ) {
+                  photoUrl = section.value;
+                  return;
+                }
+
+                if (!section.value) {
+                  return;
+                }
+                return `${section.param}_${section.value}`;
+              })
+              .filter(i => i)
+              .join(",")
+          )
+          .filter(i => i);
+
+        const urls = [
+          "https://res.cloudinary.com/vibely2/image/upload",
+          ...urlPath,
+          photoUrl
+        ];
+        const colors = ["150050", "261C2C", "B85C38", "7B113A"];
+
+        fullUrlElement.href = imgElement.src = urls.join("/");
+        fullUrlElement.innerHTML = urls
+          .map(
+            (s, index) =>
+              // `<span style="background: #${colors[index]}">${s}</span>`
+              `<span style="background: #C84B31">${s}</span>`
+          )
+          .join("");
+      }
+      const addQueryParam = (key, value) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        window.history.pushState({}, "", url.toString());
+      };
+
+      const getQueryParam = key => {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(key) || "";
+      };
+
+      function onChangeListener() {
+        const data = Array.from(listElement.children).map(elem =>
+          Array.from(elem.getElementsByClassName("list-section")).map(elem => {
+            const inputElem = elem.getElementsByTagName("input")[0];
+
+            const value = inputElem.value;
+            const param = inputElem.dataset.param;
+
+            return { param, value };
+          })
+        );
+
+        addQueryParam("data", JSON.stringify(data));
+        buildFromData(data);
+      }
+
+      function removeElement(id) {
+        document.getElementById(id).remove();
+        onChangeListener();
+      }
+
+      function addSection(listItemId, sectionParam, initialValue) {
+        if (!sectionParam) {
+          sectionParam = prompt("Please enter param:", "");
+        }
+
+        if (!sectionParam) {
+          return;
+        }
+
+        const id = getId();
+        const elem = document.createElement("div");
+        elem.id = id;
+        elem.classList.add("list-section");
+
+        elem.innerHTML = `
+          <span ondblclick="removeElement('${id}')">${sectionParam}</span>
+          <input data-param="${sectionParam}" id="input_${id}" />
+        `;
+        const listItemElem = document.getElementById(listItemId);
+        listItemElem.appendChild(elem);
+
+        const inputElem = document.getElementById("input_" + id);
+
+        if (initialValue) {
+          inputElem.value = initialValue;
+        }
+
+        inputElem.addEventListener("input", () =>
+          onChangeListener(listItemElem, elem)
+        );
+      }
+
+      function addListItem() {
+        const id = getId();
+
+        const elem = document.createElement("div");
+        elem.id = id;
+        elem.classList.add("list-item");
+
+        elem.innerHTML = `
+          <span class="icon closer" onclick="removeElement('${id}')">✖️</span>
+          <span class="icon add" onclick="addSection('${id}')">➕</span>
+      `;
+
+        listElement.appendChild(elem);
+        return elem;
+      }
+
+      const qData = getQueryParam("data");
+      if (qData) {
+        const d = JSON.parse(qData);
+        d.forEach(l => {
+          const { id } = addListItem();
+          l.forEach(s => {
+            addSection(id, s.param, s.value);
+          });
+        });
+        buildFromData(d);
+      } else {
+        addListItem();
+        addListItem();
+        addListItem();
+        addListItem();
+      }
+  </script>
+  </body>
+</html>
