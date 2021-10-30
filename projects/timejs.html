@@ -38,7 +38,7 @@
       integrity="sha512-m00bfmYnAl3plEBlQfeQUhw/U2uvmw29V2+jxSWpAjankMWS+zAsjezbKWDEJNXqWq9o9qQZSOiA2RKDpa4D5w=="
       crossorigin="anonymous"
     ></script>
-    <title>Document v2</title>
+    <title>Timejs v3</title>
     <style>
       .add-section,
       .add-section-btn {
@@ -168,7 +168,7 @@
         update = async data => {
           localStorage.setItem(this.localStorageKey, JSON.stringify(data));
 
-          this._update();
+          this._update(data);
         };
 
         getLocal = () => {
@@ -260,7 +260,7 @@
         Vue.component("v-select", VueSelect.VueSelect);
         Vue.component("v-time", TimeComponent);
 
-        var app = new Vue({
+        const app = new Vue({
           el: "#app",
           data: {
             timezoneList: [],
@@ -317,7 +317,10 @@
                 timePercentage: this.timePercentage,
                 tz
               });
-              onUpdate(this._data);
+              onUpdate({
+                selectedMainTimezoneCode: val,
+                timezoneList: this.timezoneList
+              });
             },
             timePercentage(t) {
               this.setNow({
@@ -326,7 +329,10 @@
               });
             },
             timezoneList(t) {
-              onUpdate({ ...this._data, timezoneList: t });
+              onUpdate({
+                selectedMainTimezoneCode: this.selectedMainTimezoneCode,
+                timezoneList: t
+              });
             }
           },
           methods: {
@@ -355,7 +361,9 @@
 
               this.timezoneList.push({
                 abbr: this.addTimezoneCode,
-                id: Math.random().toString(),
+                id: Math.random()
+                  .toString()
+                  .slice(2),
                 title: this.addTimezoneTitle
               });
               this.addTimezoneCode = "";
@@ -379,6 +387,8 @@
             }, 500);
           }
         });
+
+        return app;
       }
 
       async function main() {
@@ -387,11 +397,27 @@
           app.innerHTML = "?user={userName}";
           return;
         }
+        const timezone = await getTimezoneList();
+
+        const localData = database.getLocal();
+
+        const app = createApp(
+          {
+            ...localData,
+            timezone
+          },
+          d => {
+            database.update({ ...d, timezone: undefined });
+          }
+        );
+
+        console.log({ app });
 
         const data = await database.get();
 
-        createApp(data, d => {
-          database.update(d);
+        console.log("set");
+        Object.keys(data).forEach(key => {
+          app[key] = data[key];
         });
       }
 
