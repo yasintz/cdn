@@ -312,7 +312,7 @@
             },
             timezoneList(t) {
               onUpdate({
-                selectedMainTimezoneCode: this.selectedMainTimezoneCode,
+                timezoneCode: this.timezoneCode,
                 timezoneList: t
               });
             }
@@ -376,9 +376,7 @@
             ...localData,
             timezone
           },
-          d => {
-            database.update(user, { ...d, timezone: undefined });
-          }
+          d => database.update(user, d)
         );
 
         const data = await database.get(user);
