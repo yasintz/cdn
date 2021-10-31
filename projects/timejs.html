@@ -148,12 +148,13 @@
 
       class Database {
         constructor(user) {
+          this.user = user;
           this.localStorageKey = `Timer.js:${user}`;
         }
 
         _update = throttle(
           data =>
-            fetch("https://api.npoint.io/d4f6cf91bc447d534472", {
+            fetch("https://api.npoint.io/d4f6cf91bc447d534472/"+this.user, {
               method: "POST",
               headers: {
                 Accept: "application/json",
@@ -178,7 +179,7 @@
         };
 
         get = () =>
-          fetch("https://api.npoint.io/d4f6cf91bc447d534472").then(d =>
+          fetch("https://api.npoint.io/d4f6cf91bc447d534472/"+this.user).then(d =>
             d.json()
           );
       }
@@ -410,8 +411,6 @@
             database.update({ ...d, timezone: undefined });
           }
         );
-
-        console.log({ app });
 
         const data = await database.get();
 
