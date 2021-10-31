@@ -44,10 +44,12 @@
       .add-section-btn {
         margin-bottom: 16px;
       }
+
       .timezone-list {
         display: flex;
         flex-wrap: wrap;
       }
+
       .time-container {
         margin-top: 8px;
         display: flex;
@@ -62,19 +64,26 @@
 
       .time-container span {
         user-select: none;
-      }
-      .time-container span:first-child {
-        font-weight: 600;
         margin-bottom: 8px;
       }
+
+      .time-container span:first-child {
+        font-weight: 600;
+      }
+      .time-container span:last-child {
+        margin-bottom: 0;
+      }
+
       .select-container {
         border: 1px solid #ddd;
       }
+
       .range {
         width: 100%;
       }
     </style>
   </head>
+
   <body>
     <div id="app">
       <button
@@ -99,33 +108,36 @@
         Show Edit Time
       </button>
       <div v-if="isShowEditTime">
-        <div>{{formattedTimePercentage}}</div>
+        <v-select
+          :options="options"
+          v-model="timezoneCode"
+          :reduce="val=>val.value"
+        ></v-select>
+        <div style="margin-top: 8px;">{{formattedTimePercentage}}</div>
         <input
           type="range"
           min="0"
-          :max="(24*60*60).toString()"
+          :max="sliderMaxValue"
           v-model="timePercentage"
           class="range"
         />
-        <div>Main:</div>
-        <v-select
-          :options="options"
-          v-model="selectedMainTimezoneCode"
-          :reduce="val=>val.value"
-        ></v-select>
+
         <button @click="()=>isShowEditTime=false">Close Edit Time</button>
       </div>
 
       <div class="timezone-list">
         <v-time
-          v-for="(time,index) in timeList"
-          :key="index"
+          v-for="time in timeList"
+          :key="time.id"
           :date="time.date"
           :title="time.title"
           :id="time.id"
           @double-click="timeDoubleClick($event)"
         ></v-time>
       </div>
+    </div>
+    <div>
+      <h4>Double click to item if you want remove</h4>
     </div>
 
     <script>
@@ -139,125 +151,99 @@
           const timezoneJson = await axios
             .get(timezoneListUrl)
             .then(d => d.data);
-          localStorage.setItem(lsKey, JSON.stringify(timezoneJson));
-          return timezoneJson;
+          persistStr = JSON.stringify(timezoneJson);
+          localStorage.setItem(lsKey, persistStr);
         }
 
-        return JSON.parse(persistStr);
+        return JSON.parse(persistStr).map(t => ({
+          ...t,
+          timezone: t.utc[0]
+        }));
       }
 
+      const DB_LOCAL_STORAGE_KEY = "Timer.js";
       class Database {
-        constructor(user) {
-          this.user = user;
-          this.localStorageKey = `Timer.js:${user}`;
-        }
+        update = async (user, data) => {
+          const localDb = this.getLocal();
+          const newDb = {
+            ...localDb,
+            [user]: data
+          };
+          localStorage.setItem(DB_LOCAL_STORAGE_KEY, JSON.stringify(newDb));
 
-        _update = throttle(
-          data =>
-            fetch("https://api.npoint.io/d4f6cf91bc447d534472/"+this.user, {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(data)
-            }),
-          1000 * 2.5, // 10 second
-          true
-        );
-
-        update = async data => {
-          localStorage.setItem(this.localStorageKey, JSON.stringify(data));
-
-          this._update(data);
+          fetch("https://api.npoint.io/d4f6cf91bc447d534472", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newDb)
+          });
         };
 
-        getLocal = () => {
-          const persistStr = localStorage.getItem(this.localStorageKey);
+        getLocal = user => {
+          const persistStr = localStorage.getItem(DB_LOCAL_STORAGE_KEY);
           const data = JSON.parse(persistStr || "{}");
-          return data;
+          if (user === "all" || !user) {
+            return data;
+          }
+          return data[user];
         };
 
-        get = () =>
-          fetch("https://api.npoint.io/d4f6cf91bc447d534472/"+this.user).then(d =>
-            d.json()
-          );
+        get = user =>
+          fetch("https://api.npoint.io/d4f6cf91bc447d534472/")
+            .then(d => d.json())
+            .then(data => {
+              localStorage.setItem(DB_LOCAL_STORAGE_KEY, JSON.stringify(data));
+              return data[user] || {};
+            });
       }
-
-      function throttle(func, timeFrame, async) {
-        var lastTime = 0;
-        let debounce = undefined;
-
-        return function(...args) {
-          clearTimeout(debounce);
-          var now = new Date();
-          if (now - lastTime >= timeFrame) {
-            lastTime = now;
-            return func(...args);
-          }
-
-          debounce = setTimeout(() => {
-            func(...args);
-          }, timeFrame);
-
-          if (async) {
-            return Promise.resolve();
-          }
-        };
-      }
-
-      function convertTZ(date, tzString) {
-        return new Date(
-          (typeof date === "string" ? new Date(date) : date).toLocaleString(
-            "en-US",
-            {
-              timeZone: tzString
-            }
-          )
-        );
-      }
-
-      const TimeComponent = {
-        props: {
-          date: {
-            type: Date,
-            required: true
-          },
-          title: {
-            type: String,
-            required: true
-          },
-          id: {
-            type: String,
-            required: true
-          }
-        },
-        computed: {
-          formattedDate() {
-            return dayjs(this.date).format("HH:mm:ss YYYY-MM-DD");
-          }
-        },
-        methods: {
-          doubleClick() {
-            this.$emit("double-click", this.id);
-          }
-        },
-        template: `<div class="time-container" @dblclick="doubleClick">
-            <span>{{title}}</span>
-            <span>{{formattedDate}}</span>
-            </div>
-            `
-      };
 
       const urlParams = new URLSearchParams(window.location.search);
       const user = urlParams.get("user");
-      const database = new Database(user);
 
       dayjs.extend(dayjs_plugin_utc);
       dayjs.extend(dayjs_plugin_timezone);
       const lsKey = "LocalStorage:Timer.js.timezone";
 
       function createApp(timerJsData, onUpdate) {
+        const TimeComponent = {
+          props: {
+            date: {
+              type: Object,
+              required: true
+            },
+            title: {
+              type: String,
+              required: true
+            },
+            id: {
+              type: String,
+              required: true
+            }
+          },
+          computed: {
+            formattedTime() {
+              return this.date.format("hh:mm A");
+            },
+            formattedDate() {
+              return this.date.format("MM/DD/YYYY");
+            }
+          },
+          methods: {
+            doubleClick() {
+              this.$emit("double-click", this.id);
+            }
+          },
+          template: `
+               <div class="time-container" @dblclick="doubleClick">
+                 <span>{{title}}</span>
+                 <span>{{formattedTime}}</span>
+                 <span>{{formattedDate}}</span>
+               </div>
+             `
+        };
+
         Vue.component("v-select", VueSelect.VueSelect);
         Vue.component("v-time", TimeComponent);
 
@@ -265,23 +251,37 @@
           el: "#app",
           data: {
             timezoneList: [],
-            selectedMainTimezoneCode: "",
+            timezoneCode: "",
             ...timerJsData,
 
             // not persist
             addTimezoneCode: "",
             addTimezoneTitle: "",
             showAddSection: false,
-            now: new Date(),
             isShowEditTime: false,
-            timePercentage: 0
+            timePercentage: 0,
+            now: new Date(),
+            sliderMaxValue: (24 * 60 * 60 - 1).toString()
           },
           computed: {
-            dateConstant() {
-              return new Date();
+            timezoneUTC() {
+              if (this.timezoneCode) {
+                return this.timezone.find(t => t.abbr === this.timezoneCode)
+                  .timezone;
+              }
+              return Intl.DateTimeFormat().resolvedOptions().timeZone;
+            },
+            dateByTimePercentage() {
+              const i = dayjs()
+                .tz(this.timezoneUTC)
+                .hour(0)
+                .minute(0)
+                .second(this.timePercentage);
+
+              return i;
             },
             formattedTimePercentage() {
-              return this.sliderFormatter(parseInt(this.timePercentage, 10));
+              return this.dateByTimePercentage.format("hh:mm A");
             },
             options() {
               return Array.from(this.timezone)
@@ -291,19 +291,12 @@
                   label: t.text
                 }));
             },
-            mainTz() {
-              const tz = this.timezone.find(
-                i => i.abbr === (this.selectedMainTimezoneCode || "TDT")
-              ).utc[0];
-              return tz;
-            },
-
             timeList() {
-              return this.timezoneList.map(({ abbr, id, title }) => {
-                const timezoneData = this.timezone.find(i => i.abbr === abbr);
-                const firstUtc = timezoneData.utc[0];
+              return this.timezoneList.map(({ code, id, title }) => {
                 return {
-                  date: convertTZ(this.now, firstUtc),
+                  date: this.dateByTimePercentage.tz(
+                    this.timezone.find(t => t.abbr === code).timezone
+                  ),
                   title: title || timezoneData.text,
                   id
                 };
@@ -311,22 +304,10 @@
             }
           },
           watch: {
-            selectedMainTimezoneCode(val) {
-              const tz = this.timezone.find(i => i.abbr === (val || "TDT"))
-                .utc[0];
-              this.setNow({
-                timePercentage: this.timePercentage,
-                tz
-              });
+            timezoneCode(val) {
               onUpdate({
-                selectedMainTimezoneCode: val,
+                timezoneCode: val,
                 timezoneList: this.timezoneList
-              });
-            },
-            timePercentage(t) {
-              this.setNow({
-                timePercentage: t,
-                tz: this.mainTz
               });
             },
             timezoneList(t) {
@@ -337,21 +318,6 @@
             }
           },
           methods: {
-            sliderFormatter(value) {
-              if (typeof value === "number") {
-                this.dateConstant.setHours(0, 0, 0, 0);
-                this.dateConstant.setSeconds(value);
-                return dayjs(this.dateConstant).format("HH:mm:ss");
-              }
-              return "";
-            },
-            setNow({ timePercentage, tz }) {
-              const date = convertTZ(new Date(), tz);
-              date.setHours(0, 0, 0, 0);
-              date.setSeconds(timePercentage);
-              this.now = date;
-            },
-
             showEditTime() {
               this.isShowEditTime = true;
             },
@@ -361,13 +327,13 @@
               }
 
               this.timezoneList.push({
-                abbr: this.addTimezoneCode,
+                code: this.addTimezoneCode,
                 id: Math.random()
                   .toString()
                   .slice(2),
                 title: this.addTimezoneTitle
               });
-              this.addTimezoneCode = "";
+              this.addTimezoneUTC = "";
               this.addTimezoneTitle = "";
             },
             timeDoubleClick(id) {
@@ -380,12 +346,12 @@
             }
           },
           created() {
+            this.timePercentage = this.dateToTime(new Date());
             setInterval(() => {
               if (!this.isShowEditTime) {
-                this.now = new Date();
-                this.timePercentage = this.dateToTime(this.now);
+                this.timePercentage = this.dateToTime(new Date());
               }
-            }, 500);
+            }, 1000);
           }
         });
 
@@ -398,9 +364,12 @@
           app.innerHTML = "?user={userName}";
           return;
         }
+
+        const database = new Database();
+
         const timezone = await getTimezoneList();
 
-        const localData = database.getLocal();
+        const localData = database.getLocal(user);
 
         const app = createApp(
           {
@@ -408,11 +377,11 @@
             timezone
           },
           d => {
-            database.update({ ...d, timezone: undefined });
+            database.update(user, { ...d, timezone: undefined });
           }
         );
 
-        const data = await database.get();
+        const data = await database.get(user);
 
         console.log("set");
         Object.keys(data).forEach(key => {
