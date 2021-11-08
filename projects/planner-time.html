@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-circle-progress/1.2.2/circle-progress.min.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+      }
+
+      span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        line-height: 45px;
+        font-size: 23px;
+        color: gray;
+      }
+      #start {
+        transform: translate(-50%, -50%) translateY(-45px);
+      }
+      #end {
+        transform: translate(-50%, -50%) translateY(45px);
+      }
+      #time {
+        top: 16px;
+        left: unset;
+        right: 16px;
+      }
+      strong {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        width: 100%;
+        text-align: center;
+        line-height: 45px;
+        font-size: 43px;
+      }
+      #morning {
+        transform: translate(-50%, -50%) rotate(30deg);
+      }
+      #afternoon {
+        transform: translate(-50%, -50%) rotate(120deg) rotate(-90deg)
+          rotate(120deg);
+      }
+      #night {
+        transform: translate(-50%, -50%) rotate(120deg) rotate(-90deg)
+          rotate(240deg);
+      }
+    </style>
+  </head>
+  <body>
+    <strong id="text"></strong>
+    <span id="start">aadsf</span>
+    <span id="end">aadsf</span>
+    <span id="time">aadsf</span>
+    <div class="circle" id="morning"></div>
+    <div class="circle" id="afternoon"></div>
+    <div class="circle" id="night"></div>
+
+    <script>
+      document.body.style.width = `${window.innerWidth}px`;
+      document.body.style.height = `${window.innerHeight}px`;
+
+      function getTimeOfDay(h) {
+        const d = new Date();
+        d.setHours(h, 0, 0, 0);
+        return d;
+      }
+
+      $(".circle").circleProgress({
+        size: Math.min(window.innerWidth, window.innerHeight) * 0.9,
+        animation: false,
+        startAngle: 0,
+        reverse: true,
+        emptyFill: "rgba(0,0,0,0)"
+      });
+      function run() {
+        const startOfDay = getTimeOfDay(0);
+        const middleOfDay = getTimeOfDay(12);
+        const part2MiddleOfDay = getTimeOfDay(18);
+        const endOfDay = getTimeOfDay(23);
+
+        const now = new Date();
+
+        const emptyColor = "rgba(0,0,0,0.1)";
+        const maxVal = 1 / 3;
+
+        const val = (d1, d2) =>
+          now < d1 ? maxVal : maxVal - (now - d1) / (d2 - d1) / 3;
+
+        const showMorning = now < middleOfDay;
+
+        if (showMorning) {
+          $("#morning").circleProgress({
+            value: val(startOfDay, middleOfDay),
+            fill: {
+              color: "green"
+            }
+          });
+        } else {
+          $("#morning").css({ display: "none" });
+        }
+
+        const showAfternoon = now < part2MiddleOfDay;
+        if (showAfternoon) {
+          $("#afternoon").circleProgress({
+            value: val(middleOfDay, part2MiddleOfDay),
+            fill: {
+              color: "blue"
+            }
+          });
+        } else {
+          $("#afternoon").css({ display: "none" });
+        }
+        const showNight = now < endOfDay;
+        $("#night").circleProgress({
+          value: showNight ? val(part2MiddleOfDay, endOfDay) : maxVal,
+          emptyFill: emptyColor,
+          fill: {
+            color: showNight ? "purple" : emptyColor
+          }
+        });
+
+        const list = [startOfDay, middleOfDay, part2MiddleOfDay, endOfDay];
+
+        const index = list.findIndex(d => d > now);
+
+        const [start, end] = [list[index - 1], list[index]];
+
+        const diff = end - now;
+        const ONE_MINUTE = 1000 * 60;
+        const ONE_HOUR = ONE_MINUTE * 60;
+        const _hour = diff / ONE_HOUR;
+        const hour = Math.floor(_hour);
+        const minute = Math.floor(((_hour - hour) * ONE_HOUR) / ONE_MINUTE);
+        const toTime = d =>
+          `${d
+            .getHours()
+            .toString()
+            .padStart(2, "0")}:${d
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
+
+        $("#text").text(`${hour}h ${minute}m`);
+        $("#start").text(toTime(start));
+        $("#end").text(toTime(end));
+        $("#time").text(toTime(now));
+      }
+
+      run();
+      setInterval(
+        run,
+        1000 * 5 // 5sec
+      );
+    </script>
+  </body>
+</html>
