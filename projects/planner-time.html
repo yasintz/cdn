@@ -28,6 +28,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
+        transform: translate(-50%, -50%) rotate(-90deg);
       }
 
       span {
@@ -50,7 +51,7 @@
         right: 16px;
       }
       strong {
-        color: #e9a6a6;
+        color: #e9a6a6c2;
         position: absolute;
         top: 50%;
         left: 0;
@@ -60,17 +61,6 @@
         line-height: 45px;
         font-size: 43px;
       }
-      #morning {
-        transform: translate(-50%, -50%) rotate(30deg);
-      }
-      #afternoon {
-        transform: translate(-50%, -50%) rotate(120deg) rotate(-90deg)
-          rotate(120deg);
-      }
-      #night {
-        transform: translate(-50%, -50%) rotate(120deg) rotate(-90deg)
-          rotate(240deg);
-      }
     </style>
   </head>
   <body>
@@ -78,106 +68,110 @@
     <span id="start">aadsf</span>
     <span id="end">aadsf</span>
     <span id="time">aadsf</span>
-    <div class="circle" id="morning"></div>
-    <div class="circle" id="afternoon"></div>
-    <div class="circle" id="night"></div>
+    <div class="circle"></div>
 
     <script>
       document.body.style.width = `${window.innerWidth}px`;
       document.body.style.height = `${window.innerHeight}px`;
+      const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+      $(".circle").circleProgress({
+        size,
+        animation: false,
+        startAngle: 0,
+        reverse: true,
+        emptyFill: "rgba(0,0,0,0.1)",
+        thickness: size / 20,
+        fill: {
+          color: "#3F3351"
+        },
+        lineCap: "round"
+      });
+      const searchParams = new URLSearchParams(window.location.search);
+
+      const next = searchParams.get("next");
+      const periods = (searchParams.get("period") || "")
+        .split(",")
+        .map(i => parseFloat(i));
 
       function getTimeOfDay(h) {
         const d = new Date();
         d.setHours(h, 0, 0, 0);
         return d;
       }
-
-      $(".circle").circleProgress({
-        size: Math.min(window.innerWidth, window.innerHeight) * 0.9,
-        animation: false,
-        startAngle: 0,
-        reverse: true,
-        emptyFill: "rgba(0,0,0,0)"
-      });
-      function run() {
-        const startOfDay = getTimeOfDay(0);
-        const middleOfDay = getTimeOfDay(12);
-        const part2MiddleOfDay = getTimeOfDay(18);
-        const endOfDay = getTimeOfDay(23);
-
-        const now = new Date();
-
-        const emptyColor = "rgba(0,0,0,0.1)";
-        const maxVal = 1 / 3;
-
-        const val = (d1, d2) =>
-          now < d1 ? maxVal : maxVal - (now - d1) / (d2 - d1) / 3;
-
-        const showMorning = now < middleOfDay;
-
-        if (showMorning) {
-          $("#morning").circleProgress({
-            value: val(startOfDay, middleOfDay),
-            fill: {
-              color: "#7D1935"
-            }
-          });
-        } else {
-          $("#morning").css({ display: "none" });
-        }
-
-        const showAfternoon = now < part2MiddleOfDay;
-        if (showAfternoon) {
-          $("#afternoon").circleProgress({
-            value: val(middleOfDay, part2MiddleOfDay),
-            fill: {
-              color: "#2C061F"
-            }
-          });
-        } else {
-          $("#afternoon").css({ display: "none" });
-        }
-        const showNight = now < endOfDay;
-        $("#night").circleProgress({
-          value: showNight ? val(part2MiddleOfDay, endOfDay) : maxVal,
-          emptyFill: emptyColor,
-          fill: {
-            color: showNight ? "#3B185F" : emptyColor
-          }
-        });
-
-        const list = [startOfDay, middleOfDay, part2MiddleOfDay, endOfDay];
-
-        const index = list.findIndex(d => d > now);
-
-        const [start, end] = [list[index - 1], list[index]];
-
-        const diff = end - now;
+      function getDiff(start, end) {
+        const diff = end - start;
         const ONE_MINUTE = 1000 * 60;
         const ONE_HOUR = ONE_MINUTE * 60;
         const _hour = diff / ONE_HOUR;
         const hour = Math.floor(_hour);
         const minute = Math.floor(((_hour - hour) * ONE_HOUR) / ONE_MINUTE);
-        const toTime = d =>
-          `${d
-            .getHours()
-            .toString()
-            .padStart(2, "0")}:${d
-            .getMinutes()
-            .toString()
-            .padStart(2, "0")}`;
 
-        $("#text").text(`${hour}h ${minute}m`);
-        $("#start").text(toTime(start));
-        $("#end").text(toTime(end));
-        $("#time").text(toTime(now));
+        return `${hour}h ${minute}m`;
+      }
+      function toTime(d) {
+        return `${d
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${d
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`;
       }
 
-      run();
-      setInterval(
-        run,
-        1000 * 5 // 5sec
-      );
+      function run(startDate, endDate) {
+        function _run() {
+          const now = new Date();
+
+          const diff = endDate - startDate;
+          const leftTime = now - startDate;
+          const value = 1 - leftTime / diff;
+
+          $(".circle").circleProgress({
+            value: Math.min(value, 0.97)
+          });
+
+          $("#text").text(getDiff(now, endDate));
+          $("#start").text(toTime(startDate));
+          $("#end").text(toTime(endDate));
+          $("#time").text(toTime(now));
+        }
+
+        _run(startDate, endDate);
+
+        setInterval(
+          () => _run(startDate, endDate),
+          1000 * 5 // 5sec
+        );
+      }
+
+      function main() {
+        if (next) {
+          const start = searchParams.get("start");
+
+          if (!start) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("start", new Date().toISOString());
+            url.searchParams.set("next", new Date(next).toISOString());
+            window.location.href = url.toString();
+            return;
+          }
+
+          const startDate = new Date(start);
+          const endDate = new Date(next);
+          run(startDate, endDate);
+          return;
+        }
+
+        if (periods.length) {
+          const now = new Date();
+          const times = periods.map(getTimeOfDay);
+          const activeIndex = times.findIndex(t => now < t);
+
+          run(times[activeIndex - 1], times[activeIndex]);
+          return;
+        }
+      }
+      main();
     </script>
   </body>
 </html>
