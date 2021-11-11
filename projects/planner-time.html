@@ -95,7 +95,8 @@
 
       function getTimeOfDay(h) {
         const d = new Date();
-        d.setHours(h, 0, 0, 0);
+        d.setHours(0,0,0,0);
+        d.setMilliseconds(h * 60 * 60 * 1000)
         return d;
       }
       function getDiff(start, end) {
