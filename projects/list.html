@@ -110,7 +110,7 @@
           </span>
         </div>
         <div class="items">
-          <card v-if="selfItem" :item="selfItem"></card>
+          <card v-if="selfItem" :item="selfItem" @click="onCardClick"></card>
           <card
             v-for="item in items"
             :key="item.url"
