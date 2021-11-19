@@ -75,78 +75,83 @@
     </style>
   </head>
   <body class="hide">
-    <div onclick="increase()" class="btn" id="increase">-</div>
     <div onclick="random()" class="btn" id="random">Random</div>
+    <div onclick="increase()" class="btn" id="increase">-</div>
     <div onclick="edit()" class="btn" id="edit">Duzenle</div>
 
     <script>
-      const url = 'https://api.npoint.io/04043f16a9775a48c8ca';
+      const url = "https://api.npoint.io/04043f16a9775a48c8ca";
+
+      const increaseButton = document.getElementById("increase");
+      const randomButton = document.getElementById("random");
+
       const WORD_COUNT_PER_PAGE = 8;
+      const UNUSED_PAGE = 1;
 
-      const increaseButton = document.getElementById('increase');
-      const randomButton = document.getElementById('random');
+      let count = new Number(0);
 
-      let _count = 0;
+      const updateCount = newValue => {
+        count = new Number(newValue);
+        count.update = updateCount;
 
-      const count = {
-        get() {
-          return fetch(url)
-            .then((i) => i.json())
-            .then((i) => i.count);
-        },
-        set(val) {
-          return fetch(url, {
-            method: 'POST',
-            body: JSON.stringify({ count: val }),
-          }).then((i) => i.json());
-        },
+        increaseButton.innerText = `${print(count)}`;
+        document.body.classList.remove("hide");
+
+        fetch(url, {
+          method: "POST",
+          body: JSON.stringify({ count: newValue })
+        }).then(i => i.json());
       };
+      count.update = updateCount;
 
       function print(c) {
-        const page = Math.floor(c / WORD_COUNT_PER_PAGE) + 2;
-        const wordIndex = c === 0 ? 1 : c % WORD_COUNT_PER_PAGE || 8;
+        const divided = c / WORD_COUNT_PER_PAGE;
+        const page = Math.ceil(divided);
+        const wordCountRate = divided - Math.floor(divided);
+        const wordIndex =
+          (wordCountRate === 0 ? 1 : wordCountRate) * WORD_COUNT_PER_PAGE;
 
-        return `${page}. sayfa ${wordIndex}. soru`;
+        return `${page + UNUSED_PAGE}. sayfa ${wordIndex}. cumle`;
       }
+
       function edit() {
-        let value = prompt('Sayi gir');
-        if (value !== null) {
-          let newCount = 0;
-          if (value.indexOf('.') > -1) {
-            const [page, c] = value.split('.');
-            newCount = (parseInt(page, 10) - 2) * WORD_COUNT_PER_PAGE + parseInt(c, 10);
-          } else {
-            newCount = parseInt(value);
-          }
-          count.set(newCount);
-          _count = newCount;
-          increaseButton.innerText = `${print(_count)} +`;
+        let value = prompt("Sayi gir");
+        if (value === null) {
+          alert("Please enter a value");
+          return;
         }
+
+        if (value.indexOf(".") > -1) {
+          const [page, c] = value.split(".");
+
+          const pageValue =
+            (parseInt(page, 10) - (1 + UNUSED_PAGE)) * WORD_COUNT_PER_PAGE;
+
+          count.update(pageValue + parseInt(c, 10));
+          return;
+        }
+
+        count.update(parseInt(value, 10));
       }
 
       function random() {
-        const max = Math.floor(_count);
-
-        const messages = Array(3)
+        const sentenceIndexes = Array(3)
           .fill(0)
-          .map(() => Math.floor(Math.random() * max) + 1)
-          .sort((a, b) => a - b)
-          .map(print);
+          .map(() => Math.floor(Math.random() * count) + 1)
+          .sort((a, b) => a - b);
 
-        alert(messages.join('\n'));
+        const message = sentenceIndexes.map(print).join("\n");
+        alert(message);
       }
 
       function increase() {
-        _count++;
-        count.set(_count);
-        increaseButton.innerText = `${print(_count)} +`;
+        count.update(count + 1);
       }
 
-      count.get().then((count) => {
-        _count = count;
-        increaseButton.innerText = `${print(count)}`;
-        document.body.classList.remove('hide');
-      });
+      fetch(url)
+        .then(i => i.json())
+        .then(i => i.count)
+        .then(count.update);
     </script>
   </body>
 </html>
