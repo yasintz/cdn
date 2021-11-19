@@ -177,13 +177,8 @@
 
         practicedSentences.update(sentenceIndexes);
 
-        console.log({
-          sentenceIndexes,
-          available,
-          all
-        });
         const message = sentenceIndexes.map(print).join("\n");
-        // alert(message);
+        alert(message);
       }
 
       function increase() {
