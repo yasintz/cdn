@@ -81,6 +81,7 @@
 
     <script>
       const url = "https://api.npoint.io/04043f16a9775a48c8ca";
+      let fetched = false;
 
       const increaseButton = document.getElementById("increase");
       const randomButton = document.getElementById("random");
@@ -92,6 +93,9 @@
       let count = new Number(0);
       let lastRandomDate = undefined;
       function update() {
+        if(!fetched){
+          return;
+        }
         fetch(url, {
           method: "POST",
           body: JSON.stringify({
@@ -193,6 +197,7 @@
           if (diffDay < 5) {
             practicedSentences.update(data.practicedSentences);
           }
+          fetched=true;
         });
     </script>
   </body>
