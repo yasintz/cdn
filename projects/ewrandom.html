@@ -88,7 +88,29 @@
       const WORD_COUNT_PER_PAGE = 8;
       const UNUSED_PAGE = 1;
 
+      const practicedSentences = [];
       let count = new Number(0);
+      let lastRandomDate = undefined;
+      function update() {
+        fetch(url, {
+          method: "POST",
+          body: JSON.stringify({
+            count,
+            practicedSentences,
+            lastRandomDate
+          })
+        });
+      }
+
+      practicedSentences.update = newSentences => {
+        practicedSentences.push(...newSentences);
+        practicedSentences.sort((a, b) => a - b);
+        update();
+      };
+      practicedSentences.clear = () => {
+        practicedSentences.length = 0;
+        update();
+      };
 
       const updateCount = newValue => {
         count = new Number(newValue);
@@ -97,10 +119,7 @@
         increaseButton.innerText = `${print(count)}`;
         document.body.classList.remove("hide");
 
-        fetch(url, {
-          method: "POST",
-          body: JSON.stringify({ count: newValue })
-        }).then(i => i.json());
+        update();
       };
       count.update = updateCount;
 
@@ -135,13 +154,36 @@
       }
 
       function random() {
-        const sentenceIndexes = Array(3)
+        // dont show last 5 sentence
+        lastRandomDate = new Date();
+        const all = Array(count - 5)
           .fill(0)
-          .map(() => Math.floor(Math.random() * count) + 1)
-          .sort((a, b) => a - b);
+          .map((_, i) => i + 1);
 
+        let available = all.filter(i => practicedSentences.indexOf(i) === -1);
+
+        if (available.length < 3) {
+          practicedSentences.clear();
+          available = all;
+        }
+        const sentenceIndexes = Array.from(available)
+          // shuffle
+          .sort(() => 0.5 - Math.random())
+          .sort(() => 0.5 - Math.random())
+          .sort(() => 0.5 - Math.random())
+
+          // pick 3 sentence
+          .slice(0, 3);
+
+        practicedSentences.update(sentenceIndexes);
+
+        console.log({
+          sentenceIndexes,
+          available,
+          all
+        });
         const message = sentenceIndexes.map(print).join("\n");
-        alert(message);
+        // alert(message);
       }
 
       function increase() {
@@ -150,8 +192,13 @@
 
       fetch(url)
         .then(i => i.json())
-        .then(i => i.count)
-        .then(count.update);
+        .then(data => {
+          count.update(data.count);
+          const diffDay = (new Date() - new Date(data.lastRandomDate)) / 8.64e7;
+          if (diffDay < 5) {
+            practicedSentences.update(data.practicedSentences);
+          }
+        });
     </script>
   </body>
 </html>
