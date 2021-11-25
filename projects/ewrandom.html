@@ -177,7 +177,7 @@
           .sort(() => 0.5 - Math.random())
 
           // pick 3 sentence
-          .slice(0, 3);
+          .slice(0, 3).sort((a,b) => a-b);
 
         practicedSentences.update(sentenceIndexes);
 
