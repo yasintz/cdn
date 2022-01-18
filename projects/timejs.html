@@ -67,11 +67,17 @@
         margin-bottom: 8px;
       }
 
-      .time-container span:first-child {
+      .time-container span.title {
         font-weight: 600;
+        margin-bottom: 4px;
       }
-      .time-container span:last-child {
+      .time-container span.date {
         margin-bottom: 0;
+      }
+      .time-container span.offset {
+        margin-bottom: 4px;
+        font-size: 13px;
+        font-weight: 400;
       }
 
       .select-container {
@@ -102,6 +108,13 @@
           :reduce="val=>val.value"
         ></v-select>
         <button @click="addNew">Add</button>
+        <v-time
+          v-if="addTimezoneCode"
+          :date="addTimezoneProps.date"
+          :title="addTimezoneTitle"
+          :id="'1'"
+        ></v-time>
+        <hr />
       </div>
 
       <button v-if="!isShowEditTime" @click="showEditTime">
@@ -131,6 +144,7 @@
           :key="time.id"
           :date="time.date"
           :title="time.title"
+          :offset="time.offset"
           :id="time.id"
           @double-click="timeDoubleClick($event)"
         ></v-time>
@@ -217,6 +231,10 @@
               type: String,
               required: true
             },
+            offset: {
+              type: String,
+              required: false
+            },
             id: {
               type: String,
               required: true
@@ -237,9 +255,10 @@
           },
           template: `
                <div class="time-container" @dblclick="doubleClick">
-                 <span>{{title}}</span>
-                 <span>{{formattedTime}}</span>
-                 <span>{{formattedDate}}</span>
+                 <span class="title" v-if="title">{{title}}</span>
+                 <span class="offset" v-if="offset">UTC {{offset}}</span>
+                 <span class="time">{{formattedTime}}</span>
+                 <span class="date">{{formattedDate}}</span>
                </div>
              `
         };
@@ -265,7 +284,7 @@
           },
           computed: {
             timezoneUTC() {
-              if (this.timezoneCode) {
+              if (this.timezoneCode && this.isShowEditTime) {
                 return this.timezone.find(t => t.abbr === this.timezoneCode)
                   .timezone;
               }
@@ -291,13 +310,28 @@
                   label: t.text
                 }));
             },
+            addTimezoneProps() {
+              if (!this.addTimezoneCode) {
+                return null;
+              }
+              const timezone = this.timezone.find(
+                t => t.abbr === this.addTimezoneCode
+              );
+              const offsetStr = timezone.offset.toString();
+              return {
+                date: this.dateByTimePercentage.tz(timezone.timezone),
+                title: "",
+                offset: ""
+              };
+            },
             timeList() {
               return this.timezoneList.map(({ code, id, title }) => {
+                const timezone = this.timezone.find(t => t.abbr === code);
+                const offsetStr = timezone.offset.toString();
                 return {
-                  date: this.dateByTimePercentage.tz(
-                    this.timezone.find(t => t.abbr === code).timezone
-                  ),
+                  date: this.dateByTimePercentage.tz(timezone.timezone),
                   title: title || timezoneData.text,
+                  offset: offsetStr[0] === "-" ? offsetStr : `+${offsetStr}`,
                   id
                 };
               });
@@ -381,7 +415,6 @@
 
         const data = await database.get(user);
 
-        console.log("set");
         Object.keys(data).forEach(key => {
           app[key] = data[key];
         });
