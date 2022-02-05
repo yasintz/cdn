@@ -9,9 +9,9 @@ function VueCss() {
 
   const cache = {};
 
-  function css(strList, ...vars) {
+  function extendableCss({ strList, vars, extended }) {
     if (typeof strList === "string") {
-      return cache[strList];
+      return { ...cache[strList], ...extended };
     }
 
     const content = strList.reduce(
@@ -58,7 +58,9 @@ function VueCss() {
       .map(i => i.trim())
       .filter(i => i)[0];
 
-    const id = (new RegExp(idRegex).exec(firstLine) || [])[1];
+    const id = global
+      ? "global"
+      : (new RegExp(idRegex).exec(firstLine) || [])[1];
 
     if (id) {
       const idHash = getHashCode(`jss_${id}_jss`);
@@ -77,9 +79,9 @@ function VueCss() {
       cache[id] = accessObject;
     }
 
-    return accessObject;
+    return { ...accessObject, ...extended };
   }
 
-  this.css = css;
+  this.css = (strList, ...vars) => extendableCss({ strList, vars });
   this.el = el;
 }
