@@ -9,36 +9,6 @@ function VueCss() {
 
   const cache = {};
 
-  function cx() {
-    var hasOwn = {}.hasOwnProperty;
-    var classes = [];
-
-    for (var i = 0; i < arguments.length; i++) {
-      var arg = arguments[i];
-      if (!arg) continue;
-
-      var argType = typeof arg;
-
-      if (argType === "string" || argType === "number") {
-        classes.push((this && this[arg]) || arg);
-      } else if (Array.isArray(arg)) {
-        classes.push(classNames.apply(this, arg));
-      } else if (argType === "object") {
-        if (arg.toString === Object.prototype.toString) {
-          for (var key in arg) {
-            if (hasOwn.call(arg, key) && arg[key]) {
-              classes.push((this && this[key]) || key);
-            }
-          }
-        } else {
-          classes.push(arg.toString());
-        }
-      }
-    }
-
-    return classes.join(" ");
-  }
-
   function css(strList, ...vars) {
     if (typeof strList === "string") {
       return cache[strList];
@@ -82,8 +52,6 @@ function VueCss() {
       return acc;
     }, {});
 
-    accessObject.cx = cx.bind(accessObject);
-
     const idRegex = /\/\* \#(.*?) \*\//g;
     const firstLine = content
       .split("\n")
@@ -111,9 +79,7 @@ function VueCss() {
 
     return accessObject;
   }
-  css.cx = id => {
-    return (...args) => cx.bind(cache[id])(...args);
-  };
+
   this.css = css;
   this.el = el;
 }
