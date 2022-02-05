@@ -58,9 +58,7 @@ function VueCss() {
       .map(i => i.trim())
       .filter(i => i)[0];
 
-    const id = global
-      ? "global"
-      : (new RegExp(idRegex).exec(firstLine) || [])[1];
+    const id = (new RegExp(idRegex).exec(firstLine) || [])[1];
 
     if (id) {
       const idHash = getHashCode(`jss_${id}_jss`);
