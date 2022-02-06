@@ -7,13 +7,7 @@ function VueCss() {
 
   const el = document.createElement("style");
 
-  const cache = {};
-
-  function extendableCss({ strList, vars, extended }) {
-    if (typeof strList === "string") {
-      return { ...cache[strList], ...extended };
-    }
-
+  function css(strList, ...vars) {
     const content = strList.reduce(
       (acc, cur, index) =>
         `${acc}${cur}${index < strList.length - 1 ? vars[index] : ""}`,
@@ -52,34 +46,11 @@ function VueCss() {
       return acc;
     }, {});
 
-    const idRegex = /\/\* \#(.*?) \*\//g;
-    const firstLine = content
-      .split("\n")
-      .map(i => i.trim())
-      .filter(i => i)[0];
+    el.innerHTML += newContent;
 
-    const id = (new RegExp(idRegex).exec(firstLine) || [])[1];
-
-    if (id) {
-      const idHash = getHashCode(`jss_${id}_jss`);
-      const prefix = `/*${idHash}*/`;
-
-      const [prev, old, after] = el.innerHTML.split(prefix);
-      el.innerHTML = [
-        //
-        prev,
-        after,
-        prefix,
-        newContent,
-        prefix
-      ].join("\n");
-
-      cache[id] = accessObject;
-    }
-
-    return { ...accessObject, ...extended };
+    return accessObject;
   }
 
-  this.css = (strList, ...vars) => extendableCss({ strList, vars });
+  this.css = css;
   this.el = el;
 }
