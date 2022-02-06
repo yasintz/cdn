@@ -1,9 +1,8 @@
 function VueCss() {
-  const getHashCode = s =>
-    s.split("").reduce((a, b) => {
-      a = (a << 5) - a + b.charCodeAt(0);
-      return a & a;
-    }, 0);
+  function getHashCode(s) {
+    for (var h = 0, i = 0; i < s.length; h &= h) h = 31 * h + s.charCodeAt(i++);
+    return h;
+  }
 
   const el = document.createElement("style");
 
@@ -30,9 +29,11 @@ function VueCss() {
 
     const orderedByLength = uniqueClasses.sort((a, b) => b.length - a.length);
 
+    const contentHashCode = getHashCode(minContent);
+
     const hashMap = orderedByLength.map(c => ({
       className: c.substring(1),
-      hash: `jss_${getHashCode(c)}`,
+      hash: `jss_${getHashCode(`${c}${contentHashCode}`)}`,
       class: c
     }));
 
