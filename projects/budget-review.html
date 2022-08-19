@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+      integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder@2.5.2/dist/css/query-builder.default.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder@2.5.2/dist/js/query-builder.standalone.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/css/bootstrap-select.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.10/js/bootstrap-select.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css"
+    />
+    <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
+
+    <style>
+      .button-wrapper {
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .button-wrapper > button {
+        margin-right: 16px;
+      }
+      span.select2.select2-container {
+        width: auto !important;
+        max-width: 600px;
+        min-width: 160px;
+      }
+      .select2-container--bootstrap
+        .select2-results__option[aria-selected='true'] {
+        background-color: #d8d8d8;
+      }
+
+      .select2-container--bootstrap
+        .select2-results__option--highlighted[aria-selected] {
+        background-color: #337ab7;
+      }
+      .rule-header > .btn-group > button {
+        max-width: 20px;
+        overflow: hidden;
+        padding: 0;
+        display: flex;
+      }
+      .rule-header > .btn-group > button > i {
+        margin: 2px 20px 0 3px;
+      }
+      #table table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      #table td,
+      #table th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      #table th {
+        cursor: pointer;
+      }
+
+      #table th.sort {
+        background-color: #3379b719;
+      }
+
+      #table tr:nth-child(even) {
+        background-color: #dddddd5d;
+      }
+      #table {
+        padding: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="builder"></div>
+    <div class="button-wrapper">
+      <button class="btn btn-success" id="btn-filter">Filter</button>
+      <button class="btn btn-warning" id="btn-reset">Clear</button>
+    </div>
+    <div id="table"></div>
+    <script>
+      const tableElement = document.getElementById('table');
+      const initialRules = {
+        condition: 'AND',
+        rules: [
+          {
+            id: 'account',
+            field: 'account',
+            type: 'integer',
+            input: 'select',
+            operator: 'equal',
+            value: [0],
+          },
+          {
+            id: 'date',
+            field: 'date',
+            type: 'date',
+            input: 'text',
+            operator: 'between',
+            value: ['07/01/2021', '07/31/2021'],
+          },
+          {
+            id: 'type',
+            field: 'type',
+            type: 'integer',
+            input: 'select',
+            operator: 'in',
+            value: [0, 1],
+          },
+        ],
+        not: false,
+        valid: true,
+      };
+
+      window.data = [];
+      const keyOrder = [
+        'date',
+        'account',
+        'value',
+        'type',
+        'currency',
+        'target',
+        'category',
+      ];
+      let sortKey = keyOrder[0];
+      let isDesc = false;
+      const sortBy = () => (a, b) =>
+        a[sortKey] > b[sortKey]
+          ? 1 * (isDesc ? 1 : -1)
+          : b[sortKey] > a[sortKey]
+          ? -1 * (isDesc ? 1 : -1)
+          : 0;
+
+      // #region config
+      const accounts = [
+        'Yapikredi',
+        'Ziraat',
+        'Nakit',
+        'Enpara',
+        'Transferwise',
+        'Papara',
+      ];
+
+      const config = {
+        account: accounts,
+        target: accounts,
+        type: ['💸', '🔄', '💰'],
+        currency: ['₺', '$', '€', 'X'],
+        category: ['Home', 'Fun'],
+      };
+      // #endregion
+
+      // #region handlers
+      const dropdownOperatorHandlers = (type, d = config[type]) => ({
+        equal: (obj, [index]) => obj[type] === d[index],
+        not_equal: (obj, [index]) => obj[type] !== d[index],
+        in: (obj, indexes) => indexes.map((i) => d[i]).indexOf(obj[type]) > -1,
+        not_in: (obj, indexes) =>
+          indexes.map((i) => d[i]).indexOf(obj[type]) === -1,
+        is_null: (obj) => d.indexOf(obj[type]) === -1,
+        is_not_null: (obj) => d.indexOf(obj[type]) > -1,
+      });
+
+      const baseHandlers = {
+        AND: (fns) => (obj) => fns.map((fn) => fn(obj)).indexOf(false) === -1,
+        OR: (fns) => (obj) => fns.map((fn) => fn(obj)).indexOf(true) > -1,
+      };
+
+      function conditionHandler({ condition, not, rules }) {
+        const baseHandler = baseHandlers[condition];
+        const resultFn = baseHandler(
+          rules.map((rule) => {
+            if (rule.condition && !rule.id) {
+              return conditionHandler(rule);
+            }
+            const { id, value, operator } = rule;
+            const handler = qb[id].handler[operator];
+            return (obj) => handler(obj, value);
+          })
+        );
+
+        if (not) {
+          return (obj) => !resultFn(obj);
+        }
+
+        return resultFn;
+      }
+      // #endregion
+
+      function getDropdownFilter({ id, label, values, disableNull }) {
+        return {
+          id,
+          label,
+          type: 'integer',
+          input: 'select', // this is important
+          plugin: 'select2',
+          multiple: true,
+          plugin_config: {
+            theme: 'bootstrap',
+            placeholder: '------',
+            width: '160px',
+          },
+          values: {
+            '': '',
+            ...values,
+          },
+          operators: [
+            'equal',
+            'not_equal',
+            'in',
+            'not_in',
+            ...(disableNull ? [] : ['is_null', 'is_not_null']),
+          ],
+        };
+      }
+
+      function sortTable(key) {
+        isDesc = key === sortKey ? !isDesc : false;
+        sortKey = key;
+
+        buildHtmlByData(window.renderedData.sort(sortBy()));
+      }
+
+      function buildHtmlByData(data) {
+        const keys = [...keyOrder, 'desc'];
+        window.renderedData = data;
+
+        const headers = `<tr>
+          ${keys
+            .map(
+              (i) =>
+                `<th 
+                  class="${sortKey === i && 'sort'}" 
+                  onclick="sortTable('${i}')"
+                >
+                  ${qb[i] && qb[i].titleRender ? qb[i].titleRender(data) : i} ${
+                  sortKey === i ? (isDesc ? '⬆' : '⬇') : ''
+                }
+                </th>`
+            )
+            .join('')}
+        </tr>`;
+
+        tableElement.innerHTML = `
+        <table>
+          ${headers}
+          ${data
+            .map(
+              (d) =>
+                `<tr>${keys
+                  .map(
+                    (key) => `
+                  <td>
+                    ${
+                      qb[key] && qb[key].render
+                        ? qb[key].render(d[key])
+                        : d[key]
+                    }
+                  </td>`
+                  )
+                  .join('')}</tr>`
+            )
+            .join('')}
+        </table>`;
+      }
+
+      const qb = {
+        date: {
+          render: (v) => moment(v).format('DD/MM/YYYY'),
+          handler: {
+            equal: (obj, str) => obj.date === new Date(str),
+            not_equal: (obj, str) => obj.date !== new Date(str),
+            less: (obj, str) => obj.date < new Date(str),
+            greater: (obj, str) => obj.date > new Date(str),
+
+            between: (obj, [str1, str2]) =>
+              obj.date >= new Date(str1) && obj.date <= new Date(str2),
+
+            not_between: (obj, [str1, str2]) =>
+              obj.date < new Date(str1) || obj.date > new Date(str2),
+          },
+          filter: {
+            id: 'date',
+            label: 'Date',
+            type: 'date',
+            validation: {
+              format: 'MM/DD/YYYY',
+            },
+            plugin: 'datepicker',
+            plugin_config: {
+              format: 'mm/dd/yyyy',
+              todayBtn: 'linked',
+              todayHighlight: true,
+              autoclose: true,
+            },
+          },
+        },
+        value: {
+          titleRender: (data) =>
+            `Value (${data
+              .reduce((acc, cur) => acc + cur.value, 0)
+              .toFixed(2)})`,
+          handler: {
+            equal: (obj, v) => obj.value === v,
+            not_equal: (obj, v) => obj.value !== v,
+            less: (obj, v) => obj.value < v,
+            greater: (obj, v) => obj.value > v,
+            between: (obj, [v1, v2]) => obj.value >= v1 && obj.value <= v2,
+            not_between: (obj, [v1, v2]) => obj.value < v1 || obj.value > v2,
+          },
+          filter: {
+            id: 'value',
+            label: 'Value',
+            type: 'double',
+          },
+        },
+        currency: {
+          handler: dropdownOperatorHandlers('currency'),
+          filter: getDropdownFilter({
+            id: 'currency',
+            label: 'Currency',
+            disableNull: true,
+            values: config.currency,
+          }),
+        },
+        account: {
+          handler: dropdownOperatorHandlers('account'),
+          filter: getDropdownFilter({
+            id: 'account',
+            label: 'Account',
+            values: config.account,
+            disableNull: true,
+          }),
+        },
+        type: {
+          handler: dropdownOperatorHandlers('type'),
+          filter: getDropdownFilter({
+            id: 'type',
+            label: 'Type',
+            values: config.type,
+            disableNull: true,
+          }),
+        },
+        target: {
+          render: (v) => v || '',
+          handler: dropdownOperatorHandlers('target'),
+          filter: getDropdownFilter({
+            id: 'target',
+            label: 'Target',
+            values: config.account,
+          }),
+        },
+        category: {
+          render: (v) => v || '',
+          handler: dropdownOperatorHandlers('category'),
+          filter: getDropdownFilter({
+            id: 'category',
+            label: 'Category',
+            values: config.category,
+          }),
+        },
+      };
+
+      // #region create query builder
+      const getWithOperators = (field) => ({
+        operators: Object.keys(qb[field].handler),
+        ...qb[field].filter,
+      });
+
+      $('#builder').queryBuilder({
+        plugins: ['not-group'],
+        filters: keyOrder.map(getWithOperators),
+        rules: initialRules,
+      });
+      // #endregion
+
+      // #region create button click handlers
+      $('#btn-reset').on('click', function () {
+        $('#builder').queryBuilder('reset');
+      });
+
+      $('#btn-filter').on('click', function () {
+        const res = window.data.filter(
+          conditionHandler($('#builder').queryBuilder('getRules'))
+        );
+
+        buildHtmlByData(res.sort(sortBy()));
+      });
+      // #endregion
+
+      // #region Fetch csv and parse
+      const googleSheetCsvUrl =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vR75vYSilIuTzhAmPmh8ULUrrzBsNiuI7Psj7mpVZnSzB88nF9CtW0SJLRkPnLFBrGHJPSwHj9lnffH/pub?gid=0&single=true&output=csv';
+
+      fetch(googleSheetCsvUrl)
+        .then((i) => i.text())
+        .then((text) => csv().fromString(text))
+        .then((fetchedData) => {
+          window.data = fetchedData
+            .map((i) => ({
+              account: i.Account,
+              category: i.Category,
+              date: new Date(i.Date),
+              target: i.Target,
+              type: i.Type,
+              value: parseFloat(i.Value),
+              currency: Object.entries(i).find(([key]) => key === '💱')[1],
+              desc: i.Description,
+            }))
+            .sort(sortBy());
+
+          buildHtmlByData(window.data);
+        });
+      // #endregion
+    </script>
+  </body>
+</html>
