@@ -23,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "yarn build && cp -r ./projects ./build/projects",
+    "predeploy": "yarn build && cp build/index.html build/404.html && cp -r ./projects ./build/projects",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
