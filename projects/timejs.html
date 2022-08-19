@@ -307,7 +307,7 @@
                 .sort((a, b) => a.offset - b.offset)
                 .map(t => ({
                   value: t.abbr,
-                  label: t.text
+                  label: `${t.text} -- ${this.dateByTimePercentage.tz(t.timezone).format('MM/DD/YYYY, hh:mm A ')}`
                 }));
             },
             addTimezoneProps() {
