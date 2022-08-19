@@ -11,7 +11,7 @@ function App() {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/about">About</Link>
+              <Link to="/teams">About</Link>
             </li>
             <li>
               <Link to="/contact">Contact</Link>
@@ -24,6 +24,7 @@ function App() {
           <Route path="/">
             <Route index element={<div>App</div>} />
             <Route path="teams" element={<div>Teams</div>} />
+            <Route path="contact" element={<div>Contact</div>} />
           </Route>
         </Routes>
       </HashRouter>
