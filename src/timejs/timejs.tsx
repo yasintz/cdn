@@ -16,7 +16,7 @@ type TimeJsProps = {
 
 export const TimeJs = ({ data, timezone, onUpdate }: TimeJsProps) => {
   const [showAddTime, setShowAddTime] = useState(false);
-  const [showEditTime, setShowEditTime] = useState(false);
+  const [showEditTime] = useState(false);
   const [timePercentage, setTimePercentage] = useState(0);
 
   const timezoneUTC = useMemo(() => {
