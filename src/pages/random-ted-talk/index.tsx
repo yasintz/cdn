@@ -12,48 +12,76 @@ type TedTalkType = {
   description: string;
 };
 
+const localStorageKey = 'RANDOM_TED_TALK';
+
+const cache: Record<string, TedTalkType> = JSON.parse(
+  localStorage.getItem(localStorageKey) || '{}'
+);
+
 const parser = new DOMParser();
-async function getRandomTedTalk() {
+
+async function getRandomList() {
   const page = _.random(1, 157);
 
   const pageUrl = `https://www.ted.com/talks/quick-list?page=${page}`;
   const { contents: content } = await get(pageUrl).then((res) => res.json());
 
   const doc = parser.parseFromString(content, 'text/html');
-  const list = doc.querySelector('div.row.quick-list__container');
+  const list =
+    doc.querySelector('div.row.quick-list__container')?.children || [];
 
-  if (!list) {
-    alert('List is empty');
-    return;
+  const items = _.shuffle(Array.from(list))
+    .slice(0, 5)
+    .map(async (element) => {
+      const aTag = element.querySelector('a') as HTMLAnchorElement;
+
+      const url = `https://www.ted.com/talks/${aTag.href.split('/talks/')[1]}`;
+
+      if (cache[url]) {
+        return cache[url];
+      }
+      const title = aTag.innerText;
+
+      const { contents: talkContent } = await get(url).then((res) =>
+        res.json()
+      );
+
+      const talkDoc = parser.parseFromString(talkContent, 'text/html');
+
+      const metaTags = Array.from(talkDoc.querySelectorAll('meta'));
+      const image = metaTags.find(
+        (i) => 'og:image' === (i.getAttribute('property') || '')
+      )?.content as string;
+
+      const description = metaTags.find(
+        (i) => 'og:description' === (i.getAttribute('property') || '')
+      )?.content as string;
+
+      const result: TedTalkType = { image, url, title, description };
+      cache[url] = result;
+      return result;
+    });
+
+  items.forEach((item) => {
+    item.then(() => {
+      console.log('setting', cache);
+      localStorage.setItem(localStorageKey, JSON.stringify(cache));
+    });
+  });
+
+  return items;
+}
+
+async function getRandomTedTalk() {
+  const randomItemFromCache = _.shuffle(Object.values(cache))[0];
+
+  const listPromise = getRandomList();
+
+  if (randomItemFromCache) {
+    return randomItemFromCache;
   }
 
-  const items = Array.from(list.children);
-  const random = _.shuffle(items)[0];
-
-  const aTag = random.querySelector('a');
-
-  if (!aTag) {
-    alert('A tag not found');
-    return;
-  }
-
-  const url = `https://www.ted.com/talks/${aTag.href.split('/talks/')[1]}`;
-  const title = aTag.innerText;
-
-  const { contents: talkContent } = await get(url).then((res) => res.json());
-
-  const talkDoc = parser.parseFromString(talkContent, 'text/html');
-
-  const metaTags = Array.from(talkDoc.querySelectorAll('meta'));
-  const image = metaTags.find(
-    (i) => 'og:image' === (i.getAttribute('property') || '')
-  )?.content as string;
-
-  const description = metaTags.find(
-    (i) => 'og:description' === (i.getAttribute('property') || '')
-  )?.content as string;
-
-  return { image, url, title, description };
+  return listPromise.then((res) => res[0]);
 }
 
 type RandomTedTalkProps = {};
@@ -66,7 +94,7 @@ export const RandomTedTalk = (props: RandomTedTalkProps) => {
   }, []);
 
   if (!random) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   return (
