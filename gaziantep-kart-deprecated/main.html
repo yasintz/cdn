@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
+      integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/geolib@3.3.3/lib/index.min.js"></script>
+  </head>
+  <body>
+    <label>
+      From:
+      <input type="text" placeholder="36.799958, 34.574624" id="from" />
+      <input
+        type="number"
+        placeholder="threshold"
+        id="from-threshold"
+        value="1000"
+      />
+    </label>
+    <br />
+    <label>
+      To:
+      <input type="text" placeholder="36.799958, 34.574624" id="to" />
+      <input
+        type="number"
+        placeholder="threshold"
+        id="to-threshold"
+        value="1000"
+      />
+    </label>
+    <br />
+
+    <button id="get">Get</button>
+
+    <pre id="result"></pre>
+
+    <script>
+      const decodedJson = decodeURIComponent('{{{encodedJson}}}');
+      const { stops, buses } = JSON.parse(decodedJson);
+      function getNearStops(location, threshold) {
+        return _.sortBy(
+          stops
+            .map((stop) => ({
+              ...stop,
+              distance: geolib.getDistance(location, {
+                latitude: stop.lat,
+                longitude: stop.lng,
+              }),
+            }))
+            .filter((stop) => stop.distance <= threshold),
+          'distance'
+        );
+      }
+      function getBus(nearToMe, nearToTarget) {
+        const list = [];
+
+        nearToMe.forEach((stop1) => {
+          const busList = buses
+            .map((bus) => ({
+              ...bus,
+              stop1Index: bus.stopList.indexOf(stop1.id),
+            }))
+            .filter((b) => b.stop1Index > -1);
+
+          nearToTarget.forEach((stop2) => {
+            const secondStep = busList
+              .map((bus) => ({
+                ...bus,
+                stop2Index: bus.stopList.indexOf(stop2.id),
+              }))
+              .filter((bus) => bus.stop2Index > bus.stop1Index);
+
+            list.push(
+              ...secondStep.map((bus) => ({
+                route: bus.route,
+                direction: bus.direction,
+                stop1: {
+                  ...stop1,
+                  index: bus.stop1Index,
+                },
+                stop2: {
+                  ...stop2,
+                  index: bus.stop2Index,
+                },
+              }))
+            );
+          });
+        });
+
+        return _.uniqBy(list, (bus) => bus.route + bus.direction);
+      }
+
+      const fromInput = document.getElementById('from');
+      const fromThresholdInput = document.getElementById('from-threshold');
+
+      const toInput = document.getElementById('to');
+      const toThresholdInput = document.getElementById('to-threshold');
+
+      const result = document.getElementById('result');
+
+      const getCord = (value) => {
+        const [latitude, longitude] = value
+          .split(',')
+          .map((i) => i.trim())
+          .map((i) => parseFloat(i, 10));
+
+        return { latitude, longitude };
+      };
+
+      document.getElementById('get').addEventListener('click', () => {
+        const fromValue = getCord(fromInput.value);
+        const toValue = getCord(toInput.value);
+
+        const from = getNearStops(
+          fromValue,
+          parseInt(fromThresholdInput.value, 10)
+        );
+        const to = getNearStops(toValue, parseInt(toThresholdInput.value, 10));
+
+        _.sortBy(getBus(from, to), 'stop1.distance').forEach((item) => {
+          result.innerText += `\n${JSON.stringify(item, null, 2)}\n\n----------\n`;
+        });
+      });
+    </script>
+  </body>
+</html>
