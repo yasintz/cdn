@@ -1,0 +1,24 @@
+#game > header {
+  display: none;
+}
+#game {
+  flex-direction: row !important;
+  max-width: calc(100% - 80px) !important;
+  align-items: center;
+  justify-content: center;
+  width: fit-content !important;
+  height: fit-content !important;
+}
+#board-container {
+  flex-grow: initial !important;
+  height: 400px;
+}
+game-modal {
+  display: none;
+}
+
+game-keyboard {
+  width: 550px;
+  height: 200px;
+}
+
