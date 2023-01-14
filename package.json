@@ -7,8 +7,8 @@
     "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
     "build:sudoku": "mkdir dist/sudoku && node sudoku/build.js",
     "build:gk27": "cd gk27 && node generate.js",
-    "build:wordle": "cd wordle && webpack",
-    "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27"
+    "build:wordle": "mkdir dist/wordle && cd wordle && webpack",
+    "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27 && pnpm build:wordle"
   },
   "dependencies": {
     "classnames": "^2.3.2",
