@@ -45,6 +45,6 @@ Object.keys(all).forEach((level) => {
       script
     );
 
-    fs.writeFileSync(`./s/${level}-${index}.html`, html);
+    fs.writeFileSync(`../dist/sudoku/${level}-${index}.html`, html);
   });
 });
