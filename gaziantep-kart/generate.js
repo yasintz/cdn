@@ -8,7 +8,7 @@ const content = fs.readFileSync('./main.html', 'utf-8');
 const template = handlebars.compile(content);
 
 fs.writeFileSync(
-  './index.html',
+  '../dist/projects/gk27.html',
   template({
     encodedJson: encodeURIComponent(JSON.stringify({ buses, stops })),
   })
