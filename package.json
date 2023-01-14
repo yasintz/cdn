@@ -6,6 +6,7 @@
   "scripts": {
     "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
     "build:sudoku": "mkdir dist/sudoku && node sudoku/build.js",
+    "build:gk27": "cd gk27 && node generate.js",
     "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku"
   },
   "dependencies": {
