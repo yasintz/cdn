@@ -29,4 +29,7 @@ function serveHtml(): PluginOption {
 export default defineConfig({
   plugins: [react()],
   base: '/cdn/',
+  build: {
+    outDir: 'build/vite',
+  },
 });

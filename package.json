@@ -8,8 +8,8 @@
     "build:sudoku": "mkdir dist/sudoku && node sudoku/build.js",
     "build:gk27": "cd gk27 && node generate.js",
     "build:wordle": "mkdir dist/wordle && cd wordle && webpack",
-    "build:vite": "tsc && vite build",
-    "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27 && pnpm build:wordle && pnpm build:vite"
+    "build:vite": "tsc && vite build && cp build/vite/index.html build/vite/404.html && cp -r build/vite/* dist",
+    "build": "(rm -rf ./dist||true) && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27 && pnpm build:wordle && pnpm build:vite"
   },
   "dependencies": {
     "classnames": "^2.3.2",
