@@ -1,0 +1,15 @@
+<html>
+<head>
+<title>Redirect</title>
+</head>
+<body>
+  Redirecting <a id="a"></a>
+<script>
+  const url=new URLSearchParams(window.location.search).get('redirect')
+window.location.href=url;
+const atag=  document.getElementById('a');
+  atag.href=url;
+  atag.innerHtml=url;
+  </script>
+</body>
+</html>

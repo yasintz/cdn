@@ -1,0 +1,77 @@
+.add-section,
+.add-section-btn {
+  margin-bottom: 16px;
+}
+
+.timezone-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.time-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.time-container span {
+  user-select: none;
+  margin-bottom: 8px;
+}
+
+.time-container span.title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.time-container span.date {
+  margin-bottom: 0;
+}
+.time-container span.offset {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.select-container {
+  border: 1px solid #ddd;
+}
+
+.range {
+  width: 100%;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+td.time {
+  width: 130px;
+  text-align: center;
+}
+td.date {
+  width: 130px;
+  text-align: center;
+}
+
+td.action {
+  width: 30px;
+  text-align: center;
+}
