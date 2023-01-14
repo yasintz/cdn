@@ -9,7 +9,7 @@
     "build:gk27": "cd gk27 && node generate.js",
     "build:wordle": "mkdir dist/wordle && cd wordle && webpack",
     "build:vite": "tsc && vite build",
-    "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27 && pnpm build:wordle"
+    "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27 && pnpm build:wordle && pnpm build:vite"
   },
   "dependencies": {
     "classnames": "^2.3.2",

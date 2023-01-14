@@ -28,4 +28,5 @@ function serveHtml(): PluginOption {
 
 export default defineConfig({
   plugins: [react()],
+  base: '/cdn/',
 });
