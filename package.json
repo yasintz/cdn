@@ -4,8 +4,9 @@
   "private": true,
   "homepage": "http://yasintz.github.io/cdn",
   "scripts": {
-    "build:projects": "rm -rf dist/projects && mkdir dist/projects && cp -r projects/* dist/projects",
-    "build:sudoku": "rm -rf dist/projects && mkdir dist/sudoku && node sudoku/build.js"
+    "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
+    "build:sudoku": "mkdir dist/sudoku && node sudoku/build.js",
+    "build": "(rm -rf ./dist||true) && cp -r dist-raw ./dist && pnpm build:projects && pnpm build:sudoku"
   },
   "dependencies": {
     "classnames": "^2.3.2",

@@ -24,6 +24,4 @@ yarn-error.log*
 
 
 
-# dist
-dist/projects
-dist/sudoku
+dist
