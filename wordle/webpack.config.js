@@ -46,7 +46,7 @@ function merge() {
   setTimeout(() => {
     merger({
       inputPath: path.join(__dirname, 'static/write.html'),
-      outputPath: path.join(__dirname, '../projects/wordle/write.html'),
+      outputPath: path.join(__dirname, '../dist/wordle/write.html'),
       replacer: [
         {
           key: '<script src="../build/write.js"></script>',
@@ -58,7 +58,7 @@ function merge() {
 
     merger({
       inputPath: path.join(__dirname, 'static/game.html'),
-      outputPath: path.join(__dirname, '../projects/wordle/game.html'),
+      outputPath: path.join(__dirname, '../dist/wordle/game.html'),
       replacer: [
         {
           key: '<script src="../build/game.js"></script>',
