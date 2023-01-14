@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "http://yasintz.github.io/cdn",
   "scripts": {
-    "build": "echo 1"
+    "build": "cp -r projects dist/projects"
   },
   "dependencies": {
     "classnames": "^2.3.2"
