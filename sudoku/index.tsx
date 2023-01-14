@@ -33,6 +33,9 @@ const all = {
 //   );
 // });
 
+// @ts-ignore
+console.log(__dirname);
+
 const script = fs.readFileSync('./sudoku/script.js', 'utf-8');
 Object.keys(all).forEach((level) => {
   const game = data[all[level] as keyof typeof data];
@@ -45,6 +48,6 @@ Object.keys(all).forEach((level) => {
       script
     );
 
-    fs.writeFileSync(`../dist/sudoku/${level}-${index}.html`, html);
+    fs.writeFileSync(`./dist/sudoku/${level}-${index}.html`, html);
   });
 });

@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #list {
+        border-bottom: 1px solid #ddd;
+        height: 220px;
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .list-item-wrapper {
+        max-width: 224px;
+        min-width: 224px;
+        transition: max-width ease 0.5s, min-width ease 0.5s;
+        border-right: 1px solid #ddd;
+        padding: 0 8px 8px 8px;
+        height: calc(100% - 8px);
+        overflow-y: auto;
+      }
+      .list-item-wrapper.expandable {
+        max-width: 20px;
+        min-width: 20px;
+      }
+      .list-item-wrapper.expandable:hover {
+        max-width: 224px;
+        min-width: 224px;
+      }
+
+      .list-item-wrapper.hidden > .list-item {
+        opacity: 0.3;
+      }
+
+      .list-item {
+        min-width: 224px;
+        max-width: 224px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .list-item > div {
+        margin-bottom: 12px;
+      }
+      .list-item > div.action {
+        position: sticky;
+        padding: 8px 0;
+        background-color: white;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        margin-bottom: 0;
+      }
+
+      .list-item > div.action > span.icon:not(.checkbox) {
+        width: 14px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: rgba(250, 235, 215, 1);
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 2px;
+        user-select: none;
+      }
+
+      .list-section {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .list-section > span {
+        color: gray;
+        font-size: 14px;
+      }
+      .full-url {
+        display: block;
+        margin: 12px 0;
+        text-decoration: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+      }
+      .full-url > span {
+        display: block;
+        border-radius: 4px;
+        color: white;
+        margin: 1px 2px 1px 0;
+        padding: 1px 2px;
+        background-color: #c84b31;
+      }
+      img {
+        object-fit: contain;
+        width: 97%;
+        border-radius: 8px;
+        height: 100%;
+        margin-bottom: 12px;
+        filter: drop-shadow(0px 10px 25px rgba(0, 0, 0, 0.1));
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container">
+      <div id="list">
+        <div
+          v-for="listItem in listItems"
+          :key="listItem.id"
+          :class="{
+            'list-item-wrapper': true, 
+            'hidden': listItem.disabled,
+            expandable: listItem.expandable
+        }"
+        >
+          <div class="list-item">
+            <div class="action">
+              <span
+                class="icon expand"
+                @click="$set(listItem,'expandable' , !listItem.expandable)"
+              >
+                {{listItem.expandable ? '>' : '<'}}
+              </span>
+              <span class="icon" @click="addSection(listItem.id)">➕</span>
+              <span class="icon" @click="buildFromJson(listItem.id)">️✏️ </span>
+              <span
+                v-if="listItem.sections.length > 0"
+                class="icon"
+                @click="copyAsJson(listItem.id)"
+                >🔗️</span
+              >
+              <span class="icon" @click="removeListItem(listItem.id)">✖️</span>
+              <span
+                class="icon checkbox"
+                @click="changeListItemStatus(listItem.id, !listItem.disabled)"
+              >
+                <input type="checkbox" :checked="!listItem.disabled" />
+              </span>
+            </div>
+            <div
+              v-for="section in listItem.sections"
+              :key="section.id"
+              class="list-section"
+            >
+              <span @dblclick="removeSection(listItem.id, section.id)">
+                {{section.param}}
+              </span>
+              <textarea rows="1" v-model="section.value"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <button @click="addListItem">Add</button>
+      </div>
+      <a target="_blank" :href="fullImageUrl" class="full-url">
+        <span class="path-item" v-for="p in imageUrlPaths" :key="p">
+          {{p}}
+        </span>
+      </a>
+      <img id="img" :src="fullImageUrl" />
+    </div>
+    <script>
+      const el = document.getElementById('app');
+      window.addEventListener('load', () => {
+        const app = new Vue({
+          el: '#app',
+          data: {
+            listItems: JSON.parse(getQueryParam('data') || '[]'),
+          },
+          computed: {
+            fullImageUrl() {
+              return this.imageUrlPaths.join('/');
+            },
+            imageUrlPaths() {
+              let photoUrl = '';
+              const urlPath = this.listItems
+                .filter((i) => !i.disabled)
+                .map(({ sections }) =>
+                  sections
+                    .map((section) => {
+                      if (
+                        ['#', 'photoUrl', 'photo-url', 'photo url'].indexOf(
+                          section.param.toLowerCase()
+                        ) > -1
+                      ) {
+                        photoUrl = section.value;
+                        return;
+                      }
+
+                      if (!section.value) {
+                        return;
+                      }
+                      return `${section.param}_${section.value}`;
+                    })
+                    .filter((i) => i)
+                    .join(',')
+                )
+                .filter((i) => i);
+              return [
+                'https://res.cloudinary.com/vibely2/image/upload',
+                ...urlPath,
+                photoUrl,
+              ];
+            },
+          },
+          methods: {
+            addListItem() {
+              this.listItems.push({
+                id: getId(),
+                disabled: false,
+                sections: [],
+              });
+            },
+            removeListItem(id) {
+              const index = this.listItems.findIndex((item) => item.id === id);
+              this.listItems.splice(index, 1);
+            },
+            changeListItemStatus(id, status) {
+              const listItem = this.listItems.find((item) => item.id === id);
+              this.$set(listItem, 'disabled', status);
+            },
+            removeSection(listItemId, sectionId) {
+              const listItem = this.listItems.find(
+                (item) => item.id === listItemId
+              );
+              const index = listItem.sections.findIndex(
+                (item) => item.id === sectionId
+              );
+
+              listItem.sections.splice(index, 1);
+            },
+            addSection(id) {
+              const sectionParam = prompt('Please enter param:', '');
+
+              if (!sectionParam) {
+                return;
+              }
+
+              const listItem = this.listItems.find((item) => item.id === id);
+              if (listItem) {
+                listItem.sections.push({
+                  id: getId(),
+                  param: sectionParam,
+                  value: '',
+                });
+              }
+            },
+            buildFromJson(listItemId) {
+              const json = prompt('Paste JSON', '');
+              if (!json) {
+                return;
+              }
+              const listItem = this.listItems.find(
+                (item) => item.id === listItemId
+              );
+              this.$set(listItem, 'sections', JSON.parse(json));
+            },
+            copyAsJson(listItemId) {
+              const listItem = this.listItems.find(
+                (item) => item.id === listItemId
+              );
+              copyTextToClipboard(JSON.stringify(listItem.sections));
+            },
+          },
+          updated() {
+            const prevData = getQueryParam();
+            const newData = JSON.stringify(this.listItems);
+            if (prevData !== newData) {
+              addQueryParam(newData);
+            }
+          },
+        });
+      });
+    </script>
+    <script>
+      // utils
+      function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.position = 'fixed';
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'successful' : 'unsuccessful';
+          console.log('Fallback: Copying text command was ' + msg);
+        } catch (err) {
+          console.error('Fallback: Oops, unable to copy', err);
+        }
+
+        document.body.removeChild(textArea);
+      }
+      function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+          fallbackCopyTextToClipboard(text);
+          return;
+        }
+        navigator.clipboard.writeText(text).then(
+          function () {
+            console.log('Async: Copying to clipboard was successful!');
+          },
+          function (err) {
+            console.error('Async: Could not copy text: ', err);
+          }
+        );
+      }
+
+      const getId = () => 'i_' + Math.random().toString().substring(2);
+
+      const addQueryParam = (value) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('data', value);
+        window.history.pushState({}, '', url.toString());
+      };
+
+      const getQueryParam = () => {
+        const url = new URL(window.location.href);
+        return url.searchParams.get('data') || '';
+      };
+    </script>
+  </body>
+</html>
