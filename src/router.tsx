@@ -1,9 +1,8 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-const BookCoverGenerator = React.lazy(
-  () => import('./book-cover-generator/index')
-);
+const BookCoverGenerator = React.lazy(() => import('./book-cover-generator'));
+const Gk27 = React.lazy(() => import('./gk27'));
 
 const router = createBrowserRouter(
   [
@@ -16,6 +15,14 @@ const router = createBrowserRouter(
       element: (
         <React.Suspense>
           <BookCoverGenerator />
+        </React.Suspense>
+      ),
+    },
+    {
+      path: 'gk27',
+      element: (
+        <React.Suspense>
+          <Gk27 />
         </React.Suspense>
       ),
     },

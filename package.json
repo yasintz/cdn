@@ -7,10 +7,9 @@
     "dev": "vite",
     "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
     "build:sudoku": "mkdir dist/sudoku && node sudoku/build.js",
-    "build:gk27": "cd gk27 && node generate.js",
     "build:wordle": "mkdir dist/wordle && cd wordle && webpack",
     "build:vite": "tsc && vite build && cp build/vite/index.html build/vite/404.html && cp -r build/vite/* dist",
-    "build": "(rm -rf ./dist||true) && mkdir dist && pnpm build:projects && pnpm build:sudoku && pnpm build:gk27 && pnpm build:wordle && pnpm build:vite"
+    "build": "(rm -rf ./dist||true) && mkdir dist && pnpm build:projects && pnpm build:sudoku && pnpm build:wordle && pnpm build:vite"
   },
   "dependencies": {
     "axios": "^0.27.2",
@@ -19,7 +18,6 @@
     "esbuild": "^0.17.0",
     "geolib": "^3.3.3",
     "glur": "^1.1.2",
-    "handlebars": "^4.7.7",
     "js-base64": "^3.7.2",
     "lodash": "^4.17.21",
     "ms": "^2.1.3",
