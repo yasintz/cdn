@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const BookCoverGenerator = React.lazy(() => import('./book-cover-generator'));
 const Gk27 = React.lazy(() => import('./gk27'));
+const ZinciriKirma = React.lazy(() => import('./zinciri-kirma'));
 
 const router = createBrowserRouter(
   [
@@ -23,6 +24,14 @@ const router = createBrowserRouter(
       element: (
         <React.Suspense>
           <Gk27 />
+        </React.Suspense>
+      ),
+    },
+    {
+      path: 'zinciri-kirma',
+      element: (
+        <React.Suspense>
+          <ZinciriKirma />
         </React.Suspense>
       ),
     },
