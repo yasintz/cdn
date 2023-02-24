@@ -70,12 +70,3 @@ export function getBus(
 
   return _.uniqBy(list, (bus) => bus.id);
 }
-
-export const getCord = (value: string) => {
-  const [latitude, longitude] = value
-    .split(',')
-    .map((i) => i.trim())
-    .map((i) => parseFloat(i));
-
-  return { latitude, longitude };
-};

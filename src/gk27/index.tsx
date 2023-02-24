@@ -1,7 +1,8 @@
-import { getCord, getNearStops, getBus } from './utils';
+import { getNearStops, getBus } from './utils';
 import _ from 'lodash';
 import { useState } from 'react';
 import './index.scss';
+import { getCord } from '../utils/coordinate';
 
 type GaziantepKart27Props = {};
 

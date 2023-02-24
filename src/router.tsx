@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 const BookCoverGenerator = React.lazy(() => import('./book-cover-generator'));
 const Gk27 = React.lazy(() => import('./gk27'));
 const ZinciriKirma = React.lazy(() => import('./zinciri-kirma'));
+const YardimLocation = React.lazy(() => import('./yardim-location'));
 
 const router = createBrowserRouter(
   [
@@ -32,6 +33,14 @@ const router = createBrowserRouter(
       element: (
         <React.Suspense>
           <ZinciriKirma />
+        </React.Suspense>
+      ),
+    },
+    {
+      path: 'yardim-location',
+      element: (
+        <React.Suspense>
+          <YardimLocation />
         </React.Suspense>
       ),
     },
