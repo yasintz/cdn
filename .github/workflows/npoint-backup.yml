@@ -1,4 +1,4 @@
-name: Create Backup
+name: Create Npoint Backup
 on:
   workflow_dispatch:
   schedule:
