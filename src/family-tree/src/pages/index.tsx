@@ -1,7 +1,5 @@
-type LayoutProps = {};
-
-const HomePage = (props: LayoutProps) => {
-  return <div>Home</div>;
+const HomePage = () => {
+  return null;
 };
 
 export default HomePage;

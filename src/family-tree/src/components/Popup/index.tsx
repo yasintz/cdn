@@ -5,9 +5,10 @@ import style from './Popup.module.scss';
 type PopupProps = {
   open: boolean;
   onClose: () => void;
+  children: React.ReactNode;
 };
 
-const Popup: React.FC<PopupProps> = ({ children, open, onClose }) => {
+const Popup = ({ children, open, onClose }: PopupProps) => {
   if (!open) {
     return null;
   }

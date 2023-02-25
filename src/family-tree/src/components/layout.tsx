@@ -19,19 +19,18 @@ const Layout = ({ children }: LayoutProps) => {
   const data = useData();
 
   const [treeView, setTreeView] = useState<TreeView>(TreeView.Default);
-  const [personId, setPersonId] = usePersonIdStateFromUrl();
   const [treeDepth, setTreeDepth] = useState<number>(3);
   const [personSelector, setPersonSelector] = useState<{
     cb?: (v: PersonType) => void;
     person?: PersonType;
   }>();
-  const setPerson = (p: PersonType) => navigate(`/person/${p.id}`);
+  const setPerson = (p: PersonType) => navigate(`/family-tree/person/${p.id}`);
 
   return (
     <AppContext.Provider
       value={{
         ...data,
-        showCreatePersonModal: () => navigate('/create-person'),
+        showCreatePersonModal: () => navigate('/family-tree/create-person'),
         showPersonSelector: setPersonSelector,
         treeDepth,
         isDTree: treeView === TreeView.DTree,
@@ -45,8 +44,8 @@ const Layout = ({ children }: LayoutProps) => {
           <Sidebar
             person={data.person}
             onClick={setPerson}
-            onCreatePersonClick={() => navigate('/create-person')}
-            onSettingsClick={() => navigate('/settings')}
+            onCreatePersonClick={() => navigate('/family-tree/create-person')}
+            onSettingsClick={() => navigate('/family-tree/settings')}
           />
         </div>
         {children}
