@@ -15,7 +15,7 @@ import SettingsPage from './src/pages/settings';
 import './src/assets/styles/global.scss';
 
 const FamilyTreeRouter: RouteObject = {
-  path: 'family-tree',
+  path: '/',
   element: (
     <Layout>
       <Outlet />

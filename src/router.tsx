@@ -1,11 +1,11 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import FamilyTreeRouter from './family-tree/router';
 
 const BookCoverGenerator = React.lazy(() => import('./book-cover-generator'));
 const Gk27 = React.lazy(() => import('./gk27'));
 const ZinciriKirma = React.lazy(() => import('./zinciri-kirma'));
 const YardimLocation = React.lazy(() => import('./yardim-location'));
+const FamilyTree = React.lazy(() => import('./family-tree'));
 
 const router = createBrowserRouter(
   [
@@ -45,7 +45,14 @@ const router = createBrowserRouter(
         </React.Suspense>
       ),
     },
-    FamilyTreeRouter,
+    {
+      path: 'family-tree/*',
+      element: (
+        <React.Suspense>
+          <FamilyTree />
+        </React.Suspense>
+      ),
+    },
     {
       path: '*',
       element: <h1>404...</h1>,

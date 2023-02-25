@@ -1,7 +1,9 @@
 import { defineConfig, PluginOption, ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
 import fs from 'fs';
 import path from 'path';
+import vitePluginImportus from 'vite-plugin-importus';
 
 function serveHtml(): PluginOption {
   return {
@@ -27,7 +29,17 @@ function serveHtml(): PluginOption {
 }
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    visualizer(),
+    vitePluginImportus([
+      {
+        libraryName: 'lodash',
+        libraryDirectory: '',
+        camel2DashComponentName: false,
+      },
+    ]),
+  ],
   base: '/cdn/',
   build: {
     outDir: 'build/vite',
