@@ -17,13 +17,10 @@ const StyledHiddenWrapper = styled.div`
 type TreeSizeCalcProps = {
   setSize: (s: { width: number; height: number }) => void;
   deps: any[];
+  children: React.ReactNode;
 };
 
-const TreeSizeCalc: React.FC<TreeSizeCalcProps> = ({
-  children,
-  deps,
-  setSize,
-}) => {
+const TreeSizeCalc = ({ children, deps, setSize }: TreeSizeCalcProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(

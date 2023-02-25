@@ -17,7 +17,7 @@ import { usePersonIdStateFromUrl } from '../hooks/use-person-id-state-from-url';
 import { MetadataPopup } from './MetadataPopup';
 import { Sync } from '../components/sync';
 import { RawJsonPopup } from './RawJsonPopup';
-import { Routes, Route, Navigate, useNavigate } from 'react-router';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { DetailPage } from './pages/detail';
 import CreatePerson from './CreatePerson';
 
