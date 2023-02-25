@@ -2,9 +2,7 @@ import { useEffect } from 'react';
 import './index.scss';
 import { run } from './zinciri-kirma/src/main';
 
-type ZinciriKirmaProps = {};
-
-const ZinciriKirma = (props: ZinciriKirmaProps) => {
+const ZinciriKirma = () => {
   useEffect(() => {
     run();
   });

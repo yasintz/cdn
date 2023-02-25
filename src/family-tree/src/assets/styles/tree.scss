@@ -1,0 +1,126 @@
+.tree {
+  font-family: sans-serif, Arial;
+  font-size: 10pt;
+  white-space: nowrap;
+  min-width: 800px;
+  min-height: 500px;
+  ul {
+    padding-top: 20px;
+    position: relative;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    li {
+      float: left;
+      text-align: center;
+      list-style-type: none;
+      position: relative;
+      padding: 20px 5px 0 5px;
+      transition: all 0.5s;
+      -webkit-transition: all 0.5s;
+      -moz-transition: all 0.5s;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+      }
+      &::after {
+        right: auto;
+        left: 50%;
+        border-left: 1px solid #ccc;
+      }
+      &:only-child::after,
+      &:only-child::before {
+        display: none;
+      }
+      &:only-child {
+        padding-top: 0;
+      }
+      &:first-child::before,
+      &:last-child::after {
+        border: 0 none;
+      }
+      &:last-child::before {
+        border-right: 1px solid #ccc;
+        border-radius: 0 5px 0 0;
+        -webkit-border-radius: 0 5px 0 0;
+        -moz-border-radius: 0 5px 0 0;
+      }
+      &:first-child::after {
+        border-radius: 5px 0 0 0;
+        -webkit-border-radius: 5px 0 0 0;
+        -moz-border-radius: 5px 0 0 0;
+      }
+      .tree-wrapper {
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        text-decoration: none;
+        color: #666;
+        font-family: arial, verdana, tahoma;
+        font-size: 11px;
+        display: inline-block;
+        min-width: 80px;
+        min-height: 30px;
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        cursor: pointer;
+        position: relative;
+
+        .male,
+        .female {
+          display: inline-block;
+          width: 90px;
+          padding: 10px;
+          border-radius: 5px;
+          transition: all 0.3s ease-in-out;
+          -webkit-border-radius: 5px;
+          -moz-border-radius: 5px;
+          user-select: none;
+        }
+
+        .inactive-partner {
+          opacity: 0.7;
+          transform: scale(0.8);
+        }
+        .male {
+          background-color: lightblue;
+        }
+        .female {
+          background-color: lightpink;
+        }
+      }
+    }
+  }
+  ul ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 1px solid #ccc;
+    width: 0;
+    height: 20px;
+  }
+
+  li .w:hover,
+  li .w:hover + ul li .w {
+    background: #c8e4f8;
+    color: #000;
+    border: 1px solid #94a0b4;
+  }
+  li .w:hover + ul li::after,
+  li .w:hover + ul li::before,
+  li .w:hover + ul::before,
+  li .w:hover + ul ul::before {
+    border-color: #94a0b4;
+  }
+}

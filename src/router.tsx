@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import FamilyTreeRouter from './family-tree/router';
 
 const BookCoverGenerator = React.lazy(() => import('./book-cover-generator'));
 const Gk27 = React.lazy(() => import('./gk27'));
@@ -44,6 +45,7 @@ const router = createBrowserRouter(
         </React.Suspense>
       ),
     },
+    FamilyTreeRouter,
     {
       path: '*',
       element: <h1>404...</h1>,

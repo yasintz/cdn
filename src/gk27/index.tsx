@@ -4,9 +4,7 @@ import { useState } from 'react';
 import './index.scss';
 import { getCord } from '../utils/coordinate';
 
-type GaziantepKart27Props = {};
-
-const GaziantepKart27 = (props: GaziantepKart27Props) => {
+const GaziantepKart27 = () => {
   const [result, setResult] = useState<ReturnType<typeof getBus>>([]);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 

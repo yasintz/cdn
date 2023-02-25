@@ -1,0 +1,37 @@
+.dtree-container {
+  .man,
+  .woman {
+    cursor: pointer;
+  }
+  .person {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #666;
+    font-family: arial, verdana, tahoma;
+    font-size: 11px;
+    display: block;
+    min-width: 80px;
+    min-height: 30px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    cursor: pointer;
+    position: relative;
+
+    div {
+      color: #666;
+      height: 100%;
+    }
+
+    &.male div {
+      background-color: lightblue;
+    }
+    &.female div {
+      background-color: lightpink;
+    }
+  }
+}
