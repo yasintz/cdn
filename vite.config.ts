@@ -37,6 +37,7 @@ export default defineConfig({
         libraryName: 'lodash',
         libraryDirectory: '',
         camel2DashComponentName: false,
+        customName: (formatted: string) => `lodash/${formatted}`,
       },
     ]),
   ],
