@@ -33,15 +33,18 @@ export default defineConfig({
     react(),
     visualizer(),
     vitePluginImportus([
-      {
-        libraryName: 'lodash',
-        libraryDirectory: '',
-        camel2DashComponentName: false,
-        customName: (formatted: string) => `lodash/${formatted}`,
-      },
+      // {
+      //   libraryName: 'lodash',
+      //   libraryDirectory: 'es',
+      //   camel2DashComponentName: false,
+      //   customName: (formatted: string) => `lodash/${formatted}`,
+      // },
     ]),
   ],
   base: '/cdn/',
+  server: {
+    port: 3007,
+  },
   build: {
     outDir: 'build/vite',
   },

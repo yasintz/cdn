@@ -13,6 +13,11 @@ th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
+  &.stop div {
+    display: flex;
+    justify-content: space-between;
+    width: 85%;
+  }
 }
 
 tr:nth-child(even) {

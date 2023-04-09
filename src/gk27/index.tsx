@@ -7,6 +7,17 @@ import { getCord } from '../utils/coordinate';
 const GaziantepKart27 = () => {
   const [result, setResult] = useState<ReturnType<typeof getBus>>([]);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+  const [filter, setFilter] = useState<{
+    turuncu: boolean;
+    sari: boolean;
+    mavi: boolean;
+    tramway: boolean;
+  }>({
+    turuncu: true,
+    mavi: true,
+    sari: true,
+    tramway: true,
+  });
 
   const onClick = () => {
     const fromInput = document.getElementById('from') as HTMLInputElement;
@@ -30,43 +41,53 @@ const GaziantepKart27 = () => {
 
     setResult(_.sortBy(getBus(from, to), 'stop1.distance'));
   };
+  const filteredResult = result.filter(
+    (bus) =>
+      (bus.route.startsWith('B') && filter.turuncu) ||
+      (bus.route.startsWith('M') && filter.mavi) ||
+      (bus.route.startsWith('S') && filter.sari) ||
+      (bus.route.startsWith('K') && filter.tramway) ||
+      (filter.turuncu && filter.mavi && filter.sari)
+  );
   return (
     <>
       <label>
         From:
-        <input
-          type="text"
-          placeholder="36.799958, 34.574624"
-          id="from"
-          value="37.114822254971344, 37.390943663683984"
-        />
+        <input type="text" placeholder="36.799958, 34.574624" id="from" />
         <input
           type="number"
           placeholder="threshold"
           id="from-threshold"
-          value="1000"
+          defaultValue="1000"
         />
       </label>
       <br />
       <label>
         To:
-        <input
-          type="text"
-          placeholder="36.799958, 34.574624"
-          id="to"
-          value="37.095476401939095, 37.39011530655496"
-        />
+        <input type="text" placeholder="36.799958, 34.574624" id="to" />
         <input
           type="number"
           placeholder="threshold"
           id="to-threshold"
-          value="1000"
+          defaultValue="1000"
         />
       </label>
       <br />
 
       <button onClick={onClick}>Get</button>
       <button onClick={() => setSelectedIndexes([])}>Reset Selected</button>
+      {Object.keys(filter).map((key) => (
+        <label key={key}>
+          <input
+            type="checkbox"
+            checked={filter[key as keyof typeof filter]}
+            onChange={(e) =>
+              setFilter((prev) => ({ ...prev, [key]: e.target.checked }))
+            }
+          />
+          {key}
+        </label>
+      ))}
       <br />
       <br />
 
@@ -75,12 +96,22 @@ const GaziantepKart27 = () => {
           <table>
             <tr>
               <th>*</th>
-              <th>Bus</th>
-              <th>First Stop</th>
-              <th>Last Stop</th>
+              <th>Otobus</th>
+              <th className="stop">
+                <div>
+                  <span>Binis Duragi</span>
+                  <span>Durak Numarasi</span>
+                </div>
+              </th>
+              <th className="stop">
+                <div>
+                  <span>Inis Duragi</span>
+                  <span>Durak Numarasi</span>
+                </div>
+              </th>
               <th>Stop Count</th>
             </tr>
-            {result.map((bus, index) => (
+            {filteredResult.map((bus, index) => (
               <tr key={bus.id}>
                 <td>
                   <input
@@ -92,19 +123,29 @@ const GaziantepKart27 = () => {
                   />
                 </td>
                 <td>{bus.route}</td>
-                <td>{bus.stop1.name}</td>
-                <td>{bus.stop2.name}</td>
+                <td className="stop">
+                  <div>
+                    <span>{bus.stop1.name}</span> <span>{bus.stop1.id}</span>
+                  </div>
+                </td>
+                <td className="stop">
+                  <div>
+                    <span>{bus.stop2.name}</span> <span>{bus.stop2.id}</span>
+                  </div>
+                </td>
                 <td>{bus.stop2.index - bus.stop1.index}</td>
               </tr>
             ))}
           </table>
         </div>
-        <pre style={{ flex: 1, marginLeft: 16 }}>
-          {result
-            .filter((res, index) => selectedIndexes.includes(index))
-            .map((item) => `\n${JSON.stringify(item, null, 2)}`)
-            .join('\n-----------\n')}
-        </pre>
+        {selectedIndexes.length > 0 && (
+          <pre style={{ flex: 1, marginLeft: 16 }}>
+            {filteredResult
+              .filter((res, index) => selectedIndexes.includes(index))
+              .map((item) => `\n${JSON.stringify(item, null, 2)}`)
+              .join('\n-----------\n')}
+          </pre>
+        )}
       </div>
     </>
   );
