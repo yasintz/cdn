@@ -39,7 +39,7 @@ const GaziantepKart27 = () => {
     );
     const to = getNearStops(toValue, parseInt(toThresholdInput.value, 10));
 
-    setResult(_.sortBy(getBus(from, to), 'stop1.distance'));
+    setResult(_.sortBy(getBus(from, to), 'stop1.distance') as any);
   };
   const filteredResult = result.filter(
     (bus) =>
