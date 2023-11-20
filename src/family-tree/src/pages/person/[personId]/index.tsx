@@ -10,7 +10,7 @@ const PersonHomePage = () => {
   const { personId } = useParams<{ personId: string }>();
   const person = personList.find((p) => p.id === personId);
 
-  const setPerson = (p: PersonType) => navigate(`/person/${p.id}`);
+  const setPerson = (p: PersonType) => navigate(`/family-tree/person/${p.id}`);
 
   if (!person) {
     return null;
