@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import builder from '../helper/builder';
+import { PersonBuilder } from '../helper/builder';
 import { MetadataType, PersonType } from '../types';
 import { AppContext } from './ctx';
 
@@ -37,7 +37,10 @@ export const RawJsonPopup = ({ person }: RawJsonPopupProps) => {
     store,
   } = useContext(AppContext);
 
-  const buildedPerson = useMemo(() => builder(person, store), [person, store]);
+  const buildedPerson = useMemo(
+    () => new PersonBuilder(person, store),
+    [person, store]
+  );
   const metadataList = buildedPerson.metadata;
   const raw: RawJsonType = useMemo(
     () => ({

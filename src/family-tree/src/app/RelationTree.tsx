@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Tree from '../components/Tree';
-import builder, { getPersonTreeByDepth } from '../helper/builder';
+import { getPersonTreeByDepth, PersonBuilder } from '../helper/builder';
 import { PersonTreeType, PersonType, StoreType } from '../types';
 import { AppContext } from './ctx';
 import _ from 'lodash';
@@ -28,10 +28,13 @@ type PersonRelationProps = {
 const PersonRelation: React.FC<PersonRelationProps> = ({ person, onClick }) => {
   const { store, isDTree, treeDepth } = useContext(AppContext);
 
-  const buildedPerson = useMemo(() => builder(person, store), [person, store]);
+  const buildedPerson = useMemo(
+    () => new PersonBuilder(person, store),
+    [person, store]
+  );
   const parent = buildedPerson.parents[0];
   const buildedParent = useMemo(
-    () => (parent ? builder(parent, store) : undefined),
+    () => (parent ? new PersonBuilder(parent, store) : undefined),
     [parent, store]
   );
 

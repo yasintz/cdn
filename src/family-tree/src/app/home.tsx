@@ -8,9 +8,10 @@ import RelationFinder from './RelationDetail';
 import style from './app.module.scss';
 import { AppContext, TreeView } from './ctx';
 import useData from './data';
-import builder, {
+import {
   getPersonTreeByDepth,
   getParentTreeByDepth,
+  PersonBuilder,
 } from '../helper/builder';
 import styled from 'styled-components';
 import { usePersonIdStateFromUrl } from '../hooks/use-person-id-state-from-url';
@@ -109,10 +110,10 @@ const App: React.FC = () => {
   const parentlessNodes = useMemo(
     () =>
       personList.filter((person) => {
-        const main = builder(person, store);
+        const main = new PersonBuilder(person, store);
 
         const partnersHasNoParent = main.partners
-          .map((i) => builder(i, store).parents.length === 0)
+          .map((i) => new PersonBuilder(i, store).parents.length === 0)
           .every((i) => i);
 
         return main.parents.length === 0 && partnersHasNoParent;

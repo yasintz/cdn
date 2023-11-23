@@ -1,4 +1,99 @@
 import { PersonTreeType, PersonType, StoreType } from '../types';
+import { IsBuilder } from './is-builder';
+
+function Cached() {
+  return function decarator(target: any, key: any) {
+    const descriptor = arguments[2];
+    const originalGetter = descriptor.get;
+
+    descriptor.get = function () {
+      const cacheKey = `_cached_${this.id}_${key}`;
+
+      // @ts-ignore
+      if (this[cacheKey] === undefined) {
+        // @ts-ignore
+        this[cacheKey] = originalGetter.call(this);
+      }
+
+      // @ts-ignore
+      return this[cacheKey];
+    };
+
+    return descriptor;
+  };
+}
+
+export class PersonBuilder {
+  person: PersonType;
+  constructor(person: PersonType, private readonly store: StoreType) {
+    this.person = person;
+  }
+
+  private getPersonById = (id: string) =>
+    this.store.person.find((i) => i.id === id) as PersonType;
+
+  private _getParents = () => {
+    return this.store.relation
+      .filter((r) => r.type === 'parent' && r.second === this.person.id)
+      .map((r) => this.getPersonById(r.main));
+  };
+
+  private _getChildrenByParent = (parentId: string) => {
+    return this.store.relation
+      .filter((r) => r.type === 'parent' && r.main === parentId)
+      .map((i) => this.getPersonById(i.second));
+  };
+
+  @Cached()
+  get metadata() {
+    return this.store.metadata.filter((m) => m.personId === this.person.id);
+  }
+
+  @Cached()
+  get parents() {
+    return this._getParents();
+  }
+
+  @Cached()
+  get children() {
+    return this._getChildrenByParent(this.person.id);
+  }
+
+  @Cached()
+  get partners() {
+    return this.store.relation
+      .filter(
+        (i) =>
+          i.type === 'partner' &&
+          (i.main === this.person.id || i.second === this.person.id)
+      )
+      .map((r) => (r.main === this.person.id ? r.second : r.main))
+      .map((i) => this.getPersonById(i));
+  }
+
+  @Cached()
+  get siblings() {
+    return this._getParents()
+      .reduce(
+        // eslint-disable-next-line
+        (acc, cur) => (acc.push(...this._getChildrenByParent(cur.id)), acc),
+        [] as PersonType[]
+      )
+      .filter((i) => i.id !== this.person.id)
+      .reduce(
+        (acc, cur) => (
+          // eslint-disable-next-line
+          acc.findIndex((p) => p.id === cur.id) === -1 && acc.push(cur), acc
+        ),
+        [] as PersonType[]
+      );
+  }
+
+  @Cached()
+  get is() {
+    return new IsBuilder(this, this.store);
+  }
+}
 
 function getPersonTreeByDepth({
   person,
@@ -73,52 +168,8 @@ export function getCommonChildren(
   );
 }
 
-function builder(
-  person: PersonType,
-  { person: personList, relation, metadata }: StoreType
-) {
-  const getPersonById = (id: string) =>
-    personList.find((i) => i.id === id) as PersonType;
-  const _getParents = () => {
-    return relation
-      .filter((r) => r.type === 'parent' && r.second === person.id)
-      .map((r) => getPersonById(r.main));
-  };
-
-  const _getChildrenByParent = (parentId: string) => {
-    return relation
-      .filter((r) => r.type === 'parent' && r.main === parentId)
-      .map((i) => getPersonById(i.second));
-  };
-
-  return {
-    metadata: metadata.filter((m) => m.personId === person.id),
-    parents: _getParents(),
-    children: _getChildrenByParent(person.id),
-    partners: relation
-      .filter(
-        (i) =>
-          i.type === 'partner' &&
-          (i.main === person.id || i.second === person.id)
-      )
-      .map((r) => (r.main === person.id ? r.second : r.main))
-      .map((i) => getPersonById(i)),
-
-    siblings: _getParents()
-      .reduce(
-        // eslint-disable-next-line
-        (acc, cur) => (acc.push(..._getChildrenByParent(cur.id)), acc),
-        [] as PersonType[]
-      )
-      .filter((i) => i.id !== person.id)
-      .reduce(
-        (acc, cur) => (
-          // eslint-disable-next-line
-          acc.findIndex((p) => p.id === cur.id) === -1 && acc.push(cur), acc
-        ),
-        [] as PersonType[]
-      ),
-  };
+function builder(person: PersonType, store: StoreType): PersonBuilder {
+  return new PersonBuilder(person, store);
 }
 
 export { getPersonTreeByDepth, getParentTreeByDepth };

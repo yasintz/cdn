@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import style from './RelationDetail.module.scss';
 import { PersonType } from '../../types';
 import cx from 'classnames';
-import builder from '../../helper/builder';
+import { PersonBuilder } from '../../helper/builder';
 import { AppContext } from '../ctx';
 import RelationTree from '../RelationTree';
 import _ from 'lodash';
@@ -54,7 +54,7 @@ const PersonRelation = ({
     showCreatePersonModal,
   } = useContext(AppContext);
   const builded = useMemo(
-    () => (person ? builder(person, store) : null),
+    () => (person ? new PersonBuilder(person, store) : null),
     [person, store]
   );
 

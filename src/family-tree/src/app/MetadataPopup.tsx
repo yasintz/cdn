@@ -1,8 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import _ from 'lodash';
 import styled from 'styled-components';
-import Popup from '../components/Popup';
-import builder from '../helper/builder';
+import { PersonBuilder } from '../helper/builder';
 import { MetadataType, PersonType } from '../types';
 import { AppContext } from './ctx';
 import { autocomplete } from '../helper/autocomplete';
@@ -65,7 +64,10 @@ type MetadataPopupProps = {
 
 export const MetadataPopup = ({ person }: MetadataPopupProps) => {
   const { createMetadata, updateMetadata, store } = useContext(AppContext);
-  const buildedPerson = useMemo(() => builder(person, store), [person, store]);
+  const buildedPerson = useMemo(
+    () => new PersonBuilder(person, store),
+    [person, store]
+  );
   const metadataList = buildedPerson.metadata || [];
 
   const keys = useMemo(
