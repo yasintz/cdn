@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Tree from '../components/Tree';
 import { getPersonTreeByDepth, PersonBuilder } from '../helper/builder';
 import { PersonTreeType, PersonType, StoreType } from '../types';
-import { AppContext } from './ctx';
+import { useAppContext } from './ctx';
 import _ from 'lodash';
 import style from './RelationDetail/RelationDetail.module.scss';
 
@@ -26,7 +26,7 @@ type PersonRelationProps = {
 };
 
 const PersonRelation: React.FC<PersonRelationProps> = ({ person, onClick }) => {
-  const { store, isDTree, treeDepth } = useContext(AppContext);
+  const { store, isDTree, treeDepth } = useAppContext();
 
   const buildedPerson = useMemo(
     () => new PersonBuilder(person, store),

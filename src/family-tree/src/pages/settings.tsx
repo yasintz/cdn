@@ -24,8 +24,8 @@ const SettingsPage = (props: SettingsPageProps) => {
           onChange={(e) => setTreeView(e.target.value as TreeView)}
           value={treeView}
         >
-          <option value={TreeView.Default}>Default</option>
           <option value={TreeView.DTree}>Dtree</option>
+          <option value={TreeView.Default}>Default</option>
           <option value={TreeView.List}>List</option>
         </select>
       </label>

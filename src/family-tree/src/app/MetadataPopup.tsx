@@ -3,7 +3,7 @@ import _ from 'lodash';
 import styled from 'styled-components';
 import { PersonBuilder } from '../helper/builder';
 import { MetadataType, PersonType } from '../types';
-import { AppContext } from './ctx';
+import { useAppContext } from './ctx';
 import { autocomplete } from '../helper/autocomplete';
 
 const StyledItemContainer = styled.div`
@@ -63,7 +63,7 @@ type MetadataPopupProps = {
 };
 
 export const MetadataPopup = ({ person }: MetadataPopupProps) => {
-  const { createMetadata, updateMetadata, store } = useContext(AppContext);
+  const { createMetadata, updateMetadata, store } = useAppContext();
   const buildedPerson = useMemo(
     () => new PersonBuilder(person, store),
     [person, store]

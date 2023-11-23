@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { PersonBuilder } from '../helper/builder';
 import { MetadataType, PersonType } from '../types';
-import { AppContext } from './ctx';
+import { useAppContext } from './ctx';
 
 const StyledContainer = styled.div`
   width: 350px;
@@ -35,7 +35,7 @@ export const RawJsonPopup = ({ person }: RawJsonPopupProps) => {
     updatePerson,
     updateMetadata,
     store,
-  } = useContext(AppContext);
+  } = useAppContext();
 
   const buildedPerson = useMemo(
     () => new PersonBuilder(person, store),

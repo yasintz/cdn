@@ -343,7 +343,7 @@ class TreeBuilder {
 
   static _nodeSize(nodes, width, textRenderer) {
     let maxWidth = 0;
-    let maxHeight = 0;
+    let maxHeight = 45;
     let tmpSvg = document.createElement('svg');
     document.body.appendChild(tmpSvg);
 
@@ -357,7 +357,8 @@ class TreeBuilder {
       container.innerHTML = text;
 
       tmpSvg.appendChild(container);
-      let height = container.offsetHeight;
+      // let height = container.offsetHeight;
+      let height = 45;
       tmpSvg.removeChild(container);
 
       maxHeight = Math.max(maxHeight, height);

@@ -76,7 +76,7 @@ const dTree = {
         bottom: 0,
         left: 0,
       },
-      nodeWidth: 100,
+      nodeWidth: 132,
       marriageNodeSize: 10,
       styles: {
         node: 'node',

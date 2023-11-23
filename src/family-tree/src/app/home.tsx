@@ -202,7 +202,7 @@ const App: React.FC = () => {
         showPersonSelector: setPersonSelector,
         treeDepth,
         isDTree,
-        treeView: TreeView.Default,
+        treeView: TreeView.DTree,
         setTreeView: () => 0,
         setTreeDepth,
       }}

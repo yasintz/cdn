@@ -39,26 +39,26 @@ const DTree = ({ person, store, depth, onClick }: DTreeProps) => {
         nodeClick: (name, extra) => {
           onClick?.(extra.person);
         },
-        // nodeRenderer(
-        //   name,
-        //   x,
-        //   y,
-        //   height,
-        //   width,
-        //   extra,
-        //   id,
-        //   nodeClass,
-        //   textClass,
-        //   textRenderer
-        // ) {
-        //   const element = (
-        //     <div className={cx('person', genderClass[extra.person.gender])}>
-        //       <div>{name}</div>
-        //     </div>
-        //   );
+        nodeRenderer(
+          name,
+          x,
+          y,
+          height,
+          width,
+          extra,
+          id,
+          nodeClass,
+          textClass,
+          textRenderer
+        ) {
+          const element = (
+            <div className={cx('person', genderClass[extra.person.gender])}>
+              <div>{name}</div>
+            </div>
+          );
 
-        //   return ReactDOM.renderToString(element);
-        // },
+          return ReactDOM.renderToString(element);
+        },
       },
     });
   }, [person, person.name, store, depth, onClick]);

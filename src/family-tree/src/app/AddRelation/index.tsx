@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import style from './AddRelation.module.scss';
 import { PersonType, RelationValueType } from '../../types';
 import TypeSelector, { typeConfig } from '../TypeSelector';
-import { AppContext } from '../ctx';
+import { useAppContext } from '../ctx';
 
 type AddRelationProps = {
   person?: PersonType;
@@ -19,7 +19,7 @@ const PersonSelectorBox: React.FC<PersonSelectorBoxProps> = ({
   setPerson,
   base,
 }) => {
-  const ctx = useContext(AppContext);
+  const ctx = useAppContext();
   return (
     <div
       className={style.personSelector}
@@ -91,7 +91,7 @@ const PersonRenderer: React.FC<PersonRendererProps> = ({
   person,
   onGenerate,
 }) => {
-  const ctx = useContext(AppContext);
+  const ctx = useAppContext();
   const [lines, setLine] = useState<LineItem[]>([
     {
       type: 'parent',
@@ -152,7 +152,7 @@ const PersonRenderer: React.FC<PersonRendererProps> = ({
 };
 
 const AddRelation: React.FC<AddRelationProps> = ({ person }) => {
-  const { createRelation } = useContext(AppContext);
+  const { createRelation } = useAppContext();
 
   const handleGenerate = (lines: LineItem[]) => {
     if (person) {

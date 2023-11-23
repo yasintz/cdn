@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import style from './RelationDetail.module.scss';
 import { PersonType } from '../../types';
 import cx from 'classnames';
 import { PersonBuilder } from '../../helper/builder';
-import { AppContext } from '../ctx';
+import { useAppContext } from '../ctx';
 import RelationTree from '../RelationTree';
 import _ from 'lodash';
 
@@ -48,11 +48,7 @@ const PersonRelation = ({
   isOldRelation?: boolean;
 }) => {
   const [search, setSearch] = useState('');
-  const {
-    store,
-    person: personList,
-    showCreatePersonModal,
-  } = useContext(AppContext);
+  const { store, person: personList, showCreatePersonModal } = useAppContext();
   const builded = useMemo(
     () => (person ? new PersonBuilder(person, store) : null),
     [person, store]
