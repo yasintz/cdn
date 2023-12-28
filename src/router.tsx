@@ -6,6 +6,7 @@ const Gk27 = React.lazy(() => import('./gk27'));
 const ZinciriKirma = React.lazy(() => import('./zinciri-kirma'));
 const YardimLocation = React.lazy(() => import('./yardim-location'));
 const FamilyTree = React.lazy(() => import('./family-tree'));
+const MesaiTakip = React.lazy(() => import('./mesai-takip'));
 
 const router = createBrowserRouter(
   [
@@ -50,6 +51,14 @@ const router = createBrowserRouter(
       element: (
         <React.Suspense>
           <FamilyTree />
+        </React.Suspense>
+      ),
+    },
+    {
+      path: 'mesai-takip',
+      element: (
+        <React.Suspense>
+          <MesaiTakip />
         </React.Suspense>
       ),
     },
