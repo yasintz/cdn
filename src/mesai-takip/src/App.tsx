@@ -45,7 +45,7 @@ function App() {
 
         return itemDate >= startTime && itemDate <= endTime;
       })
-      .sort((a, b) => dayjs(a.date).diff(b.date));
+      .sort((a, b) => dayjs(b.date).diff(a.date));
   }, [activeMonth, items]);
 
   const selectedItemId = searchParams.get('item');
