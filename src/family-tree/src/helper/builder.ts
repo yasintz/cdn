@@ -44,22 +44,22 @@ export class PersonBuilder {
       .map((i) => this.getPersonById(i.second));
   };
 
-  @Cached()
+  // @Cached()
   get metadata() {
     return this.store.metadata.filter((m) => m.personId === this.person.id);
   }
 
-  @Cached()
+  // @Cached()
   get parents() {
     return this._getParents();
   }
 
-  @Cached()
+  // @Cached()
   get children() {
     return this._getChildrenByParent(this.person.id);
   }
 
-  @Cached()
+  // @Cached()
   get partners() {
     return this.store.relation
       .filter(
@@ -71,7 +71,7 @@ export class PersonBuilder {
       .map((i) => this.getPersonById(i));
   }
 
-  @Cached()
+  // @Cached()
   get siblings() {
     return this._getParents()
       .reduce(
@@ -89,7 +89,7 @@ export class PersonBuilder {
       );
   }
 
-  @Cached()
+  // @Cached()
   get is() {
     return new IsBuilder(this, this.store);
   }
