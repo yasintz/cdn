@@ -1,12 +1,14 @@
+// @ts-ignore
 import TreeBuilder from './builder.js';
 import _ from 'lodash';
+// @ts-ignore
 import d3 from './d3';
 import './style.scss';
 
 const dTree = {
   VERSION: '/* @echo DTREE_VERSION */',
 
-  init: function (data, options = {}) {
+  init: function (data: any, options = {}) {
     var opts = _.defaultsDeep(options || {}, {
       target: '#graph',
       debug: false,
@@ -14,24 +16,30 @@ const dTree = {
       height: 600,
       hideMarriageNodes: true,
       callbacks: {
-        nodeClick: function (name, extra, id) {},
-        nodeRightClick: function (name, extra, id) {},
-        marriageClick: function (extra, id) {},
-        marriageRightClick: function (extra, id) {},
-        nodeHeightSeperation: function (nodeWidth, nodeMaxHeight) {
-          return TreeBuilder._nodeHeightSeperation(nodeWidth, nodeMaxHeight);
-        },
+        nodeHeightSeperation: (nodeWidth: number, nodeMaxHeight: number) =>
+          TreeBuilder._nodeHeightSeperation(nodeWidth, nodeMaxHeight),
         nodeRenderer: function (
+          // @ts-ignore
           name,
+          // @ts-ignore
           x,
+          // @ts-ignore
           y,
+          // @ts-ignore
           height,
+          // @ts-ignore
           width,
+          // @ts-ignore
           extra,
+          // @ts-ignore
           id,
+          // @ts-ignore
           nodeClass,
+          // @ts-ignore
           textClass,
+          // @ts-ignore
           textRenderer
+          // @ts-ignore
         ) {
           return TreeBuilder._nodeRenderer(
             name,
@@ -46,15 +54,19 @@ const dTree = {
             textRenderer
           );
         },
+        // @ts-ignore
         nodeSize: function (nodes, width, textRenderer) {
           return TreeBuilder._nodeSize(nodes, width, textRenderer);
         },
+        // @ts-ignore
         nodeSorter: function (aName, aExtra, bName, bExtra) {
           return 10;
         },
+        // @ts-ignore
         textRenderer: function (name, extra, textClass) {
           return TreeBuilder._textRenderer(name, extra, textClass);
         },
+        // @ts-ignore
         marriageSize: function (nodes, size) {
           return TreeBuilder._marriageSize(nodes, size);
         },
@@ -76,10 +88,12 @@ const dTree = {
       },
     });
 
+    // @ts-ignore
     var data = this._preprocess(data, opts);
     var treeBuilder = new TreeBuilder(data.root, data.siblings, opts);
     treeBuilder.create();
 
+    // @ts-ignore
     function _zoomTo(x, y, zoom = 1, duration = 500) {
       treeBuilder.svg
         .transition()
@@ -104,6 +118,7 @@ const dTree = {
           );
       },
       zoomTo: _zoomTo,
+      // @ts-ignore
       zoomToNode: function (nodeId, zoom = 2, duration = 500) {
         const node = _.find(treeBuilder.allNodes, { data: { id: nodeId } });
         if (node) {
@@ -134,8 +149,9 @@ const dTree = {
     };
   },
 
+  // @ts-ignore
   _preprocess: function (data, opts) {
-    var siblings = [];
+    var siblings: any[] = [];
 
     var root = {
       name: '',
@@ -144,7 +160,13 @@ const dTree = {
       children: [],
     };
 
-    var reconstructTree = function (person, parent, index, mappedParent) {
+    function reconstructTree(
+      person: any,
+      parent: any,
+      index: number | string,
+      mappedParent: any[]
+    ) {
+      const parentChildren = [];
       var node = {
         name: person.name,
         id: person.extra.person.id,
@@ -155,14 +177,9 @@ const dTree = {
         class: person.class ? person.class : opts.styles.node,
         index,
         mappedParent,
+        noParent: parent === root,
       };
 
-      // hide linages to the hidden root node
-      if (parent == root) {
-        node.noParent = true;
-      }
-
-      // apply depth offset
       for (var i = 0; i < person.depthOffset; i++) {
         var pushNode = {
           name: '',
@@ -171,13 +188,14 @@ const dTree = {
           children: [],
           noParent: node.noParent,
         };
-        parent.children.push(pushNode);
+        parentChildren.push(pushNode);
         parent = pushNode;
       }
 
       // sort children
       dTree._sortPersons(person.children, opts);
 
+      // node.children = person.children
       // add "direct" children
       _.forEach(person.children, function (child, index) {
         reconstructTree(child, node, index, person.children);
@@ -187,7 +205,7 @@ const dTree = {
       dTree._sortMarriages(person.marriages, opts);
 
       if (person.marriages.length < 2) {
-        parent.children.push(node);
+        parentChildren.push(node);
       }
 
       let isPushed = false;
@@ -217,11 +235,11 @@ const dTree = {
         };
 
         if (person.marriages.length >= 2 && !isPushed) {
-          parent.children.push(spouse, m);
+          parentChildren.push(spouse, m);
           isPushed = true;
-          parent.children.push(node);
+          parentChildren.push(node);
         } else {
-          parent.children.push(m, spouse);
+          parentChildren.push(m, spouse);
         }
 
         dTree._sortPersons(marriage.children, opts);
@@ -241,7 +259,9 @@ const dTree = {
           number: index,
         });
       });
-    };
+
+      parent.children.push(...parentChildren);
+    }
 
     _.forEach(data, function (person, index) {
       reconstructTree(person, root, index, data);
@@ -249,14 +269,17 @@ const dTree = {
 
     return {
       root: d3.hierarchy(root),
-      siblings: siblings,
+      siblings,
     };
   },
 
+  // @ts-ignore
   _sortPersons: function (persons, opts) {
     if (persons != undefined) {
+      // @ts-ignore
       persons.sort(function (a, b) {
         return opts.callbacks.nodeSorter.call(
+          // @ts-ignore
           this,
           a.name,
           a.extra,
@@ -268,12 +291,14 @@ const dTree = {
     return persons;
   },
 
+  // @ts-ignore
   _sortMarriages: function (marriages, opts) {
     if (marriages != undefined && Array.isArray(marriages)) {
       marriages.sort(function (marriageA, marriageB) {
         var a = marriageA.spouse;
         var b = marriageB.spouse;
         return opts.callbacks.nodeSorter.call(
+          // @ts-ignore
           this,
           a.name,
           a.extra,
