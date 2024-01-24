@@ -1,0 +1,16 @@
+{
+  "name": "Deneme Analizi",
+  "short_name": "Deneme Analizi",
+  "description": "Deneme Analizi",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/exam-analyzer",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#111111"
+}
