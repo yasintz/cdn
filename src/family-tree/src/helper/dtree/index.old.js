@@ -136,24 +136,25 @@ const dTree = {
 
   _preprocess: function (data, opts) {
     var siblings = [];
-    var id = 0;
 
     var root = {
       name: '',
-      id: id++,
+      id: 'root',
       hidden: true,
       children: [],
     };
 
-    var reconstructTree = function (person, parent) {
+    var reconstructTree = function (person, parent, index, mappedParent) {
       var node = {
         name: person.name,
-        id: id++,
+        id: person.extra.person.id,
         hidden: false,
         children: [],
         extra: person.extra,
         textClass: person.textClass ? person.textClass : opts.styles.text,
         class: person.class ? person.class : opts.styles.node,
+        index,
+        mappedParent,
       };
 
       // hide linages to the hidden root node
@@ -165,7 +166,7 @@ const dTree = {
       for (var i = 0; i < person.depthOffset; i++) {
         var pushNode = {
           name: '',
-          id: id++,
+          id: `${person.extra.person.id}_depth_offset_${i}`,
           hidden: true,
           children: [],
           noParent: node.noParent,
@@ -178,8 +179,8 @@ const dTree = {
       dTree._sortPersons(person.children, opts);
 
       // add "direct" children
-      _.forEach(person.children, function (child) {
-        reconstructTree(child, node);
+      _.forEach(person.children, function (child, index) {
+        reconstructTree(child, node, index, person.children);
       });
 
       //sort marriages
@@ -192,9 +193,10 @@ const dTree = {
 
       let isPushed = false;
       _.forEach(person.marriages, function (marriage, index) {
+        var sp = marriage.spouse;
         var m = {
           name: '',
-          id: id++,
+          id: `${sp.extra.person.id}_partner_connection`,
           hidden: opts.hideMarriageNodes,
           noParent: true,
           children: [],
@@ -203,11 +205,9 @@ const dTree = {
           class: marriage.class ? marriage.class : opts.styles.marriageNode,
         };
 
-        var sp = marriage.spouse;
-
         var spouse = {
           name: sp.name,
-          id: id++,
+          id: sp.extra.person.id,
           hidden: false,
           noParent: true,
           children: [],
@@ -225,8 +225,8 @@ const dTree = {
         // }
 
         dTree._sortPersons(marriage.children, opts);
-        _.forEach(marriage.children, function (child) {
-          reconstructTree(child, m);
+        _.forEach(marriage.children, function (child, index) {
+          reconstructTree(child, m, index, marriage.children);
         });
 
         siblings.push({
@@ -243,8 +243,8 @@ const dTree = {
       });
     };
 
-    _.forEach(data, function (person) {
-      reconstructTree(person, root);
+    _.forEach(data, function (person, index) {
+      reconstructTree(person, root, index, data);
     });
 
     return {

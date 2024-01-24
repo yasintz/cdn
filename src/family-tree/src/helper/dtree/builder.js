@@ -1,6 +1,19 @@
 import _ from 'lodash';
 import d3 from './d3';
 
+const stringToColor = (str) => {
+  let hash = 0;
+  str.split('').forEach((char) => {
+    hash = char.charCodeAt(0) + ((hash << 5) - hash);
+  });
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += value.toString(16).padStart(2, '0');
+  }
+  return color;
+};
+
 class TreeBuilder {
   constructor(root, siblings, opts) {
     TreeBuilder.DEBUG_LEVEL = opts.debug ? 1 : 0;
@@ -108,7 +121,10 @@ class TreeBuilder {
       })
       .append('path')
       .attr('class', opts.styles.linage)
-      .attr('d', this._elbow);
+      .attr('d', this._elbow)
+      .attr('stroke', (d, i) =>
+        stringToColor(`sibling ${d.source.id} ${d.target.id}${i}`)
+      );
 
     let nodes = this.g.selectAll('.node').data(treenodes.descendants()).enter();
 
@@ -121,7 +137,10 @@ class TreeBuilder {
       .enter()
       .append('path')
       .attr('class', opts.styles.marriage)
-      .attr('d', _.bind(this._siblingLine, this));
+      .attr('d', _.bind(this._siblingLine, this))
+      .attr('stroke', (d, i) =>
+        stringToColor(`marriage ${d.source.id} ${d.target.id}${i}`)
+      );
 
     // Create the node rectangles.
 
@@ -217,36 +236,53 @@ class TreeBuilder {
   }
 
   // children lline
-  _elbow(d, i) {
+  _elbow(d) {
     if (d.target.data.noParent) {
       return 'M0,0L0,0';
     }
-    let ny = Math.round(d.target.y + (d.source.y - d.target.y) * 0.5);
+
+    const index = d.target.data.index;
+    const isPlacedAtLeft = d.target.x > d.source.x;
+    const sameDirectionSiblings = d.target.parent.children.filter((i) =>
+      isPlacedAtLeft ? i.x > d.source.x : i.x < d.source.x
+    );
+
+    const sameDirectionIndex = sameDirectionSiblings.findIndex(
+      (i) => i.id === d.target.id
+    );
+
+    const lineY =
+      d.target.y -
+      (d.target.y - d.source.y) / 2 +
+      (isPlacedAtLeft
+        ? sameDirectionSiblings.length - sameDirectionIndex
+        : sameDirectionIndex) /
+        2;
 
     let linedata = [
       {
+        x: d.source.x + index * 1.2,
+        y: d.source.y,
+      },
+      {
+        x: d.source.x + index * 1.2,
+        y: lineY,
+      },
+      {
+        x: d.target.x,
+        y: lineY,
+      },
+      {
         x: d.target.x,
         y: d.target.y,
-      },
-      {
-        x: d.target.x,
-        y: ny,
-      },
-      {
-        x: d.source.x,
-        y: d.source.y,
       },
     ];
 
     let fun = d3
       .line()
-      .curve(d3.curveStepAfter)
-      .x(function (d) {
-        return d.x;
-      })
-      .y(function (d) {
-        return d.y;
-      });
+      .x((d) => d.x)
+      .y((d) => d.y);
+
     return fun(linedata);
   }
 
@@ -324,7 +360,7 @@ class TreeBuilder {
       },
     ];
 
-    let fun = d3
+    const fun = d3
       .line()
       .curve(d3.curveStepAfter)
       .x(function (d) {
@@ -333,7 +369,9 @@ class TreeBuilder {
       .y(function (d) {
         return d.y;
       });
-    return fun(linedata);
+
+    const result = fun(linedata);
+    return result;
   }
 
   static _nodeHeightSeperation(nodeWidth, nodeMaxHeight) {
