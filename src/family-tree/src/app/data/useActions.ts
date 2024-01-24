@@ -5,12 +5,14 @@ import {
   PersonType,
   RelationType,
   RelationValueType,
+  StoreType,
 } from '../../types';
 import turkishToEnglish from '../../helper/tr-to-eng';
+import { useStore } from '../store';
 
 const uid = () => Math.random().toString(36).substring(2, 12);
 
-type State<S> = [S, React.Dispatch<React.SetStateAction<S>>];
+type State<S> = readonly [S, (value: S) => void];
 
 type Params = {
   personState: State<PersonType[]>;
@@ -21,8 +23,8 @@ type Params = {
 function usePersonActions(params: Params) {
   const {
     personState: [personList, setPerson],
-    relationState: [, setRelation],
-    metadataState: [, setMetadata],
+    relationState: [relation, setRelation],
+    metadataState: [metadata, setMetadata],
   } = params;
 
   const createPerson = (name: string, gender: Gender) => {
@@ -32,7 +34,7 @@ function usePersonActions(params: Params) {
       id: personList.length.toString(),
     };
 
-    setPerson((prev) => [newPerson, ...prev]);
+    setPerson([newPerson, ...personList]);
 
     return newPerson;
   };
@@ -40,35 +42,32 @@ function usePersonActions(params: Params) {
   const updatePerson = (
     id: string,
     newPerson: Partial<Omit<PersonType, 'id'>>
-  ) =>
-    setPerson((prev) => {
-      const prs = prev.findIndex((p) => p.id === id);
+  ) => {
+    const prs = personList.findIndex((p) => p.id === id);
 
-      if (prs === -1) {
-        return prev;
-      }
+    if (prs === -1) {
+      return;
+    }
 
-      const prevPerson = prev[prs];
-      const newItem = {
-        ...prevPerson,
-        ...newPerson,
-        id,
-      };
+    const prevPerson = personList[prs];
+    const newItem = {
+      ...prevPerson,
+      ...newPerson,
+      id,
+    };
 
-      const arrayCopy = Array.from(prev);
-      arrayCopy[prs] = newItem;
+    const arrayCopy = Array.from(personList);
+    arrayCopy[prs] = newItem;
 
-      return arrayCopy;
-    });
+    setPerson(arrayCopy);
+  };
 
   const deletePerson = (id: string) => {
     const doubleCheck = window.confirm('Are you sure?');
     if (doubleCheck) {
-      setMetadata((prev) => prev.filter((m) => m.personId !== id));
-      setRelation((prev) =>
-        prev.filter((r) => r.main !== id && r.second !== id)
-      );
-      setPerson((prev) => prev.filter((p) => p.id !== id));
+      setMetadata(metadata.filter((m) => m.personId !== id));
+      setRelation(relation.filter((r) => r.main !== id && r.second !== id));
+      setPerson(personList.filter((p) => p.id !== id));
     }
   };
 
@@ -79,7 +78,7 @@ function useRelationActions(params: Params) {
   const {
     relationState: [relations, setRelation],
     personState: [personList, setPerson],
-    metadataState: [, setMetadata],
+    metadataState: [metadataList, setMetadata],
   } = params;
 
   type RelationParam = {
@@ -137,8 +136,8 @@ function useRelationActions(params: Params) {
         return;
       }
 
-      setRelation((prev) =>
-        prev.map((r) =>
+      setRelation(
+        relations.map((r) =>
           r.main === second
             ? { ...r, main: main }
             : r.second === second
@@ -147,20 +146,22 @@ function useRelationActions(params: Params) {
         )
       );
 
-      setMetadata((prev) =>
-        prev.map((m) => (m.personId === second ? { ...m, personId: main } : m))
+      setMetadata(
+        metadataList.map((m) =>
+          m.personId === second ? { ...m, personId: main } : m
+        )
       );
-      setPerson((prev) => prev.filter((u) => u.id !== second));
+      setPerson(personList.filter((u) => u.id !== second));
 
       return;
     }
 
-    setRelation((prev) => [
-      ...prev,
+    setRelation([
+      ...relations,
       ...args
         .filter((i) => i.main !== i.second)
         .map(handleRelation)
-        .filter((rel) => prev.findIndex((a) => a.id === rel.id) === -1),
+        .filter((rel) => relations.findIndex((a) => a.id === rel.id) === -1),
     ]);
   };
 
@@ -169,7 +170,7 @@ function useRelationActions(params: Params) {
 
 function useMetadataActions(params: Params) {
   const {
-    metadataState: [, setMetadata],
+    metadataState: [metadataList, setMetadata],
   } = params;
 
   const createMetadata = (metadata: Omit<MetadataType, 'id'>): MetadataType => {
@@ -178,7 +179,7 @@ function useMetadataActions(params: Params) {
       ...metadata,
     };
 
-    setMetadata((prev) => [newMetadata, ...prev]);
+    setMetadata([newMetadata, ...metadataList]);
 
     return newMetadata;
   };
@@ -186,34 +187,53 @@ function useMetadataActions(params: Params) {
   const updateMetadata = (
     id: string,
     newMetadata: Partial<Omit<MetadataType, 'id'>>
-  ) =>
-    setMetadata((prev) => {
-      const prs = prev.findIndex((p) => p.id === id);
+  ) => {
+    const prs = metadataList.findIndex((p) => p.id === id);
 
-      if (prs === -1) {
-        return prev;
-      }
+    if (prs === -1) {
+      return;
+    }
 
-      const prevMetadata = prev[prs];
-      const newItem = {
-        ...prevMetadata,
-        ...newMetadata,
-        id,
-      };
+    const prevMetadata = metadataList[prs];
+    const newItem = {
+      ...prevMetadata,
+      ...newMetadata,
+      id,
+    };
 
-      const arrayCopy = Array.from(prev);
-      arrayCopy[prs] = newItem;
+    const arrayCopy = Array.from(metadataList);
+    arrayCopy[prs] = newItem;
 
-      return arrayCopy;
-    });
+    setMetadata(arrayCopy);
+  };
   const deleteMetadata = (id: string) => {
-    setMetadata((prev) => prev.filter((i) => i.id !== id));
+    setMetadata(metadataList.filter((i) => i.id !== id));
   };
 
   return { createMetadata, updateMetadata, deleteMetadata };
 }
 
-export function useActions(params: Params) {
+export function useActions() {
+  const { store, setStore } = useStore();
+  const personState = [
+    store.person,
+    (person: StoreType['person']) => setStore({ ...store, person }),
+  ] as const;
+  const relationState = [
+    store.relation,
+    (relation: StoreType['relation']) => setStore({ ...store, relation }),
+  ] as const;
+  const metadataState = [
+    store.metadata,
+    (metadata: StoreType['metadata']) => setStore({ ...store, metadata }),
+  ] as const;
+
+  const params = {
+    personState,
+    relationState,
+    metadataState,
+  };
+
   const { createPerson, updatePerson, deletePerson } = usePersonActions(params);
   const { createRelation } = useRelationActions(params);
   const { createMetadata, updateMetadata, deleteMetadata } =
