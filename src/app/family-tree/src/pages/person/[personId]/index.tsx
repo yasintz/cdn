@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TreeView, useAppContext } from '../../../app/ctx';
 import { DetailPage } from '../../../app/pages/detail';

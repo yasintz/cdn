@@ -19,7 +19,7 @@ const apps = fs.readdirSync('./src/app');
 
 const templateContent = fs.readFileSync('./src/main.template.tsx', 'utf-8');
 
-fs.writeFileSync(
-  './src/main.tsx',
-  templateContent.replace('{app-path}', process.env.PROJECT)
-);
+// fs.writeFileSync(
+//   './src/main.tsx',
+//   templateContent.replace('{app-path}', process.env.PROJECT)
+// );
