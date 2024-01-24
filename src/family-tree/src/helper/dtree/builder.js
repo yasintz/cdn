@@ -124,6 +124,7 @@ class TreeBuilder {
       .attr('d', _.bind(this._siblingLine, this));
 
     // Create the node rectangles.
+
     nodes
       .append('foreignObject')
       .filter(function (d) {
@@ -145,32 +146,19 @@ class TreeBuilder {
         return d.id;
       })
       .html(function (d) {
-        if (d.data.isMarriage) {
-          return opts.callbacks.marriageRenderer.call(
-            this,
-            d.x,
-            d.y,
-            marriageSize[0],
-            marriageSize[1],
-            d.data.extra,
-            d.data.id,
-            d.data.class
-          );
-        } else {
-          return opts.callbacks.nodeRenderer.call(
-            this,
-            d.data.name,
-            d.x,
-            d.y,
-            nodeSize[0],
-            nodeSize[1],
-            d.data.extra,
-            d.data.id,
-            d.data.class,
-            d.data.textClass,
-            opts.callbacks.textRenderer
-          );
-        }
+        return opts.callbacks.nodeRenderer.call(
+          this,
+          d.data.name,
+          d.x,
+          d.y,
+          nodeSize[0],
+          nodeSize[1],
+          d.data.extra,
+          d.data.id,
+          d.data.class,
+          d.data.textClass,
+          opts.callbacks.textRenderer
+        );
       })
       .on('dblclick', function () {
         // do not propagate a double click on a node
@@ -228,6 +216,7 @@ class TreeBuilder {
     return n;
   }
 
+  // children lline
   _elbow(d, i) {
     if (d.target.data.noParent) {
       return 'M0,0L0,0';
@@ -288,7 +277,17 @@ class TreeBuilder {
     });
   }
 
-  _siblingLine(d, i) {
+  // marriage line
+  _siblingLine(p, i) {
+    const d = p;
+    // const d = {
+    //   ...p,
+    //   source: _.minBy([p.source, p.target], 'x'),
+    //   target: _.maxBy([p.source, p.target], 'x'),
+    // };
+
+    // console.log({d,p})
+
     let ny = Math.round(d.target.y + (d.source.y - d.target.y) * 0.5);
     let nodeWidth = this.nodeSize[0];
     let nodeHeight = this.nodeSize[1];
@@ -415,10 +414,6 @@ class TreeBuilder {
     node += name;
     node += '</p>\n';
     return node;
-  }
-
-  static _marriageRenderer(x, y, height, width, extra, id, nodeClass) {
-    return `<div style="height:100%" class="${nodeClass}" id="node${id}"></div>`;
   }
 
   static _debug(msg) {

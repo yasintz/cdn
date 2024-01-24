@@ -6,7 +6,7 @@ import { SyncStatusEnum } from '../components/sync';
 import { useStore } from './store';
 
 function useData() {
-  const { store, setStore } = useStore();
+  const { store } = useStore();
   const [syncStatus] = useState(SyncStatusEnum.Loaded);
 
   const {

@@ -66,7 +66,10 @@ export function personTreeToDTree(
     children: childToDTree(parentlessChildren),
     marriages: partnersWithChildren.map(({ partner, children }) => ({
       spouse: personToDtreePerson(partner),
-      children: childToDTree(children),
+      children: childToDTree(
+        children
+        // .filter((i) => i.id === 'Sukru_0_nk6kshef6o')
+      ),
     })),
   };
 }

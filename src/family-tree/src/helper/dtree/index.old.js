@@ -50,21 +50,10 @@ const dTree = {
           return TreeBuilder._nodeSize(nodes, width, textRenderer);
         },
         nodeSorter: function (aName, aExtra, bName, bExtra) {
-          return 0;
+          return 10;
         },
         textRenderer: function (name, extra, textClass) {
           return TreeBuilder._textRenderer(name, extra, textClass);
-        },
-        marriageRenderer: function (x, y, height, width, extra, id, nodeClass) {
-          return TreeBuilder._marriageRenderer(
-            x,
-            y,
-            height,
-            width,
-            extra,
-            id,
-            nodeClass
-          );
         },
         marriageSize: function (nodes, size) {
           return TreeBuilder._marriageSize(nodes, size);
@@ -157,7 +146,6 @@ const dTree = {
     };
 
     var reconstructTree = function (person, parent) {
-      // convert to person to d3 node
       var node = {
         name: person.name,
         id: id++,
@@ -194,12 +182,15 @@ const dTree = {
         reconstructTree(child, node);
       });
 
-      parent.children.push(node);
-
       //sort marriages
       dTree._sortMarriages(person.marriages, opts);
 
-      // go through marriage
+      parent.children.push(node);
+      // if (person.marriages.length < 2) {
+      //   parent.children.push(node);
+      // }
+
+      let isPushed = false;
       _.forEach(person.marriages, function (marriage, index) {
         var m = {
           name: '',
@@ -228,6 +219,11 @@ const dTree = {
 
         parent.children.push(m, spouse);
 
+        // if (person.marriages.length >= 2 && !isPushed) {
+        //   isPushed = true;
+        //   parent.children.push(node);
+        // }
+
         dTree._sortPersons(marriage.children, opts);
         _.forEach(marriage.children, function (child) {
           reconstructTree(child, m);
@@ -235,9 +231,11 @@ const dTree = {
 
         siblings.push({
           source: {
+            __node: node,
             id: node.id,
           },
           target: {
+            __node: spouse,
             id: spouse.id,
           },
           number: index,
@@ -251,7 +249,7 @@ const dTree = {
 
     return {
       root: d3.hierarchy(root),
-      siblings: siblings,
+      siblings: _.shuffle(siblings),
     };
   },
 

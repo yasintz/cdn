@@ -11,6 +11,7 @@ type StateType = {
 };
 
 const db = googleSheetDb('0');
+// const db = googleSheetDb('1945192592');
 
 export const useStore = create(
   persist<StateType>(

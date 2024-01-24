@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/server';
+import { useEffect, useRef } from 'react';
 import cx from 'classnames';
-import React, { useEffect, useRef } from 'react';
 import dTree, { personTreeToDTree } from '../../helper/dtree';
 import { generateId } from '../../helper/generate-id';
 import { PersonTreeType, PersonType, StoreType } from '../../types';
