@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as geolib from 'geolib';
-import { CoordinateType, getCord } from '../utils/coordinate';
+import { CoordinateType, getCord } from 'src/utils/coordinate';
 import _ from 'lodash';
 
 type HelpType = {

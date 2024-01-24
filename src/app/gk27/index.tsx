@@ -2,7 +2,7 @@ import { getNearStops, getBus } from './utils';
 import _ from 'lodash';
 import { useState } from 'react';
 import './index.scss';
-import { getCord } from '../utils/coordinate';
+import { getCord } from 'src/utils/coordinate';
 
 const GaziantepKart27 = () => {
   const [result, setResult] = useState<ReturnType<typeof getBus>>([]);

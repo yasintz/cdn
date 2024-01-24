@@ -1,6 +1,4 @@
-import { useRoutes } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import router from './router';
 
-const FamilyTree = () => useRoutes([router]);
-
-export default FamilyTree;
+export default () => <RouterProvider router={router} />;
