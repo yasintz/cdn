@@ -186,10 +186,9 @@ const dTree = {
       //sort marriages
       dTree._sortMarriages(person.marriages, opts);
 
-      parent.children.push(node);
-      // if (person.marriages.length < 2) {
-      //   parent.children.push(node);
-      // }
+      if (person.marriages.length < 2) {
+        parent.children.push(node);
+      }
 
       let isPushed = false;
       _.forEach(person.marriages, function (marriage, index) {
@@ -217,12 +216,13 @@ const dTree = {
           marriageNode: m,
         };
 
-        parent.children.push(m, spouse);
-
-        // if (person.marriages.length >= 2 && !isPushed) {
-        //   isPushed = true;
-        //   parent.children.push(node);
-        // }
+        if (person.marriages.length >= 2 && !isPushed) {
+          parent.children.push(spouse, m);
+          isPushed = true;
+          parent.children.push(node);
+        } else {
+          parent.children.push(m, spouse);
+        }
 
         dTree._sortPersons(marriage.children, opts);
         _.forEach(marriage.children, function (child, index) {
@@ -249,7 +249,7 @@ const dTree = {
 
     return {
       root: d3.hierarchy(root),
-      siblings: _.shuffle(siblings),
+      siblings: siblings,
     };
   },
 

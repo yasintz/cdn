@@ -289,27 +289,22 @@ class TreeBuilder {
   _linkSiblings() {
     let allNodes = this.allNodes;
 
-    _.forEach(this.siblings, function (d) {
-      let start = allNodes.filter(function (v) {
-        return d.source.id == v.data.id;
-      });
-      let end = allNodes.filter(function (v) {
-        return d.target.id == v.data.id;
-      });
-      d.source.x = start[0].x;
-      d.source.y = start[0].y;
-      d.target.x = end[0].x;
-      d.target.y = end[0].y;
+    _.forEach(this.siblings, (sibling) => {
+      const source = allNodes.find((v) => sibling.source.id == v.data.id);
+      const target = allNodes.find((v) => sibling.target.id == v.data.id);
+      sibling.source.x = source.x;
+      sibling.source.y = source.y;
+      sibling.target.x = target.x;
+      sibling.target.y = target.y;
 
-      let marriageId =
-        start[0].data.marriageNode != null
-          ? start[0].data.marriageNode.id
-          : end[0].data.marriageNode.id;
-      let marriageNode = allNodes.find(function (n) {
-        return n.data.id == marriageId;
-      });
-      d.source.marriageNode = marriageNode;
-      d.target.marriageNode = marriageNode;
+      const marriageId =
+        source.data.marriageNode != null
+          ? source.data.marriageNode.id
+          : target.data.marriageNode.id;
+
+      const marriageNode = allNodes.find((n) => n.data.id == marriageId);
+      sibling.source.marriageNode = marriageNode;
+      sibling.target.marriageNode = marriageNode;
     });
   }
 
@@ -337,22 +332,6 @@ class TreeBuilder {
       {
         x: d.source.x,
         y: d.source.y,
-      },
-      {
-        x: Math.round(d.source.x + (nodeWidth * 6) / 10),
-        y: d.source.y,
-      },
-      {
-        x: Math.round(d.source.x + (nodeWidth * 6) / 10),
-        y: ny,
-      },
-      {
-        x: d.target.marriageNode.x,
-        y: ny,
-      },
-      {
-        x: d.target.marriageNode.x,
-        y: d.target.y,
       },
       {
         x: d.target.x,
