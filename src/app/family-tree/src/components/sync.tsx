@@ -1,9 +1,4 @@
-import React from 'react';
-import styled, {
-  css,
-  FlattenSimpleInterpolation,
-  keyframes,
-} from 'styled-components';
+import styled, { RuleSet, css, keyframes } from 'styled-components';
 import Icon from './Icon';
 
 export enum SyncStatusEnum {
@@ -22,7 +17,7 @@ const rotate = keyframes`
   }
 `;
 
-const styleByStatus: Record<SyncStatusEnum, FlattenSimpleInterpolation> = {
+const styleByStatus: Record<SyncStatusEnum, RuleSet<object>> = {
   [SyncStatusEnum.Loading]: css`
     animation: ${rotate} 2s linear infinite;
   `,
