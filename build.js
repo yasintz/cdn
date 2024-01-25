@@ -39,7 +39,7 @@ fs.cpSync('projects', 'dist', { recursive: true });
  */
 fs.cpSync('projects', 'dist/projects', { recursive: true });
 
-const apps = fs.readdirSync('./src/app');
+const apps = fs.readdirSync('./src/app').filter((i) => i !== '_archived');
 
 apps.forEach((app) => {
   execSync(`PROJECT="${app}" pnpm vite build`);
