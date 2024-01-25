@@ -1,9 +1,10 @@
-import React from 'react';
+import App from './App';
+import './index.css';
 
 type ExamAnalyzerProps = {};
 
 const ExamAnalyzer = (props: ExamAnalyzerProps) => {
-  return <h2>Exam</h2>;
+  return <App />;
 };
 
 export default ExamAnalyzer;
