@@ -1,5 +1,4 @@
 import React from 'react';
-import fs from 'fs';
 import ReactDomServer from 'react-dom/server';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -27,54 +26,21 @@ async function getHtml(app: string) {
 
   return html;
 }
-function createEntries(app: string) {
-  const templateContent = fs.readFileSync('./src/main.template.tsx', 'utf-8');
 
-  fs.writeFileSync(
-    `./src/dist/${app}.tsx`,
-    templateContent.replace('{app-path}', app)
-  );
-  fs.writeFileSync(`./src/dist/${app}.html`, `<!DOCTYPE html> <%- content %>`);
-}
-
-export default defineConfig(async ({ command }) => {
+export default defineConfig(async () => {
   const selectedApp = process.env.PROJECT;
-  const apps = await Promise.all(
-    fs.readdirSync('./src/app').map(async (app) => {
-      const content = await getHtml(app);
-      return { app, content };
-    })
-  );
-
-  apps.forEach((app) => createEntries(app.app));
 
   return {
     plugins: [
-      command === 'serve' &&
-        createHtmlPlugin({
-          minify: true,
-          entry: 'src/main.tsx',
-          inject: {
-            data: {
-              content: await getHtml(selectedApp),
-            },
+      createHtmlPlugin({
+        minify: true,
+        entry: 'src/main.tsx',
+        inject: {
+          data: {
+            content: await getHtml(selectedApp),
           },
-        }),
-      command === 'build' &&
-        createHtmlPlugin({
-          minify: true,
-          pages: apps.map(({ app, content }) => ({
-            filename: `${app}.html`,
-            // template: 'index.html',
-            template: `src/dist/${app}.html`,
-            entry: `./${app}.tsx`,
-            injectOptions: {
-              data: {
-                content: content,
-              },
-            },
-          })),
-        }),
+        },
+      }),
       react(),
       visualizer(),
       tsconfigPaths(),
