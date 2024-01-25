@@ -1,8 +1,8 @@
 import ReactDOM from 'react-dom/client';
-// @ts-ignore
-import App from 'src/app/{app-path}';
+// {import}
 
 const element = document.getElementById('root') as HTMLElement;
 const root = ReactDOM.createRoot(element);
 
+// @ts-ignore
 root.render(<App />);

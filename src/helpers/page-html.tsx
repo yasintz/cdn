@@ -10,6 +10,7 @@ const Html = (props: PageHtmlProps) => {
       </head>
       <body>
         <div id="root"></div>
+        <script src="./src/main.tsx" type="module" />
       </body>
     </html>
   );

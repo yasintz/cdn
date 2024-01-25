@@ -5,10 +5,13 @@ const Html = (props: PageHtmlProps) => {
     <html lang="en">
       <head>
         <script src="https://d3js.org/d3.v4.min.js"></script>
+        <link rel="manifest" href="/family-tree/manifest.json" />
+        <link rel="icon" type="image/png" href="/family-tree/icon.png" />
         <title>Family Tree</title>
       </head>
       <body>
-        <div id="root"></div>
+        <div id="root" />
+        <script src="./src/main.tsx" type="module" />
       </body>
     </html>
   );
