@@ -1,0 +1,12 @@
+@import 'src/app/mesai-takip/theme.scss';
+
+.title {
+  @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white;
+  margin-bottom: 8px;
+}
+.toggle {
+  @apply w-11 h-6 bg-gray-200;
+}
+.answer {
+  @apply ms-3 text-sm font-medium text-gray-900 dark:text-gray-300;
+}

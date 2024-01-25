@@ -1,0 +1,16 @@
+{
+  "name": "Mesai Takip",
+  "short_name": "Mesai Takip",
+  "description": "Mesai takip uygulamasi",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/mesai-takip",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#111111"
+}

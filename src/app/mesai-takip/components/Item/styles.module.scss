@@ -1,0 +1,30 @@
+.container {
+  @apply block
+    max-w-sm
+    p-2
+    bg-white
+    border
+    border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700;
+
+  user-select: none;
+  display: flex;
+  transition: transform ease 0.2s;
+  gap: 8px;
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.title {
+  @apply font-medium tracking-tight text-gray-900 dark:text-gray-200;
+}
+
+.subtitle {
+  @apply text-gray-700 dark:text-gray-400;
+  font-style: italic;
+}
+
+.note {
+  @apply text-gray-900 dark:text-gray-200;
+  display: table-cell;
+}

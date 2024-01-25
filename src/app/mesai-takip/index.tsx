@@ -1,5 +1,7 @@
-import App from './src/App';
-import 'react-spring-bottom-sheet/dist/style.css';
-import './src/app.scss';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './routes';
 
-export default App;
+import 'react-spring-bottom-sheet/dist/style.css';
+import './app.scss';
+
+export default () => <RouterProvider router={router} />;

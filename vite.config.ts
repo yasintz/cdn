@@ -51,13 +51,17 @@ async function editMainEntry(selectedApp: string, command: string) {
   );
 }
 
-export default defineConfig(async ({ command }) => {
+export default defineConfig(async ({ command, mode }) => {
   const selectedApp = process.env.PROJECT;
 
   await editMainEntry(selectedApp, command);
 
   return {
-    plugins: [react(), visualizer(), tsconfigPaths()],
+    plugins: [
+      react(),
+      tsconfigPaths(),
+      mode === 'analyze' && visualizer({ open: true }),
+    ],
     base: `/cdn/${command === 'serve' ? `${selectedApp}/` : ''}`,
     server: {
       port: 3007,

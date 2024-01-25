@@ -1,0 +1,10 @@
+.headerButtonContainer {
+  @apply flex gap-3 items-center;
+
+  & > .button {
+    flex: 1;
+  }
+  & > .icon{
+    @apply dark:text-white text-gray-900;
+  }
+}

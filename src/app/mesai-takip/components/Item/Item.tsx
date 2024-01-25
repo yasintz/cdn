@@ -1,8 +1,9 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { ItemType } from '../useStore';
-import { dayColors } from '../colors';
+import { ItemType, PricesType } from 'src/app/mesai-takip/useStore';
 import cx from 'classnames';
+import styles from './styles.module.scss';
+import { itemPriceCalculator } from 'src/app/mesai-takip/utils/calc';
 
 function getTimeText(item: ItemType) {
   if (item.minute && item.hour) {
@@ -21,54 +22,48 @@ export function Item({
   item,
   active,
   onItemClick,
+  prices,
 }: {
   item: ItemType;
   active?: boolean;
   onItemClick: () => void;
+  prices: PricesType;
 }) {
-  const timeText = getTimeText(item);
-
   const dateInstance = React.useMemo(() => dayjs(item.date), [item.date]);
 
-  const day = React.useMemo(() => dateInstance.format('DD'), [dateInstance]);
-
-  const date = React.useMemo(() => dateInstance.format('dddd'), [dateInstance]);
+  const itemPrice = React.useMemo(
+    () => Math.round(itemPriceCalculator(item, prices)),
+    [item, prices]
+  );
+  const day = React.useMemo(
+    () => dateInstance.format('DD MMMM, dddd'),
+    [dateInstance]
+  );
 
   return (
     <div>
-      <div className={cx('item-container', { active })} onClick={onItemClick}>
-        <div
-          className="item-image"
-          style={{ backgroundColor: dayColors[date] }}
-        >
-          {day}
-        </div>
+      <div
+        className={cx('item-container', styles.container, { active })}
+        onClick={onItemClick}
+      >
         <div
           style={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
+            gap: 4,
           }}
         >
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
-              marginBottom: 8,
             }}
           >
-            <div style={{ fontWeight: 600, color: '#313c47' }}>{timeText}</div>
-
-            <div
-              style={{
-                color: '#989898',
-                fontSize: 14,
-                fontStyle: 'italic',
-                fontWeight: 300,
-              }}
-            >
-              {date}
-            </div>
+            <div className={styles.title}>{day}</div>
+          </div>
+          <div className={styles.subtitle}>
+            {getTimeText(item)} → {itemPrice} TL
           </div>
           <div
             style={{
@@ -77,14 +72,7 @@ export function Item({
               width: '100%',
             }}
           >
-            <div
-              className="text-overflow"
-              style={{
-                display: 'table-cell',
-                color: item.note ? undefined : 'gray',
-                fontWeight: item.note ? undefined : 200,
-              }}
-            >
+            <div className={cx('text-overflow', styles.note)}>
               {item.note || 'Not eklemediniz...'}
             </div>
           </div>
