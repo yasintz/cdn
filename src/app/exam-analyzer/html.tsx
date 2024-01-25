@@ -4,13 +4,12 @@ const Html = (props: PageHtmlProps) => {
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="/mesai-takip/manifest.json" />
-        <link rel="icon" type="image/png" href="/mesai-takip/icon.png" />
-        <title>Mesai Takip Uygulmasi</title>
+        <link rel="manifest" href="/exam-analyzer/manifest.json" />
+        <link rel="icon" type="image/png" href="/exam-analyzer/icon.png" />
+        <title>Exam Analyzer</title>
       </head>
       <body>
         <div id="root" />
-        <div id="modal-root"></div>
         <script src="./src/main.tsx" type="module" />
       </body>
     </html>
