@@ -72,7 +72,10 @@
         iframe.remove();
         watchButton.addEventListener('click', () => {
           const videoUrl = new URL(input.value);
-          const id = videoUrl.searchParams.get('v');
+          let id = videoUrl.searchParams.get('v');
+          if (videoUrl.host === 'youtu.be') {
+            id = videoUrl.pathname.replace('/', '');
+          }
           const newUrl = new URL(window.location.href);
           newUrl.searchParams.append('v', id);
           window.location.href = newUrl;
