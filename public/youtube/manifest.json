@@ -1,0 +1,16 @@
+{
+  "name": "Youtube",
+  "short_name": "Youtube",
+  "description": "Youtube",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/mesai-takip",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#111111"
+}
