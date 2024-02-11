@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ShieldX } from 'lucide-react';
+import { ShieldX, Info } from 'lucide-react';
 
 function getYoutubeVideosFromSearch(json: any) {
   return json?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents
@@ -87,6 +87,13 @@ export const SearchPage = (props: SearchPageProps) => {
           </Alert>
         )}
         {isLoading && <Loading />}
+        {data?.videos?.length === 0 && (
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>No Data</AlertTitle>
+            <AlertDescription>Result is empty</AlertDescription>
+          </Alert>
+        )}
         {data?.videos?.slice(0, limit).map((video: any) => (
           <Link
             to={`/watch?v=${video.videoId}`}
