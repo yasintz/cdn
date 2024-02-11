@@ -1,15 +1,27 @@
 import _ from 'lodash';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { SearchInput } from '../../components/SearchInput';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ShieldX, Info } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 function getYoutubeVideosFromSearch(json: any) {
-  return json?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents
+  const contents =
+    json?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents
+      ?.map((i: any) => i.itemSectionRenderer?.contents)
+      ?.filter((i: any) => i)
+      ?.reduce((acc: any[], cur: any[]) => [...acc, ...cur]);
+
+  return contents
     ?.map((i: any) => i.videoRenderer)
     .filter((i: any) => i)
     .map((video: any) => ({
@@ -96,22 +108,30 @@ export const SearchPage = (props: SearchPageProps) => {
           </Alert>
         )}
         {data?.videos?.slice(0, limit).map((video: any) => (
-          <Link
-            to={`/watch?v=${video.videoId}`}
-            className="video"
-            key={video.videoId}
-          >
-            <div className="thumbnail">
-              <img src={video.metadata.imgSrc} />
-              <div className="time">{video.metadata.time}</div>
-            </div>
-            <div>
-              <div className="title">
-                {_.truncate(video.metadata.title, { length: 32 })}
-              </div>
-              <div>{video.publishedTimeText.simpleText}</div>
-            </div>
-          </Link>
+          <TooltipProvider key={video.videoId}>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link
+                  to={`/watch?v=${video.videoId}`}
+                  className="video text-left"
+                >
+                  <div className="thumbnail">
+                    <img src={video.metadata.imgSrc} />
+                    <div className="time">{video.metadata.time}</div>
+                  </div>
+                  <div>
+                    <div className="title">
+                      {_.truncate(video.metadata.title, { length: 32 })}
+                    </div>
+                    <div>{video.publishedTimeText.simpleText}</div>
+                  </div>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{video.metadata.title}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ))}
         {data?.videos && (
           <Button onClick={() => setLimit((prev) => prev + 3)}>
