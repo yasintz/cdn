@@ -9,7 +9,7 @@
       "type": "image/png"
     }
   ],
-  "start_url": "/exam-analyzer",
+  "start_url": "/cdn/exam-analyzer",
   "display": "standalone",
   "theme_color": "#111111",
   "background_color": "#111111"

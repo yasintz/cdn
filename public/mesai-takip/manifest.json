@@ -9,7 +9,7 @@
       "type": "image/png"
     }
   ],
-  "start_url": "/mesai-takip",
+  "start_url": "/cdn/mesai-takip",
   "display": "standalone",
   "theme_color": "#111111",
   "background_color": "#111111"
