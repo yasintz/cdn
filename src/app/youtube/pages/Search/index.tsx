@@ -73,6 +73,7 @@ export const SearchPage = (props: SearchPageProps) => {
     queryKey: ['search', searchQuery],
     queryFn: () => youtubeSearch(searchQuery!),
     enabled: Boolean(searchQuery),
+    refetchOnWindowFocus: false,
   });
 
   return (
