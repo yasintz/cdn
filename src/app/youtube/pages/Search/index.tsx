@@ -1,8 +1,12 @@
 import _ from 'lodash';
-import React, { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { SearchInput } from '../../components/SearchInput';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import Loading from '@/components/ui/loading';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ShieldX } from 'lucide-react';
 
 function getYoutubeVideosFromSearch(json: any) {
   return json?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents
@@ -61,25 +65,33 @@ async function youtubeSearch(query: string) {
 type SearchPageProps = {};
 
 export const SearchPage = (props: SearchPageProps) => {
+  const [limit, setLimit] = useState(3);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search_query');
-  const navigate = useNavigate();
 
-  const { data } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['search', searchQuery],
     queryFn: () => youtubeSearch(searchQuery!),
     enabled: Boolean(searchQuery),
   });
 
   return (
-    <div>
+    <div className="py-8">
       <SearchInput />
-      <div className="videos">
-        {data?.videos?.slice(0, 3).map((video: any) => (
-          <div
-            key={video.videoId}
+      <div className="videos max-w-2xl mx-auto mt-8">
+        {error && (
+          <Alert variant="destructive">
+            <ShieldX className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>Something went wrong</AlertDescription>
+          </Alert>
+        )}
+        {isLoading && <Loading />}
+        {data?.videos?.slice(0, limit).map((video: any) => (
+          <Link
+            to={`/watch?v=${video.videoId}`}
             className="video"
-            onClick={() => navigate(`/watch?v=${video.videoId}`)}
+            key={video.videoId}
           >
             <div className="thumbnail">
               <img src={video.metadata.imgSrc} />
@@ -91,8 +103,13 @@ export const SearchPage = (props: SearchPageProps) => {
               </div>
               <div>{video.publishedTimeText.simpleText}</div>
             </div>
-          </div>
+          </Link>
         ))}
+        {data?.videos && (
+          <Button onClick={() => setLimit((prev) => prev + 3)}>
+            Load More
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ body,
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
+  // padding: 16px;
   align-items: center;
 }
 
@@ -22,7 +22,8 @@ body,
   max-width: 720px;
   border-radius: 8px;
   cursor: pointer;
-  padding: 8px;
+  color: rgb(19, 19, 19);
+  text-decoration: none;
 
   &:hover {
     background-color: #ddd;
