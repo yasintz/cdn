@@ -8,7 +8,7 @@ export const WatchPage = (props: WatchPageProps) => {
   const watchVideoId = searchParams.get('v');
 
   return (
-    <>
+    <div className="flex flex-col gap-6 pt-4">
       <SearchInput />
       <iframe
         src={`https://www.youtube.com/embed/${watchVideoId}?rel=0`}
@@ -16,8 +16,8 @@ export const WatchPage = (props: WatchPageProps) => {
         frameBorder={0}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="watch-iframe"
+        className="h-screen w-screen"
       />
-    </>
+    </div>
   );
 };
