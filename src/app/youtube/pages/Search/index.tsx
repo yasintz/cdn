@@ -135,7 +135,7 @@ export const SearchPage = (props: SearchPageProps) => {
             </Tooltip>
           </TooltipProvider>
         ))}
-        {data?.videos && (
+        {!!data?.videos?.length && (
           <Button onClick={() => setLimit((prev) => prev + 3)} className='self-center'>
             Load More
           </Button>
