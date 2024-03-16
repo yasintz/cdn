@@ -73,7 +73,7 @@ const ImageCard = (item: ImageCardProps) => {
         item.comingSoon && 'pointer-events-none opacity-50',
         item.className
       )}
-      style={{ maxWidth: 360 }}
+      style={{ maxWidth: 336 }}
     >
       <img
         src={item.image}
