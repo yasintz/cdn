@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 const Recommendations = () => {
   const [word, setWord] = useState(generate() as string);
   return (
-    <div className="flex gap-8 p-8 flex-wrap">
+    <div className="flex gap-8 mt-8 flex-wrap">
       <ImageCard
         title="Podcast Dinle"
         image="https://cdn.dribbble.com/users/730703/screenshots/11076980/media/f092bb64b0c5458e962cddfa9d3ff272.jpg"

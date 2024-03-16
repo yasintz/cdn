@@ -90,7 +90,7 @@ export const SearchPage = (props: SearchPageProps) => {
   });
 
   return (
-    <div className="py-8">
+    <div className="p-8">
       <SearchInput />
       {!searchQuery && <Recommendations />}
       <div className="videos max-w-2xl mx-auto mt-8">

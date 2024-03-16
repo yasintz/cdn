@@ -69,11 +69,11 @@ const ImageCard = (item: ImageCardProps) => {
     <div
       key={item.image}
       className={cn(
-        'w-full flex flex-col bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 overflow-hidden',
+        'w-full flex flex-col bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 overflow-hidden md:max-w-sm sm:max-w-full',
         item.comingSoon && 'pointer-events-none opacity-50',
         item.className
       )}
-      style={{ maxWidth: 336 }}
+      // style={{ maxWidth: 336 }}
     >
       <img
         src={item.image}
