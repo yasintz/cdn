@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import Recommendations from '../../components/Recommendations';
 
 function getYoutubeVideosFromSearch(json: any) {
   const contents =
@@ -91,6 +92,7 @@ export const SearchPage = (props: SearchPageProps) => {
   return (
     <div className="py-8">
       <SearchInput />
+      {!searchQuery && <Recommendations />}
       <div className="videos max-w-2xl mx-auto mt-8">
         {error && (
           <Alert variant="destructive">
