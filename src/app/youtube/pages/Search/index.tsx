@@ -112,12 +112,12 @@ export const SearchPage = (props: SearchPageProps) => {
         {data?.videos?.slice(0, limit).map((video: any) => (
           <TooltipProvider key={video.videoId}>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Link
                   to={`/watch?v=${video.videoId}`}
-                  className="video text-left"
+                  className="video text-left flex flex-wrap w-full flex-1 hover:bg-gray-100"
                 >
-                  <div className="thumbnail">
+                  <div className="thumbnail md:w-56 aspect-video w-full">
                     <img src={video.metadata.imgSrc} />
                     <div className="time">{video.metadata.time}</div>
                   </div>
@@ -136,7 +136,7 @@ export const SearchPage = (props: SearchPageProps) => {
           </TooltipProvider>
         ))}
         {data?.videos && (
-          <Button onClick={() => setLimit((prev) => prev + 3)}>
+          <Button onClick={() => setLimit((prev) => prev + 3)} className='self-center'>
             Load More
           </Button>
         )}
