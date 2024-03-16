@@ -6,6 +6,7 @@ const Html = (props: PageHtmlProps) => {
       <head>
         <link rel="manifest" href="/youtube/manifest.json" />
         <link rel="icon" type="image/png" href="/youtube/icon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Youtube</title>
       </head>
       <body>
