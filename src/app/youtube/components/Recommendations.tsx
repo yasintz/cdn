@@ -47,6 +47,13 @@ const Recommendations = () => {
         text="Ipadi Ac"
         onClick={() => toast("Ipad'i acman gerekiyor. Hement yanibasinda")}
       />
+      <ImageCard
+        title="Ted Talks"
+        image="https://snov.io/blog/wp-content/uploads/2021/03/80XkAlRC0rn99aIBVxcbXpLrzAUCqne3KfLHoolm-min-1536x768.png"
+        description="Baska bir video izleme yolu."
+        text="Izle"
+        to="https://www.ted.com/talks"
+      />
     </div>
   );
 };
