@@ -7,19 +7,24 @@ import {
   computedMiddleware,
 } from '@/utils/zustand/zustand-computed';
 
-type TodoType = {};
+export type TodoType = {
+  id: string;
+  title: string;
+  description?: string;
+  dueDate: string;
+  completed?: boolean;
+};
 
 type NonUpdateAbleProperties = 'id' | 'createdAt';
 
 type StoreType = {
   todoList: TodoType[];
   todoLength: number;
-  //   addTodo: (todo: TodoType) => void;
-  //   removeTodo: (todo: TodoType) => void;
-  //   updateTodo: (
-  //     id: string,
-  //     todo: Partial<Omit<TodoType, NonUpdateAbleProperties>>
-  //   ) => void;
+  addTodo: (todo: TodoType) => void;
+  updateTodo: (
+    id: string,
+    todo: Partial<Omit<TodoType, NonUpdateAbleProperties>>
+  ) => void;
 };
 
 const computed = computedCreator<StoreType>();
@@ -28,12 +33,25 @@ const sheetTabId = window.location.href.includes('localhost')
   ? '311739416'
   : '311739416';
 
-export const useStore = create(
+export const useStore = create<StoreType>()(
   computedMiddleware(
     immer(
-      persist<StoreType>(
+      persist(
         (set) => ({
           todoList: [],
+          addTodo: (todo) =>
+            set((prev) => {
+              prev.todoList.push(todo);
+            }),
+          updateTodo: (id, values) => {
+            set((prev) => {
+              const todo = prev.todoList.find((t) => t.id === id);
+              if (todo) {
+                Object.assign(todo, values);
+              }
+            });
+          },
+
           ...computed((s) => ({
             todoLength: s.todoList.length,
           })),

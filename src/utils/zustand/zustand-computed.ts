@@ -52,13 +52,6 @@ export const computed = <StoreType>() => {
   return computed;
 };
 
-type ComputedState = <
-  T,
-  Mps extends [StoreMutatorIdentifier, unknown][] = [],
-  Mcs extends [StoreMutatorIdentifier, unknown][] = []
->(
-  f: StateCreator<T, Mps, Mcs>
-) => StateCreator<T, Mps, Mcs>;
-
-export const computedMiddleware = ((f: any) =>
-  injectComputedMiddleware(f as any) as any) as unknown as ComputedState;
+export function computedMiddleware<S>(fn: S): S {
+  return injectComputedMiddleware(fn as any) as any;
+}
