@@ -54,6 +54,8 @@
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
@@ -63,6 +65,7 @@
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
     "clsx": "^2.1.0",
+    "cmdk": "^1.0.0",
     "dayjs": "^1.11.10",
     "geolib": "^3.3.4",
     "glur": "^1.1.2",
@@ -80,12 +83,14 @@
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
     "react-router-dom": "^6.21.3",
+    "react-sortablejs": "^6.1.4",
     "react-spring-bottom-sheet": "^3.4.1",
     "sonner": "^1.4.3",
     "sort-by": "^1.2.0",
     "styled-components": "^6.1.8",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "use-debounce": "^10.0.0",
     "zustand": "^4.5.0"
   }
 }

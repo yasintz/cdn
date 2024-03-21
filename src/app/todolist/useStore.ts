@@ -13,6 +13,7 @@ export type TodoType = {
   description?: string;
   dueDate: string;
   completed?: boolean;
+  recurring?: string;
 };
 
 type NonUpdateAbleProperties = 'id' | 'createdAt';
@@ -21,10 +22,12 @@ type StoreType = {
   todoList: TodoType[];
   todoLength: number;
   addTodo: (todo: TodoType) => void;
+  removeTodo: (id: string) => void;
   updateTodo: (
     id: string,
     todo: Partial<Omit<TodoType, NonUpdateAbleProperties>>
   ) => void;
+  updateOrder: (items: string[]) => void;
 };
 
 const computed = computedCreator<StoreType>();
@@ -51,6 +54,16 @@ export const useStore = create<StoreType>()(
               }
             });
           },
+          updateOrder: (todoList) =>
+            set((prev) => {
+              prev.todoList = todoList.map(
+                (id) => prev.todoList.find((todo) => todo.id === id)!
+              );
+            }),
+          removeTodo: (id) =>
+            set((prev) => {
+              prev.todoList = prev.todoList.filter((i) => i.id !== id);
+            }),
 
           ...computed((s) => ({
             todoLength: s.todoList.length,
