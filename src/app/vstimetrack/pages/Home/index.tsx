@@ -10,6 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { useSearchParams } from 'react-router-dom';
 
 dayjs.extend(duration);
 
@@ -51,7 +52,9 @@ function getTotal(logs: LogType[]) {
 }
 
 const HomePage = () => {
-  const [project, setProject] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const project = searchParams.get('project') || '';
+
   const { data } = useQuery({
     queryKey: ['vscode-time-tracker'],
     queryFn: () =>
@@ -87,7 +90,12 @@ const HomePage = () => {
     <div className="p-8">
       <Combobox
         value={project}
-        setValue={setProject}
+        setValue={(value) =>
+          setSearchParams((prev) => {
+            prev.set('project', value);
+            return prev;
+          })
+        }
         placeholder="Select Project"
         options={Object.keys(groups).map((path) => ({
           label: path,
