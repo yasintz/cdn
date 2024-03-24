@@ -1,0 +1,16 @@
+{
+  "name": "VsTimeTrack",
+  "short_name": "VsTimeTrack",
+  "description": "VsTimeTrack",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/cdn/vstimetrack",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#111111"
+}
