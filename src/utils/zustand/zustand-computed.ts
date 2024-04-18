@@ -40,17 +40,6 @@ export function computedCreator<StoreType>() {
 
   return computed;
 }
-export const computed = <StoreType>() => {
-  function computed<T extends Partial<StoreType>>(
-    fn: (store: StoreType) => T
-  ): T {
-    return {
-      [prefix]: fn,
-    } as any;
-  }
-
-  return computed;
-};
 
 export function computedMiddleware<S>(fn: S): S {
   return injectComputedMiddleware(fn as any) as any;
