@@ -23,5 +23,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/app/_archived"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
