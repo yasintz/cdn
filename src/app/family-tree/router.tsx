@@ -1,4 +1,4 @@
-import { Outlet, RouteObject, createHashRouter } from 'react-router-dom';
+import { Outlet, RouteObject } from 'react-router-dom';
 import Layout from './src/components/layout';
 import PersonLayout from './src/components/person-layout';
 import HomePage from './src/pages';
@@ -14,9 +14,9 @@ import PersonUpdatePage from './src/pages/person/[personId]/update';
 import SettingsPage from './src/pages/settings';
 import './src/assets/styles/global.scss';
 
-const router = createHashRouter([
+const router: RouteObject[] = [
   {
-    path: '/',
+    path: '',
     element: (
       <Layout>
         <Outlet />
@@ -84,6 +84,6 @@ const router = createHashRouter([
       },
     ],
   },
-]);
+];
 
 export default router;

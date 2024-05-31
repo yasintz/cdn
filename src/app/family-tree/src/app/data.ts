@@ -6,7 +6,7 @@ import { SyncStatusEnum } from '../components/sync';
 import { useStore } from './store';
 
 function useData() {
-  const { store } = useStore();
+  const { store, isLoading } = useStore();
   const [syncStatus] = useState(SyncStatusEnum.Loaded);
 
   const {
@@ -32,6 +32,7 @@ function useData() {
     deletePerson,
     syncStatus,
     deleteMetadata,
+    isLoading,
   };
 }
 

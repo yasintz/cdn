@@ -3,7 +3,5 @@
 /dist
 .DS_Store
 stats.html
-/src/main.tsx
 .env
-index.html
 /src/dist

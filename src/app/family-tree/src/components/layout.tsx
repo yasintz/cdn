@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext, TreeView } from '../app/ctx';
 import useData from '../app/data';
-import { usePersonIdStateFromUrl } from '../hooks/use-person-id-state-from-url';
 import { PersonType } from '../types';
 import Sidebar from './Sidebar';
 import style from '../app/app.module.scss';
 import Popup from './Popup';
 import RelationFinder from '../app/RelationDetail';
 import { Sync } from './sync';
+import Loading from '@/components/ui/loading';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -24,13 +24,17 @@ const Layout = ({ children }: LayoutProps) => {
     cb?: (v: PersonType) => void;
     person?: PersonType;
   }>();
-  const setPerson = (p: PersonType) => navigate(`/person/${p.id}`);
+  const setPerson = (p: PersonType) => navigate(`person/${p.id}`);
+
+  if (data.isLoading) {
+    return <Loading />;
+  }
 
   return (
     <AppContext.Provider
       value={{
         ...data,
-        showCreatePersonModal: () => navigate('/create-person'),
+        showCreatePersonModal: () => navigate('create-person'),
         showPersonSelector: setPersonSelector,
         treeDepth,
         isDTree: treeView === TreeView.DTree,
@@ -44,8 +48,8 @@ const Layout = ({ children }: LayoutProps) => {
           <Sidebar
             person={data.person}
             onClick={setPerson}
-            onCreatePersonClick={() => navigate('/create-person')}
-            onSettingsClick={() => navigate('/settings')}
+            onCreatePersonClick={() => navigate('create-person')}
+            onSettingsClick={() => navigate('settings')}
           />
         </div>
         {children}

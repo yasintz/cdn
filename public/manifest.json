@@ -1,0 +1,16 @@
+{
+  "name": "Applications",
+  "short_name": "Applications",
+  "description": "Applications",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/cdn/",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#111111"
+}

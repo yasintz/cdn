@@ -1,18 +1,16 @@
 import ReactDOM from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import '../app/globals.css';
 
-// {import}
+import router from './navigation/router';
 
 const element = document.getElementById('root') as HTMLElement;
 const root = ReactDOM.createRoot(element);
 
-// @ts-ignore
-const Root = App;
-
 root.render(
   <>
-    <Root />
+    <RouterProvider router={router} />
     <Toaster />
   </>
 );

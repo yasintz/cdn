@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
-    "build:vite": "vite build && cp build/vite/index.html build/vite/404.html && cp -r build/vite/* dist",
-    "build": "tsc && node build.js"
+    "build:vite": "vite build && cp dist/index.html dist/404.html",
+    "build": "tsc && pnpm build:vite && pnpm build:projects"
   },
   "engines": {
     "node": "18"
@@ -94,6 +94,6 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.0",
-    "zustand": "^4.5.0"
+    "zustand": "^4.5.2"
   }
 }

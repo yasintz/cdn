@@ -1,4 +1,4 @@
-export function googleSheetDb(id: string) {
+export function googleSheetDbDeprecated(id: string) {
   const apiUrl = `https://google-sheet-database.vercel.app/api/v2/jdb/19Q7TuqVy08vpu2phdPXPyGN0J1L4iwHOK9_jkxzPHwQ/${id}`;
   const set = async (value: string) => {
     await fetch(apiUrl, {
@@ -14,3 +14,4 @@ export function googleSheetDb(id: string) {
     set: (val: string) => set(val),
   };
 }
+
