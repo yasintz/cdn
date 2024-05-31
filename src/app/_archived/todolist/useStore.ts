@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
+import { gSheetStorageDeprecated } from '@/utils/zustand/gsheet-storage';
 import {
   computedCreator,
   computedMiddleware,
@@ -71,7 +71,7 @@ export const useStore = create<StoreType>()(
         }),
         {
           name: 'todolist',
-          storage: createJSONStorage(() => gSheetStorage(sheetTabId)),
+          storage: createJSONStorage(() => gSheetStorageDeprecated(sheetTabId)),
         }
       )
     )

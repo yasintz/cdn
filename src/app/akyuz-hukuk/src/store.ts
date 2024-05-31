@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
+import { gSheetStorageDeprecated } from '@/utils/zustand/gsheet-storage';
 import shadown from 'showdown';
 
 const converter = new shadown.Converter();
@@ -55,7 +55,7 @@ export const useStore = create(
     }),
     {
       name: 'akyuz-kukuk',
-      storage: createJSONStorage(() => gSheetStorage('1557948135')),
+      storage: createJSONStorage(() => gSheetStorageDeprecated('1557948135')),
     }
   )
 );

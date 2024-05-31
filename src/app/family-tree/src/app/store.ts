@@ -5,7 +5,7 @@ import _orderBy from 'lodash/orderBy';
 import { StoreType } from '../types';
 import {
   gSheetStorage,
-  handleIsLoadingState,
+  handleStoreLoadingState,
 } from '@/utils/zustand/gsheet-storage';
 
 type StateType = {
@@ -27,9 +27,11 @@ export const useStore = create(
     }),
     {
       name: 'family_tree_store_1',
-      storage: createJSONStorage(() => gSheetStorage('0')),
+      storage: createJSONStorage(() =>
+        gSheetStorage('1BiqlwaBsUdyQIZU2wy0dMv7HkA7E0WpOZjyR3rWTr6E')
+      ),
     }
   )
 );
 
-handleIsLoadingState(useStore, 'isLoading');
+handleStoreLoadingState(useStore, 'isLoading');

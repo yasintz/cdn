@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import _debounce from 'lodash/debounce';
 import _orderBy from 'lodash/orderBy';
 import { StoreType } from '../types';
-import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
+import { gSheetStorageDeprecated } from '@/utils/zustand/gsheet-storage';
 
 type StateType = {
   store: StoreType;
@@ -22,7 +22,7 @@ export const useStore = create(
     }),
     {
       name: 'family_tree_store',
-      storage: createJSONStorage(() => gSheetStorage('0')),
+      storage: createJSONStorage(() => gSheetStorageDeprecated('0')),
     }
   )
 );

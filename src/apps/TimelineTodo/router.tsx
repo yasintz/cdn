@@ -3,7 +3,7 @@ import TimelineTodo from './TimelineTodo';
 
 const timelineTodoRouter: RouteObject[] = [
   {
-    path: '',
+    path: ':sessionId?',
     element: <TimelineTodo />,
   },
 ];
