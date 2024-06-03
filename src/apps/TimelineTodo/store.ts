@@ -28,6 +28,7 @@ type StoreType = {
   }>;
 
   createSession: (name: string) => void;
+  duplicateSession: (id: string, name: string) => void;
   createEntry: (sessionId: string) => void;
   updateEntryTime: (id: string, time: number) => void;
   createTodo: (entryId: string, text: string) => void;
@@ -38,6 +39,9 @@ type StoreType = {
   deleteTodo: (id: string) => void;
   reorderTodo: (id: string, direction: 'up' | 'down') => void;
 };
+
+type EntryType = StoreType['entries'][number];
+type TodoType = StoreType['todos'][number];
 
 const uid = () => Math.random().toString(36).substring(2, 9);
 
@@ -60,21 +64,60 @@ export const useStore = create<StoreType>()(
                 },
               ],
             })),
+          duplicateSession: (sessionId, name) =>
+            set((prev) => {
+              const newSession = {
+                id: uid(),
+                name,
+              };
+
+              prev.sessions.push(newSession);
+
+              const entries = prev.entries
+                .filter((entry) => entry.sessionId === sessionId)
+                .map((entry) => ({
+                  entry,
+                  todos: prev.todos.filter((todo) => todo.entryId === entry.id),
+                }));
+
+              entries.forEach(({ entry, todos }) => {
+                const newEntry: EntryType = {
+                  ...entry,
+                  id: uid(),
+                  sessionId: newSession.id,
+                };
+                prev.entries.push(newEntry);
+
+                todos.forEach((todo) => {
+                  const newTodo: TodoType = {
+                    ...todo,
+                    id: uid(),
+                    entryId: newEntry.id,
+                  };
+                  prev.todos.push(newTodo);
+                });
+              });
+            }),
 
           createEntry: (sessionId) =>
-            set((prev) => ({
-              entries: [
-                ...prev.entries,
-                {
-                  id: uid(),
-                  sessionId,
-                  time:
-                    (prev.entries[prev.entries.length - 1]?.time || 0) +
-                    1000 * 60 * 5,
-                  tags: [],
-                },
-              ],
-            })),
+            set((prev) => {
+              const sessionEntries = prev.entries.filter(
+                (entry) => entry.sessionId === sessionId
+              );
+              return {
+                entries: [
+                  ...prev.entries,
+                  {
+                    id: uid(),
+                    sessionId,
+                    time:
+                      (sessionEntries[sessionEntries.length - 1]?.time || 0) +
+                      1000 * 60 * 5,
+                    tags: [],
+                  },
+                ],
+              };
+            }),
 
           updateEntryTime: (id, time) =>
             set((prev) => ({
@@ -113,9 +156,22 @@ export const useStore = create<StoreType>()(
               ),
             })),
           deleteSession: (id) =>
-            set((prev) => ({
-              sessions: prev.sessions.filter((session) => session.id !== id),
-            })),
+            set((prev) => {
+              prev.sessions = prev.sessions.filter(
+                (session) => session.id !== id
+              );
+              const deletedEntryIds = prev.entries
+                .filter((entry) => entry.sessionId === id)
+                .map((i) => i.id);
+
+              prev.entries = prev.entries.filter(
+                (entry) => entry.sessionId !== id
+              );
+
+              prev.todos = prev.todos.filter(
+                (todo) => !deletedEntryIds.includes(todo.entryId)
+              );
+            }),
           deleteEntry: (id) =>
             set((prev) => ({
               entries: prev.entries.filter((session) => session.id !== id),
