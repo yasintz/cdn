@@ -27,7 +27,7 @@ const TimelineTodo = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [time, setTime] = useState(Date.now());
 
-  const isPreview = searchParams.get('preview') === 'true';
+  const isPreview = searchParams.get('preview') !== 'false';
 
   const {
     sessions,
