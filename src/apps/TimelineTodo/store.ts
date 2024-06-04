@@ -31,7 +31,7 @@ type StoreType = {
   duplicateSession: (id: string, name: string) => void;
   createEntry: (sessionId: string) => void;
   updateEntryTime: (id: string, time: number) => void;
-  createTodo: (entryId: string, text: string) => void;
+  createTodo: (entryId: string, text: string) => string;
   toggleTodo: (id: string) => void;
   updateTodoText: (id: string, text: string) => void;
 
@@ -132,18 +132,22 @@ export const useStore = create<StoreType>()(
               ),
             })),
 
-          createTodo: (entryId, text) =>
+          createTodo: (entryId, text) => {
+            const id = uid();
             set((prev) => ({
               todos: [
                 ...prev.todos,
                 {
-                  id: uid(),
+                  id,
                   entryId,
                   text,
                   completed: false,
                 },
               ],
-            })),
+            }));
+
+            return id;
+          },
 
           toggleTodo: (id) =>
             set((prev) => ({

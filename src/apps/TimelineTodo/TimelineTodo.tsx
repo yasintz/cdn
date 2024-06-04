@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import _ from 'lodash';
 import { cn } from '@/lib/utils';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import HeaderButton from './HeaderButton';
 
 dayjs.extend(duration);
@@ -48,6 +48,7 @@ const TimelineTodo = () => {
     reorderTodo,
     updateTodoText,
   } = useStore();
+  const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
 
   const handleCreateSession = () => {
     const name = prompt('What is the session name?');
@@ -300,11 +301,19 @@ const TimelineTodo = () => {
                         }
                         onKeyDown={(event) => {
                           if (event.key === 'Enter') {
-                            createTodo(entry.id, '');
+                            const newTodoId = createTodo(entry.id, '');
+                            setTimeout(() => {
+                              allTodosRef.current[newTodoId]?.focus();
+                            }, 100);
                           }
 
                           if (!todo.text && event.key === 'Backspace') {
                             deleteTodo(todo.id);
+                          }
+                        }}
+                        ref={(item) => {
+                          if (item) {
+                            allTodosRef.current[todo.id] = item;
                           }
                         }}
                       />
