@@ -4,6 +4,7 @@ import duration from 'dayjs/plugin/duration';
 import { EntryType, useStore } from './store';
 import { getTagSpentTime } from './helpers';
 import { cn } from '@/lib/utils';
+import _ from 'lodash';
 dayjs.extend(duration);
 
 type TagsTableProps = {
@@ -14,17 +15,18 @@ type TagsTableProps = {
 const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
   const { allTags } = useStore();
 
-  const tagsWithSpentTime = useMemo(
-    () =>
-      allTags.map(({ tag, color }) => ({
+  const tagsWithSpentTime = useMemo(() => {
+    const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
+    return allTags
+      .filter(({ tag }) => sessionTags.includes(tag))
+      .map(({ tag, color }) => ({
         tag,
         color,
         spentTime: dayjs
           .duration(getTagSpentTime(tag, sessionEntries))
           .format('H[h] m[m]'),
-      })),
-    [allTags, sessionEntries]
-  );
+      }));
+  }, [allTags, sessionEntries]);
 
   return (
     <div className={cn('flex-1 px-4', className)}>

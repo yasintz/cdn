@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import Header from './Header';
 import Entry from './Entry';
-import { getTagSpentTime } from './helpers';
 import TagsTable from './TagsTable';
 import './style.scss';
 
@@ -21,7 +20,7 @@ const TimelineTodo = () => {
 
   const isPreview = searchParams.get('preview') !== 'false';
 
-  const { sessions, entries, createEntry, allTags } = useStore();
+  const { sessions, entries, createEntry } = useStore();
 
   const session = sessions.find((session) => session.id === sessionId);
   const sessionEntries = useMemo(() => {
@@ -46,18 +45,6 @@ const TimelineTodo = () => {
 
     return sessionEntriesData;
   }, [entries, sessionId, time]);
-
-  const tagsWithSpentTime = useMemo(
-    () =>
-      allTags.map(({ tag, color }) => ({
-        tag,
-        color,
-        spentTime: dayjs
-          .duration(getTagSpentTime(tag, sessionEntries))
-          .format('H[h] m[m]'),
-      })),
-    [allTags, sessionEntries]
-  );
 
   useEffect(() => {
     setTime(dayjs().diff(dayjs().startOf('day')));
