@@ -65,21 +65,17 @@ const Entry = ({ isLast, entry, isPreview }: EntryProps) => {
         {entry.active && (
           <div className="h-2 w-2 rounded-full bg-red-700 absolute -translate-x-3" />
         )}
-        {isPreview ? (
-          <div className="font-bold text-purple-500 select-none">
-            {dayjs.duration(entry.time).format('HH:mm')}
-          </div>
-        ) : (
-          <input
-            className="font-bold text-purple-500"
-            type="time"
-            value={dayjs.duration(entry.time).format('HH:mm')}
-            onChange={(event) => {
-              const [h, m] = event.target.value.split(':');
-              updateEntryTime(entry.id, ms(`${h}h`) + ms(`${m}m`));
-            }}
-          />
-        )}
+
+        <input
+          className="font-bold text-purple-500 hidden-icon focus:outline-none"
+          type="time"
+          value={dayjs.duration(entry.time).format('HH:mm')}
+          onChange={(event) => {
+            const [h, m] = event.target.value.split(':');
+            updateEntryTime(entry.id, ms(`${h}h`) + ms(`${m}m`));
+          }}
+          onClick={(event) => (event.target as any).showPicker()}
+        />
         <PlusCircleIcon
           size={13}
           className={cn('cursor-pointer', isPreview && 'hidden')}
