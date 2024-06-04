@@ -1,18 +1,10 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useStore } from './store';
 import ms from 'ms';
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  PlusCircleIcon,
-  XCircleIcon,
-} from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import _ from 'lodash';
-import { cn } from '@/lib/utils';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Header from './Header';
 import Entry from './Entry';
 
@@ -25,27 +17,8 @@ const TimelineTodo = () => {
 
   const isPreview = searchParams.get('preview') !== 'false';
 
-  const {
-    sessions,
-    entries,
-    todos,
-    updateEntryTime,
-    createTodo,
-    toggleTodo,
-    deleteEntry,
-    deleteTodo,
-    reorderTodo,
-    updateTodoText,
-  } = useStore();
+  const { sessions, entries, createEntry } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
-
-  const handleCreateTodo = (entryId: string) => {
-    const text = prompt('I will complete...');
-
-    if (text) {
-      createTodo(entryId, text);
-    }
-  };
 
   const session = sessions.find((session) => session.id === sessionId);
   const sessionEntries = useMemo(() => {
@@ -98,6 +71,7 @@ const TimelineTodo = () => {
             entry={entry}
             isLast={index === sessionEntries.length - 1}
             isPreview={isPreview}
+            onEntryCreate={() => createEntry(session!.id)}
           />
         ))}
       </ul>

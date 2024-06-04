@@ -5,7 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { cn } from '@/lib/utils';
 import { EntryType, useStore } from './store';
 import ms from 'ms';
-import { PlusCircleIcon, XCircleIcon } from 'lucide-react';
+import { PlusCircleIcon, PlusIcon, XCircleIcon } from 'lucide-react';
 import Todo from './Todo';
 
 dayjs.extend(duration);
@@ -32,9 +32,10 @@ type EntryProps = {
     diff: number;
     active: boolean;
   };
+  onEntryCreate: () => void;
 };
 
-const Entry = ({ isLast, entry, isPreview }: EntryProps) => {
+const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
   const { updateEntryTime, deleteEntry, todos, createTodo } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
 
@@ -44,6 +45,7 @@ const Entry = ({ isLast, entry, isPreview }: EntryProps) => {
       allTodosRef.current[newTodoId]?.focus();
     }, 100);
   };
+  const entryTodos = todos.filter((todo) => todo.entryId === entry.id);
 
   return (
     <li className="my-2 relative min-h-20">
@@ -87,19 +89,29 @@ const Entry = ({ isLast, entry, isPreview }: EntryProps) => {
           size={13}
         />
       </div>
-      <ul className="ml-8 my-2">
-        {todos
-          .filter((todo) => todo.entryId === entry.id)
-          .map((todo) => (
-            <Todo
-              key={todo.id}
-              allTodosRef={allTodosRef}
-              isPreview={isPreview}
-              onEnterPress={handleCreateTodo}
-              todo={todo}
-            />
-          ))}
-      </ul>
+      <div className="ml-8 my-2">
+        {entryTodos.length > 0 && (
+          <ul>
+            {entryTodos.map((todo) => (
+              <Todo
+                key={todo.id}
+                allTodosRef={allTodosRef}
+                isPreview={isPreview}
+                onEnterPress={handleCreateTodo}
+                todo={todo}
+              />
+            ))}
+          </ul>
+        )}
+        {entryTodos.length === 0 && (
+          <div
+            className="text-sm flex gap-1 items-center py-4 opacity-5 cursor-pointer"
+            onClick={isLast ? onEntryCreate : handleCreateTodo}
+          >
+            <PlusIcon size={12} /> Add {isLast ? 'entry' : 'todo'}
+          </div>
+        )}
+      </div>
     </li>
   );
 };
