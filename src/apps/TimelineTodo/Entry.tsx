@@ -1,0 +1,97 @@
+import { useRef } from 'react';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import { cn } from '@/lib/utils';
+import { EntryType, useStore } from './store';
+import ms from 'ms';
+import { PlusCircleIcon, XCircleIcon } from 'lucide-react';
+import Todo from './Todo';
+
+dayjs.extend(duration);
+
+type EntryProps = {
+  isLast: boolean;
+  isPreview: boolean;
+  entry: EntryType & {
+    diff: number;
+    active: boolean;
+  };
+};
+
+const Entry = ({ isLast, entry, isPreview }: EntryProps) => {
+  const { updateEntryTime, deleteEntry, todos, createTodo } = useStore();
+  const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
+
+  const handleCreateTodo = () => {
+    const newTodoId = createTodo(entry.id, '');
+    setTimeout(() => {
+      allTodosRef.current[newTodoId]?.focus();
+    }, 100);
+  };
+
+  return (
+    <li className="my-2 relative min-h-20">
+      {!isLast && (
+        <div
+          className="absolute top-7 -bottom-2 bg-slate-300 flex items-center justify-center"
+          style={{
+            width: '1px',
+            left: 7,
+          }}
+        >
+          <div className="px-0.5 bg-white rounded-lg border border-slate-300 text-xs text-gray-300 text-center">
+            {dayjs
+              .duration(entry.diff)
+              .format(entry.diff >= ms('1hour') ? 'H[h] m[m]' : 'm[m]')}
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-2 items-center">
+        {entry.active && (
+          <div className="h-2 w-2 rounded-full bg-red-700 absolute -translate-x-3" />
+        )}
+        {isPreview ? (
+          <div className="font-bold text-purple-500 select-none">
+            {dayjs.duration(entry.time).format('HH:mm')}
+          </div>
+        ) : (
+          <input
+            className="font-bold text-purple-500"
+            type="time"
+            value={dayjs.duration(entry.time).format('HH:mm')}
+            onChange={(event) => {
+              const [h, m] = event.target.value.split(':');
+              updateEntryTime(entry.id, ms(`${h}h`) + ms(`${m}m`));
+            }}
+          />
+        )}
+        <PlusCircleIcon
+          size={13}
+          className={cn('cursor-pointer', isPreview && 'hidden')}
+          onClick={handleCreateTodo}
+        />
+        <XCircleIcon
+          className={cn('cursor-pointer', isPreview && 'hidden')}
+          onClick={() => deleteEntry(entry.id)}
+          size={13}
+        />
+      </div>
+      <ul className="ml-8 my-2">
+        {todos
+          .filter((todo) => todo.entryId === entry.id)
+          .map((todo) => (
+            <Todo
+              key={todo.id}
+              allTodosRef={allTodosRef}
+              isPreview={isPreview}
+              onEnterPress={handleCreateTodo}
+              todo={todo}
+            />
+          ))}
+      </ul>
+    </li>
+  );
+};
+
+export default Entry;

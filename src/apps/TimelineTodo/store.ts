@@ -41,8 +41,9 @@ type StoreType = {
   reorderTodo: (id: string, direction: 'up' | 'down') => void;
 };
 
-type EntryType = StoreType['entries'][number];
-type TodoType = StoreType['todos'][number];
+export type SessionType = StoreType['sessions'][number];
+export type EntryType = StoreType['entries'][number];
+export type TodoType = StoreType['todos'][number];
 
 const uid = () => Math.random().toString(36).substring(2, 9);
 
