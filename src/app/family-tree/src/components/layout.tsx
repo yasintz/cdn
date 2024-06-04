@@ -26,10 +26,6 @@ const Layout = ({ children }: LayoutProps) => {
   }>();
   const setPerson = (p: PersonType) => navigate(`person/${p.id}`);
 
-  if (data.isLoading) {
-    return <Loading />;
-  }
-
   return (
     <AppContext.Provider
       value={{

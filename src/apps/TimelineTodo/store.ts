@@ -33,6 +33,7 @@ type StoreType = {
   updateEntryTime: (id: string, time: number) => void;
   createTodo: (entryId: string, text: string) => void;
   toggleTodo: (id: string) => void;
+  updateTodoText: (id: string, text: string) => void;
 
   deleteSession: (id: string) => void;
   deleteEntry: (id: string) => void;
@@ -155,6 +156,14 @@ export const useStore = create<StoreType>()(
                   : todo
               ),
             })),
+          updateTodoText: (id, text) =>
+            set((prev) => {
+              const todo = prev.todos.find((todo) => todo.id === id);
+
+              if (todo) {
+                todo.text = text;
+              }
+            }),
           deleteSession: (id) =>
             set((prev) => {
               prev.sessions = prev.sessions.filter(

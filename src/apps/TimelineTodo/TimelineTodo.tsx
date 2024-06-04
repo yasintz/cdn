@@ -3,13 +3,15 @@ import { useStore } from './store';
 import { Button } from '@/components/ui/button';
 import ms from 'ms';
 import {
+  AlarmClockIcon,
+  AlarmClockPlusIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   CopyIcon,
   EyeIcon,
+  FolderKanbanIcon,
   PencilIcon,
   PlusCircleIcon,
-  PlusIcon,
   TrashIcon,
   XCircleIcon,
 } from 'lucide-react';
@@ -19,6 +21,7 @@ import duration from 'dayjs/plugin/duration';
 import _ from 'lodash';
 import { cn } from '@/lib/utils';
 import React, { useEffect, useMemo, useState } from 'react';
+import HeaderButton from './HeaderButton';
 
 dayjs.extend(duration);
 
@@ -43,6 +46,7 @@ const TimelineTodo = () => {
     deleteEntry,
     deleteTodo,
     reorderTodo,
+    updateTodoText,
   } = useStore();
 
   const handleCreateSession = () => {
@@ -112,8 +116,8 @@ const TimelineTodo = () => {
   }, []);
 
   return (
-    <div className="p-3">
-      <div className="flex gap-2 pb-1">
+    <div>
+      <div className="flex gap-2 px-3 pt-3 pb-2 overflow-x-auto w-full">
         {sessions.map((session) => (
           <NavLink
             to={`/cdn/timeline-todo/${
@@ -129,76 +133,61 @@ const TimelineTodo = () => {
             </Button>
           </NavLink>
         ))}
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleCreateSession}
-          className={cn(isPreview && 'hidden')}
-        >
-          <PlusIcon size={14} className="mr-2" />
-          Add Session
-        </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleDuplicateSession}
-          className={cn((isPreview || !session) && 'hidden')}
-        >
-          <CopyIcon size={14} className="mr-2" />
-          Duplicate Session
-        </Button>
-        <Button
-          variant="secondary"
-          size="sm"
+        <HeaderButton
+          title="Edit"
+          hidden={!isPreview || !session}
+          icon={PencilIcon}
+          onClick={() =>
+            setSearchParams((prev) => {
+              prev.set('preview', 'false');
+              return prev;
+            })
+          }
+        />
+        <HeaderButton
+          title="Preview"
+          hidden={isPreview || !session}
+          icon={EyeIcon}
+          onClick={() =>
+            setSearchParams((prev) => {
+              prev.set('preview', 'true');
+              return prev;
+            })
+          }
+        />
+        <HeaderButton
+          title="Add Entry"
+          hidden={isPreview || !session}
+          icon={AlarmClockPlusIcon}
           onClick={handleCreateEntry}
-          className={cn((isPreview || !session) && 'hidden')}
-        >
-          <PlusIcon size={14} className="mr-2" />
-          Add Entry
-        </Button>
+        />
+        <HeaderButton
+          title="Add Session"
+          hidden={isPreview}
+          icon={FolderKanbanIcon}
+          onClick={handleCreateSession}
+        />
 
-        {session && (
-          <>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() =>
-                setSearchParams((prev) => {
-                  prev.set('preview', isPreview ? 'false' : 'true');
-                  return prev;
-                })
-              }
-            >
-              {isPreview ? (
-                <>
-                  <PencilIcon size={14} className="mr-2" />
-                  Edit
-                </>
-              ) : (
-                <>
-                  <EyeIcon size={14} className="mr-2" />
-                  Preview
-                </>
-              )}
-            </Button>
+        <HeaderButton
+          title="Duplicate Session"
+          hidden={isPreview || !session}
+          icon={CopyIcon}
+          onClick={handleDuplicateSession}
+        />
 
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => deleteSession(session.id)}
-              className={cn(isPreview && 'hidden')}
-            >
-              <TrashIcon size={14} className="mr-2" />
-              Remove Session
-            </Button>
-          </>
-        )}
+        <HeaderButton
+          title="Remove Session"
+          hidden={isPreview || !session}
+          icon={TrashIcon}
+          variant="destructive"
+          onClick={() => deleteSession(session!.id)}
+        />
       </div>
 
       <ul
-        className="py-4 px-4 overflow-y-auto relative"
+        className="py-4 px-6 overflow-y-auto relative"
         style={{
-          height: 'calc(100vh - 3.5rem)',
+          height: 'calc(100vh - 3.6rem)',
         }}
       >
         {sessionEntries.map((entry, index) => (
@@ -303,9 +292,22 @@ const TimelineTodo = () => {
                         checked={todo.completed}
                         onCheckedChange={() => toggleTodo(todo.id)}
                       />
-                      <span>
-                        {todo.completed ? <s>{todo.text}</s> : todo.text}
-                      </span>
+                      <input
+                        value={todo.text}
+                        className="focus:outline-none w-full"
+                        onChange={(e) =>
+                          updateTodoText(todo.id, e.target.value)
+                        }
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            createTodo(entry.id, '');
+                          }
+
+                          if (!todo.text && event.key === 'Backspace') {
+                            deleteTodo(todo.id);
+                          }
+                        }}
+                      />
                       <XCircleIcon
                         className={cn('cursor-pointer', isPreview && 'hidden')}
                         onClick={() => deleteTodo(todo.id)}
