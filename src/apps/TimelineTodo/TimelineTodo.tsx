@@ -4,12 +4,12 @@ import ms from 'ms';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import _ from 'lodash';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from './Header';
 import Entry from './Entry';
-import './style.scss';
 import { getTagSpentTime } from './helpers';
 import TagsTable from './TagsTable';
+import './style.scss';
 
 dayjs.extend(duration);
 
