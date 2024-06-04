@@ -69,8 +69,8 @@ dependencies:
     specifier: ^4.17.21
     version: 4.17.21
   lucide-react:
-    specifier: ^0.323.0
-    version: 0.323.0(react@18.2.0)
+    specifier: ^0.383.0
+    version: 0.383.0(react@18.2.0)
   match-sorter:
     specifier: ^6.3.3
     version: 6.3.3
@@ -128,6 +128,9 @@ dependencies:
   zustand:
     specifier: ^4.5.2
     version: 4.5.2(@types/react@18.2.48)(immer@10.0.4)(react@18.2.0)
+  zustand-computed-state:
+    specifier: ^0.1.4
+    version: 0.1.4(zustand@4.5.2)
 
 devDependencies:
   '@babel/plugin-syntax-flow':
@@ -3662,8 +3665,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lucide-react@0.323.0(react@18.2.0):
-    resolution: {integrity: sha512-rTXZFILl2Y4d1SG9p1Mdcf17AcPvPvpc/egFIzUrp7IUy60MUQo3Oi1mu8LGYXUVwuRZYsSMt3csHRW5mAovJg==}
+  /lucide-react@0.383.0(react@18.2.0):
+    resolution: {integrity: sha512-13xlG0CQCJtzjSQYwwJ3WRqMHtRj3EXmLlorrARt7y+IHnxUCp3XyFNL1DfaGySWxHObDvnu1u1dV+0VMKHUSg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -5262,6 +5265,15 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zustand-computed-state@0.1.4(zustand@4.5.2):
+    resolution: {integrity: sha512-jER1omxOgsnMM6UjRKKhnlYllbDWoLl/c0KE58Hq7eKrU0j6L8eyNFTJKJHRB58AxvlWjy7MF2h+1E5IEj4k3g==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      zustand: ^4.3.8
+    dependencies:
+      zustand: 4.5.2(@types/react@18.2.48)(immer@10.0.4)(react@18.2.0)
+    dev: false
 
   /zustand@4.5.2(@types/react@18.2.48)(immer@10.0.4)(react@18.2.0):
     resolution: {integrity: sha512-2cN1tPkDVkwCy5ickKrI7vijSjPksFRfqS6237NzT0vqSsztTNnQdHw9mmN7uBdk3gceVXU0a+21jFzFzAc9+g==}

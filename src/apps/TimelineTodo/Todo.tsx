@@ -6,12 +6,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 type TodoProps = {
   todo: TodoType;
+  previousTodoId: string | undefined;
   isPreview: boolean;
   onEnterPress: () => void;
   allTodosRef: React.MutableRefObject<Record<string, HTMLInputElement>>;
 };
 
-const Todo = ({ todo, isPreview, onEnterPress, allTodosRef }: TodoProps) => {
+const Todo = ({
+  todo,
+  isPreview,
+  onEnterPress,
+  allTodosRef,
+  previousTodoId,
+}: TodoProps) => {
   const { reorderTodo, updateTodoText, deleteTodo, toggleTodo } = useStore();
   return (
     <li
@@ -43,6 +50,11 @@ const Todo = ({ todo, isPreview, onEnterPress, allTodosRef }: TodoProps) => {
 
           if (!todo.text && event.key === 'Backspace') {
             deleteTodo(todo.id);
+            setTimeout(() => {
+              if (previousTodoId) {
+                allTodosRef.current[previousTodoId]?.focus();
+              }
+            }, 100);
           }
         }}
         ref={(item) => {
