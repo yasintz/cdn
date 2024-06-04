@@ -9,6 +9,7 @@ import Header from './Header';
 import Entry from './Entry';
 import './style.scss';
 import { getTagSpentTime } from './helpers';
+import TagsTable from './TagsTable';
 
 dayjs.extend(duration);
 
@@ -80,6 +81,12 @@ const TimelineTodo = () => {
             height: 'calc(100vh - 3.6rem)',
           }}
         >
+          {session && (
+            <TagsTable
+              className="md:hidden flex"
+              sessionEntries={sessionEntries}
+            />
+          )}
           {sessionEntries.map((entry, index) => (
             <Entry
               key={entry.id}
@@ -93,30 +100,13 @@ const TimelineTodo = () => {
             />
           ))}
         </ul>
-        <div className="flex-1 px-4">
-          <table className="tags">
-            <thead>
-              <tr>
-                <th>Tag</th>
-                <th>Spent Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tagsWithSpentTime.map(({ tag, spentTime, color }) => (
-                <tr key={tag}>
-                  <td className="flex gap-2 items-center">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: color }}
-                    />
-                    {tag}
-                  </td>
-                  <td>{spentTime}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+        {session && (
+          <TagsTable
+            className="hidden md:flex"
+            sessionEntries={sessionEntries}
+          />
+        )}
       </div>
     </div>
   );
