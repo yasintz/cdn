@@ -75,7 +75,7 @@ const TimelineTodo = () => {
     setTime(dayjs().diff(dayjs().startOf('day')));
     const interval = setInterval(() => {
       setTime(dayjs().diff(dayjs().startOf('day')));
-    }, ms('5 minutes'));
+    }, ms('1 minute'));
 
     return () => {
       clearInterval(interval);

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { cn } from '@/lib/utils';
 import { EntryType, useStore } from './store';
 import ms from 'ms';
@@ -8,6 +9,21 @@ import { PlusCircleIcon, XCircleIcon } from 'lucide-react';
 import Todo from './Todo';
 
 dayjs.extend(duration);
+dayjs.extend(relativeTime);
+
+function showDiff(diff: number) {
+  const duration = dayjs.duration(diff);
+
+  if (diff < ms('1 hour')) {
+    return duration.format('m[m]');
+  }
+
+  if (duration.minutes() > 0) {
+    return duration.format('H[h] m[m]');
+  }
+
+  return duration.format('H[h]');
+}
 
 type EntryProps = {
   isLast: boolean;
@@ -39,10 +55,8 @@ const Entry = ({ isLast, entry, isPreview }: EntryProps) => {
             left: 7,
           }}
         >
-          <div className="px-0.5 bg-white rounded-lg border border-slate-300 text-xs text-gray-300 text-center">
-            {dayjs
-              .duration(entry.diff)
-              .format(entry.diff >= ms('1hour') ? 'H[h] m[m]' : 'm[m]')}
+          <div className="px-0.5 bg-white rounded-lg border border-slate-300 text-xs text-gray-300 text-center min-w-8">
+            {showDiff(entry.diff)}
           </div>
         </div>
       )}
