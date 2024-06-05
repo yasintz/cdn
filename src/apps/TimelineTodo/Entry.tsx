@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -9,9 +9,9 @@ import {
   CalendarPlus2Icon,
   CalendarMinus2Icon,
   PlusIcon,
-  XCircleIcon,
   TagIcon,
   AlarmClockPlusIcon,
+  Trash2Icon,
 } from 'lucide-react';
 import Todo from './Todo';
 import { TagInput } from './TagInput';
@@ -125,9 +125,13 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
             createEntry(entry.sessionId, entry.time + ms('10 minutes'))
           }
         />
-        <XCircleIcon
-          className={cn('cursor-pointer', isPreview && 'hidden')}
-          onClick={() => deleteEntry(entry.id)}
+        <Trash2Icon
+          className={cn(
+            'cursor-pointer',
+            isPreview && 'hidden',
+            'text-red-400'
+          )}
+          onClick={() => confirm('Are you sure?') && deleteEntry(entry.id)}
           size={13}
         />
         <div className={cn('flex gap-2 items-center', isPreview && 'hidden')}>

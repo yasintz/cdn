@@ -113,7 +113,9 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
         hidden={isPreview || !activeSession}
         icon={TrashIcon}
         variant="destructive"
-        onClick={() => deleteSession(activeSession!.id)}
+        onClick={() =>
+          confirm('Are you sure?') && deleteSession(activeSession!.id)
+        }
       />
     </div>
   );
