@@ -34,7 +34,7 @@ export type StoreType = {
 
   createSession: (name: string) => void;
   duplicateSession: (id: string, name: string) => void;
-  createEntry: (sessionId: string) => void;
+  createEntry: (sessionId: string, time?: number) => void;
   updateEntryTime: (id: string, time: number) => void;
   createTodo: (entryId: string, text: string) => string;
   toggleTodo: (id: string) => void;
@@ -109,7 +109,7 @@ export const useStore = create<StoreType>()(
                 });
               }),
 
-            createEntry: (sessionId) =>
+            createEntry: (sessionId, time) =>
               set((prev) => {
                 const sessionEntries = prev.entries.filter(
                   (entry) => entry.sessionId === sessionId
@@ -123,7 +123,7 @@ export const useStore = create<StoreType>()(
                     {
                       id: uid(),
                       sessionId,
-                      time: (lastEntry?.time || 0) + 1000 * 60 * 5,
+                      time: time || (lastEntry?.time || 0) + 1000 * 60 * 5,
                       tags: [],
                     },
                   ],

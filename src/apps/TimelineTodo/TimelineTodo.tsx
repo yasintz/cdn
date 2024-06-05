@@ -16,7 +16,6 @@ const TimelineTodo = () => {
   const { sessionId } = useParams();
   const [searchParams] = useSearchParams();
   const [time, setTime] = useState(Date.now());
-  const [showTagInputEntryId, setShowTagInputEntryId] = useState<string>();
 
   const isPreview = searchParams.get('preview') !== 'false';
 
@@ -81,9 +80,6 @@ const TimelineTodo = () => {
               isLast={index === sessionEntries.length - 1}
               isPreview={isPreview}
               onEntryCreate={() => createEntry(session!.id)}
-              tagInputShown={showTagInputEntryId === entry.id}
-              showTagInput={() => setShowTagInputEntryId(entry.id)}
-              hideTagInput={() => setShowTagInputEntryId(undefined)}
             />
           ))}
         </ul>

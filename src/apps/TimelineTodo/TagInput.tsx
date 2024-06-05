@@ -25,13 +25,11 @@ import { stringToColor } from './helpers';
 type TagInputPropsType = {
   allTags: StoreType['allTags'];
   entryTags: string[];
-  onClose: () => void;
   onTagClick: (tag: string) => void;
   children?: React.ReactNode;
 };
 
 export function TagInput({
-  onClose,
   onTagClick,
   allTags,
   entryTags,

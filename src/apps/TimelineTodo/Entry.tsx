@@ -11,6 +11,7 @@ import {
   PlusIcon,
   XCircleIcon,
   TagIcon,
+  AlarmClockPlusIcon,
 } from 'lucide-react';
 import Todo from './Todo';
 import { TagInput } from './TagInput';
@@ -42,20 +43,9 @@ type EntryProps = {
     active: boolean;
   };
   onEntryCreate: () => void;
-  tagInputShown: boolean;
-  showTagInput: () => void;
-  hideTagInput: () => void;
 };
 
-const Entry = ({
-  isLast,
-  entry,
-  isPreview,
-  onEntryCreate,
-  tagInputShown,
-  showTagInput,
-  hideTagInput,
-}: EntryProps) => {
+const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
   const {
     updateEntryTime,
     deleteEntry,
@@ -63,6 +53,7 @@ const Entry = ({
     createTodo,
     toggleEntryTag,
     allTags,
+    createEntry,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
 
@@ -127,6 +118,13 @@ const Entry = ({
           )}
           onClick={() => updateEntryTime(entry.id, entry.time - ms('24 hours'))}
         />
+        <AlarmClockPlusIcon
+          size={13}
+          className={cn('cursor-pointer', isPreview && 'hidden')}
+          onClick={() =>
+            createEntry(entry.sessionId, entry.time + ms('10 minutes'))
+          }
+        />
         <XCircleIcon
           className={cn('cursor-pointer', isPreview && 'hidden')}
           onClick={() => deleteEntry(entry.id)}
@@ -140,13 +138,9 @@ const Entry = ({
           <TagInput
             allTags={allTags}
             entryTags={entry.tags}
-            onClose={hideTagInput}
             onTagClick={(tag) => toggleEntryTag(entry.id, tag)}
           >
-            <div
-              className="text-xs px-2 py-0.5 rounded-full cursor-pointer border"
-              onClick={showTagInput}
-            >
+            <div className="text-xs px-2 py-0.5 rounded-full cursor-pointer border">
               <TagIcon size={13} />
             </div>
           </TagInput>
