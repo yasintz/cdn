@@ -28,6 +28,8 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
       }));
   }, [allTags, sessionEntries]);
 
+  console.log({ allTags, sessionEntries });
+
   return (
     <div className={cn('flex-1 px-4', className)}>
       <div className="w-full">

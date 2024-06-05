@@ -246,12 +246,11 @@ export const useStore = create<StoreType>()(
                 }
               }),
             ...compute(get, (state) => ({
-              allTags: _.uniqBy(
+              allTags: _.uniq(
                 state.entries.reduce(
-                  (acc, entry) => [...acc, ...entry.tags.map((tag) => tag)],
+                  (acc, entry) => [...acc, ...entry.tags],
                   [] as StoreType['allTags']
-                ),
-                'tag'
+                )
               ),
             })),
           } as StoreType),
