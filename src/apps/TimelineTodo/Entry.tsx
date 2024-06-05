@@ -15,6 +15,7 @@ import {
 import Todo from './Todo';
 import { TagInput } from './TagInput';
 import _ from 'lodash';
+import Tag from './Tag';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -134,15 +135,7 @@ const Entry = ({
         <div className={cn('flex gap-2 items-center', isPreview && 'hidden')}>
           {' | '}
           {entry.tags.map((tag) => (
-            <div
-              key={tag}
-              className="text-xs px-2 py-0.5 rounded-full"
-              style={{
-                backgroundColor: allTags.find((t) => t.tag === tag)?.color,
-              }}
-            >
-              {tag}
-            </div>
+            <Tag key={tag} tag={tag} />
           ))}
           <TagInput
             allTags={allTags}

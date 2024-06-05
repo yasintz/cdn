@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { stringToColor } from './helpers';
+import { getTagColor, stringToColor } from './helpers';
 
 export type StoreType = {
   isLoading: boolean;
@@ -30,10 +30,7 @@ export type StoreType = {
     entryId: string;
   }>;
 
-  allTags: Array<{
-    tag: string;
-    color: string;
-  }>;
+  allTags: Array<string>;
 
   createSession: (name: string) => void;
   duplicateSession: (id: string, name: string) => void;
@@ -251,13 +248,7 @@ export const useStore = create<StoreType>()(
             ...compute(get, (state) => ({
               allTags: _.uniqBy(
                 state.entries.reduce(
-                  (acc, entry) => [
-                    ...acc,
-                    ...entry.tags.map((tag) => ({
-                      tag,
-                      color: stringToColor(tag),
-                    })),
-                  ],
+                  (acc, entry) => [...acc, ...entry.tags.map((tag) => tag)],
                   [] as StoreType['allTags']
                 ),
                 'tag'

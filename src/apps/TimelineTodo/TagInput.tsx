@@ -39,17 +39,7 @@ export function TagInput({
 }: TagInputPropsType) {
   const [dynamicTag, setDynamicTag] = React.useState('');
   const allTagsList = React.useMemo(
-    () =>
-      _.uniqBy(
-        [
-          {
-            tag: dynamicTag,
-            color: stringToColor(dynamicTag),
-          },
-          ...allTags,
-        ].filter((i) => i.tag),
-        'tag'
-      ),
+    () => _.uniq([dynamicTag, ...allTags].filter((i) => i)),
     [allTags, dynamicTag]
   );
 
@@ -67,7 +57,7 @@ export function TagInput({
           <CommandList>
             <CommandEmpty>No framework found.</CommandEmpty>
             <CommandGroup>
-              {allTagsList.map(({ tag, color }) => (
+              {allTagsList.map((tag) => (
                 <CommandItem
                   key={tag}
                   value={tag}

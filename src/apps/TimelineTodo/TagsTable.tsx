@@ -5,6 +5,7 @@ import { EntryType, useStore } from './store';
 import { getTagSpentTime } from './helpers';
 import { cn } from '@/lib/utils';
 import _ from 'lodash';
+import Tag from './Tag';
 dayjs.extend(duration);
 
 type TagsTableProps = {
@@ -18,10 +19,9 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
   const tagsWithSpentTime = useMemo(() => {
     const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
     return allTags
-      .filter(({ tag }) => sessionTags.includes(tag))
-      .map(({ tag, color }) => ({
+      .filter((tag) => sessionTags.includes(tag))
+      .map((tag) => ({
         tag,
-        color,
         spentTime: dayjs
           .duration(getTagSpentTime(tag, sessionEntries))
           .format('H[h] m[m]'),
@@ -39,14 +39,12 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
             </tr>
           </thead>
           <tbody>
-            {tagsWithSpentTime.map(({ tag, spentTime, color }) => (
+            {tagsWithSpentTime.map(({ tag, spentTime }) => (
               <tr key={tag}>
-                <td className="flex gap-2 items-center">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
-                  {tag}
+                <td>
+                  <div className="flex">
+                    <Tag tag={tag} />
+                  </div>
                 </td>
                 <td>{spentTime}</td>
               </tr>

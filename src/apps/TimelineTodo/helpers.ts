@@ -44,3 +44,47 @@ export function stringToColor(
 
   return color;
 }
+
+export const tagsColor: Record<
+  string,
+  { backgroundColor: string; color: string }
+> = {
+  yemek: {
+    backgroundColor: '#fecaca',
+    color: '#dd2a29',
+  },
+  sleep: {
+    backgroundColor: '#ffef8a',
+    color: '#ca8a03',
+  },
+  ibadet: {
+    backgroundColor: '#bfdbfe',
+    color: '#2463eb',
+  },
+};
+
+const toRGB = (color: string) => {
+  const { style } = new Option();
+  style.color = color;
+  const rgb = style.color;
+
+  const [r, g, b] = rgb.replace('rgb(', '').replace(')', '').split(',');
+
+  return { r, g, b };
+};
+
+export function getTagColor(tag: string) {
+  const definedColor = tagsColor[tag];
+
+  if (definedColor) {
+    return definedColor;
+  }
+
+  const color = stringToColor(tag, 'dark');
+  const { r, g, b } = toRGB(color);
+
+  return {
+    color,
+    backgroundColor: `rgba(${r},${g},${b},0.2)`,
+  };
+}
