@@ -56,6 +56,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
     createEntry,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCreateTodo = () => {
     const newTodoId = createTodo(entry.id, '');
@@ -86,21 +87,31 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
           <div className="h-2 w-2 rounded-full bg-red-700 absolute -translate-x-3" />
         )}
 
-        <input
-          className="font-bold text-purple-500 hidden-icon focus:outline-none"
-          type="time"
-          value={dayjs.duration(entry.time).format('HH:mm')}
-          onChange={(event) => {
-            const [h, m] = event.target.value.split(':');
-            const isBelongsToNextDay = entry.time > ms('24 hours') - 1;
-            const result = ms(`${h}h`) + ms(`${m}m`);
-            updateEntryTime(
-              entry.id,
-              isBelongsToNextDay ? result + ms('24 hours') : result
-            );
-          }}
-          onClick={(event) => (event.target as any).showPicker()}
-        />
+        <div className="w-12 relative">
+          <input
+            className="absolute top-0 opacity-0"
+            type="time"
+            ref={inputRef}
+            value={dayjs.duration(entry.time).format('HH:mm')}
+            onChange={(event) => {
+              const [h, m] = event.target.value.split(':');
+              const isBelongsToNextDay = entry.time > ms('24 hours') - 1;
+              const result = ms(`${h}h`) + ms(`${m}m`);
+              updateEntryTime(
+                entry.id,
+                isBelongsToNextDay ? result + ms('24 hours') : result
+              );
+            }}
+            onClick={() => (inputRef?.current as any).showPicker()}
+          />
+
+          <div
+            className="font-bold text-purple-500"
+            onClick={() => (inputRef?.current as any).showPicker()}
+          >
+            {dayjs.duration(entry.time).format('HH:mm')}
+          </div>
+        </div>
 
         <CalendarPlus2Icon
           size={13}
@@ -134,20 +145,21 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
           onClick={() => confirm('Are you sure?') && deleteEntry(entry.id)}
           size={13}
         />
-        <div className={cn('flex gap-2 items-center', isPreview && 'hidden')}>
-          {' | '}
+        <div className={cn('flex gap-2 items-center')}>
           {entry.tags.map((tag) => (
             <Tag key={tag} tag={tag} />
           ))}
-          <TagInput
-            allTags={allTags}
-            entryTags={entry.tags}
-            onTagClick={(tag) => toggleEntryTag(entry.id, tag)}
-          >
-            <div className="text-xs px-2 py-0.5 rounded-full cursor-pointer border">
-              <TagIcon size={13} />
-            </div>
-          </TagInput>
+          {!isPreview && (
+            <TagInput
+              allTags={allTags}
+              entryTags={entry.tags}
+              onTagClick={(tag) => toggleEntryTag(entry.id, tag)}
+            >
+              <div className="text-xs px-2 py-0.5 rounded-full cursor-pointer border">
+                <TagIcon size={13} />
+              </div>
+            </TagInput>
+          )}
         </div>
       </div>
       <div className="ml-8 my-2">
