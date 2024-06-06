@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { EntryType, useStore } from './store';
@@ -19,6 +19,7 @@ type TagsTableProps = {
 };
 
 const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
+  const [expandedTags, setExpandedTags] = useState<string[]>([]);
   const { allTags } = useStore();
 
   const tagsWithSpentTime = useMemo(() => {
@@ -84,28 +85,41 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
                 <React.Fragment key={tag}>
                   <tr>
                     <td>
-                      <div className="flex">
-                        <Tag tag={tag} />
+                      <div
+                        className="flex gap-2 cursor-pointer"
+                        onClick={() =>
+                          setExpandedTags((prev) =>
+                            prev.includes(tag)
+                              ? prev.filter((t) => t !== tag)
+                              : [...prev, tag]
+                          )
+                        }
+                      >
+                        <Tag tag={tag} />{' '}
+                        {!expandedTags.includes(tag) && childs.length > 0 && (
+                          <span className="text-sm">{childs.length}</span>
+                        )}
                       </div>
                     </td>
                     <td>{formatDuration(spentTime)}</td>
                   </tr>
 
-                  {childs.map((child) => (
-                    <tr
-                      key={child.tag}
-                      style={{
-                        backgroundColor: getTagColor(tag).backgroundColor,
-                      }}
-                    >
-                      <td>
-                        <div className="flex ml-4">
-                          <Tag tag={child.tag} />
-                        </div>
-                      </td>
-                      <td>{formatDuration(child.spentTime)}</td>
-                    </tr>
-                  ))}
+                  {expandedTags.includes(tag) &&
+                    childs.map((child) => (
+                      <tr
+                        key={child.tag}
+                        style={{
+                          backgroundColor: getTagColor(tag).backgroundColor,
+                        }}
+                      >
+                        <td>
+                          <div className="flex ml-4">
+                            <Tag tag={child.tag} />
+                          </div>
+                        </td>
+                        <td>{formatDuration(child.spentTime)}</td>
+                      </tr>
+                    ))}
                 </React.Fragment>
               );
             }
