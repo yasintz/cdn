@@ -1,12 +1,17 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { EntryType, useStore } from './store';
-import { getTagSpentTime } from './helpers';
+import { getTagColor, getTagSpentTime, tagsGroup } from './helpers';
 import { cn } from '@/lib/utils';
 import _ from 'lodash';
 import Tag from './Tag';
+
 dayjs.extend(duration);
+
+function formatDuration(duration: number) {
+  return dayjs.duration(duration).format('H[h] m[m]');
+}
 
 type TagsTableProps = {
   sessionEntries: EntryType[];
@@ -18,40 +23,103 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
 
   const tagsWithSpentTime = useMemo(() => {
     const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
-    return allTags
+    const tags = allTags
       .filter((tag) => sessionTags.includes(tag))
       .map((tag) => ({
         tag,
-        spentTime: dayjs
-          .duration(getTagSpentTime(tag, sessionEntries))
-          .format('H[h] m[m]'),
+        spentTime: getTagSpentTime(tag, sessionEntries),
+        groupedTag: Object.entries(tagsGroup).find(([, value]) =>
+          value.includes(tag)
+        )?.[0],
       }));
+
+    const unTagged = sessionEntries
+      .filter((entry) => entry.tags.length === 0)
+      .map((entry) => ({
+        ...entry,
+        tags: ['un-categorized'],
+      }));
+
+    unTagged.pop();
+
+    if (unTagged.length > 0) {
+      const unCategorized = {
+        tag: 'un-categorized',
+        groupedTag: undefined,
+        spentTime: getTagSpentTime(
+          'un-categorized',
+          sessionEntries.map(
+            (entry) => unTagged.find((e) => e.id === entry.id) || entry
+          )
+        ),
+      };
+      tags.push(unCategorized);
+    }
+
+    return tags;
   }, [allTags, sessionEntries]);
 
-  console.log({ allTags, sessionEntries });
+  const groupedTags = tagsWithSpentTime
+    .filter((i) => !i.groupedTag)
+    .map(({ tag, spentTime }) => {
+      const childs = tagsWithSpentTime.filter((i) => i.groupedTag === tag);
+      return {
+        childs,
+        tag,
+        spentTime,
+      };
+    });
 
   return (
     <div className={cn('flex-1 px-4', className)}>
-      <div className="w-full">
+      <div className="w-full max-w-96">
         <table className="tags">
-          <thead>
-            <tr>
-              <th>Tag</th>
-              <th>Spent Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tagsWithSpentTime.map(({ tag, spentTime }) => (
-              <tr key={tag}>
-                <td>
-                  <div className="flex">
-                    <Tag tag={tag} />
-                  </div>
-                </td>
-                <td>{spentTime}</td>
-              </tr>
-            ))}
-          </tbody>
+          <tr>
+            <th>Tag</th>
+            <th>Spent Time</th>
+          </tr>
+          {_.orderBy(groupedTags, 'spentTime', 'desc').map(
+            ({ tag, childs, spentTime }) => {
+              return (
+                <React.Fragment key={tag}>
+                  <tr>
+                    <td>
+                      <div className="flex">
+                        <Tag tag={tag} />
+                      </div>
+                    </td>
+                    <td>{formatDuration(spentTime)}</td>
+                  </tr>
+
+                  {childs.map((child) => (
+                    <tr
+                      key={child.tag}
+                      style={{
+                        backgroundColor: getTagColor(tag).backgroundColor,
+                      }}
+                    >
+                      <td>
+                        <div className="flex ml-4">
+                          <Tag tag={child.tag} />
+                        </div>
+                      </td>
+                      <td>{formatDuration(child.spentTime)}</td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              );
+            }
+          )}
+
+          <tr>
+            <th>Total</th>
+
+            <th>
+              {formatDuration(
+                groupedTags.reduce((acc, cur) => acc + cur.spentTime, 0)
+              )}
+            </th>
+          </tr>
         </table>
       </div>
     </div>

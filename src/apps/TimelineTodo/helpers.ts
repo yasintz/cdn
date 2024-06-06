@@ -63,6 +63,11 @@ export const tagsColor: Record<
   },
 };
 
+export const tagsGroup = {
+  productivity: ['reading', 'podcast'],
+  work: ['kajabi', 'chat-app', 'nexizon'],
+};
+
 const toRGB = (color: string) => {
   const { style } = new Option();
   style.color = color;
