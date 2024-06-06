@@ -1,13 +1,9 @@
 import { computed, compute } from 'zustand-computed-state';
-import {
-  gSheetStorage,
-  handleStoreLoadingState,
-} from '@/utils/zustand/gsheet-storage';
+import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import _ from 'lodash';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { getTagColor, stringToColor } from './helpers';
 
 export type StoreType = {
   isLoading: boolean;
@@ -256,13 +252,12 @@ export const useStore = create<StoreType>()(
           } as StoreType),
         {
           name: 'timeline-todo',
-          storage: createJSONStorage(() =>
-            gSheetStorage('1gI4tbIt1ETMm6aPXNdk5ycHt8tHlJr-TxkbKuAKqBKc')
-          ),
         }
       )
     )
   )
 );
 
-handleStoreLoadingState(useStore, 'isLoading');
+gSheetStorage('1gI4tbIt1ETMm6aPXNdk5ycHt8tHlJr-TxkbKuAKqBKc').handleStore(
+  useStore
+);

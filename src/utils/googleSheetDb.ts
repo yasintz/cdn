@@ -27,7 +27,8 @@ export function googleSheetDB(id: string, tabId: string = '0') {
     });
   };
   return {
-    get: () => fetch(apiUrl).then((res) => res.text()),
+    get: () => fetch(apiUrl).then((res) => res.json()),
     set: (val: string) => set(val),
   };
 }
+

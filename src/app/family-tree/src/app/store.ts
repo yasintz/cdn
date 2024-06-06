@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import _debounce from 'lodash/debounce';
 import _orderBy from 'lodash/orderBy';
 import { StoreType } from '../types';
@@ -22,9 +22,10 @@ export const useStore = create(
     }),
     {
       name: 'family_tree_store_1',
-      storage: createJSONStorage(() =>
-        gSheetStorage('1BiqlwaBsUdyQIZU2wy0dMv7HkA7E0WpOZjyR3rWTr6E')
-      ),
     }
   )
+);
+
+gSheetStorage('1BiqlwaBsUdyQIZU2wy0dMv7HkA7E0WpOZjyR3rWTr6E').handleStore(
+  useStore
 );
