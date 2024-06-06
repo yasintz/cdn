@@ -64,7 +64,7 @@ export const tagsColor: Record<
 };
 
 export const tagsGroup = {
-  productivity: ['reading', 'podcast'],
+  productivity: ['reading', 'podcast', 'spor'],
   work: ['kajabi', 'chat-app', 'nexizon'],
 };
 
