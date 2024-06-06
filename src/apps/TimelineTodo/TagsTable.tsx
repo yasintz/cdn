@@ -97,7 +97,7 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
                       >
                         <Tag tag={tag} />{' '}
                         {!expandedTags.includes(tag) && childs.length > 0 && (
-                          <span className="text-sm">{childs.length}</span>
+                          <span className="text-xs">{childs.length}</span>
                         )}
                       </div>
                     </td>
