@@ -49,7 +49,7 @@ export const tagsColor: Record<
   string,
   { backgroundColor: string; color: string }
 > = {
-  yemek: {
+  bad: {
     backgroundColor: '#fecaca',
     color: '#dd2a29',
   },
@@ -61,11 +61,16 @@ export const tagsColor: Record<
     backgroundColor: '#bfdbfe',
     color: '#2463eb',
   },
+  free: {
+    color: '#24b021',
+    backgroundColor: '#ceeccb',
+  },
 };
 
 export const tagsGroup = {
-  productivity: ['reading', 'podcast', 'spor'],
+  productivity: ['reading', 'podcast', 'spor', 'plan'],
   work: ['kajabi', 'chat-app', 'nexizon'],
+  bad: ['youtube'],
 };
 
 const toRGB = (color: string) => {
