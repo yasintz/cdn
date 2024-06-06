@@ -89,7 +89,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
 
         <div className="w-12 relative">
           <input
-            className="absolute top-0 opacity-0"
+            className="absolute top-0 opacity-0 w-1"
             type="time"
             ref={inputRef}
             value={dayjs.duration(entry.time).format('HH:mm')}
@@ -106,7 +106,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
           />
 
           <div
-            className="font-bold text-purple-500"
+            className="font-bold text-purple-500 cursor-pointer"
             onClick={() => (inputRef?.current as any).showPicker()}
           >
             {dayjs.duration(entry.time).format('HH:mm')}
