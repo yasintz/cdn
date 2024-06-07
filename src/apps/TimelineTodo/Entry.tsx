@@ -146,9 +146,6 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
           size={13}
         />
         <div className={cn('flex gap-2 items-center')}>
-          {entry.tags.map((tag) => (
-            <Tag key={tag} tag={tag} />
-          ))}
           {!isPreview && (
             <TagInput
               allTags={allTags}
@@ -160,6 +157,9 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
               </div>
             </TagInput>
           )}
+          {entry.tags.map((tag) => (
+            <Tag key={tag} tag={tag} />
+          ))}
         </div>
       </div>
       <div className="ml-8 my-2">
