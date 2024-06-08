@@ -2,7 +2,6 @@ import familyRouter from '@/app/family-tree/router';
 import HomePage from '@/apps/HomePage';
 import timelineTodoRouter from '@/apps/TimelineTodo/router';
 import AppLayout from '@/containers/AppLayout';
-import AkyuzHukuk from '@/app/akyuz-hukuk/src/pages';
 import { Outlet, createBrowserRouter } from 'react-router-dom';
 
 const router = createBrowserRouter([
@@ -25,10 +24,6 @@ const router = createBrowserRouter([
       {
         path: 'timeline-todo',
         children: timelineTodoRouter,
-      },
-      {
-        path: 'akyuz-hukuk',
-        element: <AkyuzHukuk />,
       },
     ],
   },
