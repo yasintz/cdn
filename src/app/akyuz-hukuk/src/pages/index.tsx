@@ -1,46 +1,23 @@
 import { Button } from '@/components/ui/button';
-import { useStore } from '../store';
-import { useRef, useState } from 'react';
+import { ArticleTypeEnum, useStore } from '../store';
+import { useState } from 'react';
 import { getPreviewHtml } from './preview';
 import { Input } from '@/components/ui/input';
-import _, { uniqueId } from 'lodash';
-import { PlusIcon, UploadIcon } from 'lucide-react';
-import { cloudinary } from './cloudinary';
-import Loading from '@/components/ui/loading';
+import _ from 'lodash';
+import { PlusIcon } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import Header from './Header';
+import TypeSelect from './TypeSelect';
 
 const HomePage = () => {
-  const [selectedArticleId, setSelectedArticleId] = useState<string>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedArticleId = searchParams.get('id');
   const { articles, addArticle, updateTitle, deleteArticle, updateArticle } =
     useStore();
   const [showEdit, setShowEdit] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imageUploading, setImageUploading] = useState(false);
 
   const selectedArticle =
     articles.find((article) => article.id === selectedArticleId) || articles[0];
-
-  const handleUploadImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const addToMarkdown = (str: string) => {
-    updateArticle(
-      selectedArticle.id,
-      `${selectedArticle.postMd || ''}\n${str}`
-    );
-  };
-
-  const onFileUpload = async () => {
-    try {
-      setImageUploading(true);
-      const file = fileInputRef.current?.files?.[0];
-      const uploadedFile = await cloudinary.upload(file!);
-      addToMarkdown(`![image.png](${uploadedFile?.url})`);
-    } catch (error) {
-      alert('Islem Basarisiz');
-    }
-    setImageUploading(false);
-  };
 
   return (
     <div className="flex gap-2 p-4">
@@ -53,7 +30,12 @@ const HomePage = () => {
               variant={
                 selectedArticle.id === article.id ? 'default' : 'secondary'
               }
-              onClick={() => setSelectedArticleId(article.id)}
+              onClick={() =>
+                setSearchParams((prev) => {
+                  prev.set('id', article.id);
+                  return prev;
+                })
+              }
             >
               {_.truncate(article.title || '', { length: 20 }) || article.id}
             </Button>
@@ -62,10 +44,11 @@ const HomePage = () => {
           variant="outline"
           onClick={() =>
             addArticle({
-              id: `makale-${uniqueId('m')}`,
+              id: `m${Math.random().toString(36).substring(2, 8)}`,
               post: '',
               title: `Makale ${articles.length}`,
               postMd: '',
+              type: ArticleTypeEnum.Ceza,
             })
           }
         >
@@ -82,6 +65,7 @@ const HomePage = () => {
                   updateTitle(selectedArticle?.id || '', e.target.value)
                 }
               />
+              <TypeSelect article={selectedArticle} key={selectedArticleId} />
               {showEdit ? (
                 <>
                   <Button
@@ -93,9 +77,7 @@ const HomePage = () => {
                 </>
               ) : (
                 <>
-                  {typeof selectedArticle.postMd === 'string' && (
-                    <Button onClick={() => setShowEdit(true)}>Duzenle</Button>
-                  )}
+                  <Button onClick={() => setShowEdit(true)}>Duzenle</Button>
                   <Button
                     variant="destructive"
                     onClick={() => deleteArticle(selectedArticle.id)}
@@ -107,45 +89,15 @@ const HomePage = () => {
             </div>
             {showEdit ? (
               <div className="flex flex-col h-full w-full">
-                <div className="flex my-2 gap-2">
-                  <Button
-                    variant="secondary"
-                    onClick={handleUploadImageClick}
-                    disabled={imageUploading}
-                  >
-                    {imageUploading ? (
-                      <Loading className="mr-2 size-4" />
-                    ) : (
-                      <UploadIcon className="mr-2" size={16} />
-                    )}{' '}
-                    Resim Yukle
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => addToMarkdown('# Baslik')}
-                  >
-                    Buyuk Baslik Ekle
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => addToMarkdown('### Kucuk Baslik')}
-                  >
-                    Kucuk Baslik Ekle
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => addToMarkdown('1. yazi\n2. yazi')}
-                  >
-                    Sirali Liste Ekle
-                  </Button>
- 
-                </div>
+                <Header article={selectedArticle} key={selectedArticle.id} />
 
                 <div className="flex flex-1">
                   <textarea
-                    value={selectedArticle.postMd}
+                    value={selectedArticle.postMd || ''}
                     onChange={(e) =>
-                      updateArticle(selectedArticle.id, e.target.value)
+                      updateArticle(selectedArticle.id, {
+                        postMd: e.target.value,
+                      })
                     }
                     className="flex-1 p-2 border-r"
                   />
@@ -163,14 +115,6 @@ const HomePage = () => {
             )}
           </>
         )}
-
-        <input
-          type="file"
-          className="hidden"
-          ref={fileInputRef}
-          accept="image/x-png,image/jpeg"
-          onChange={onFileUpload}
-        />
       </div>
     </div>
   );

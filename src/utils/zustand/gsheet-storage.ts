@@ -32,13 +32,16 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
     db.set(value);
   }, 500);
 
-  async function handleStore<S extends ReturnType<typeof create>>(store: S) {
+  async function handleStore<S extends ReturnType<typeof create>>(
+    store: S,
+    keepState?: boolean
+  ) {
     await db.get().then((response) => {
       store.setState(response.state ? response.state : response);
     });
 
     store.subscribe((state) => {
-      debouncedSync(JSON.stringify(state));
+      debouncedSync(JSON.stringify(keepState ? { state } : state));
     });
   }
 
