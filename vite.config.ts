@@ -10,7 +10,7 @@ export default defineConfig(async ({ command, mode }) => {
       tsconfigPaths(),
       mode === 'analyze' && visualizer({ open: true }),
     ],
-    base: `/cdn/`,
+    base: `/mustafa-akyuz/`,
     server: {
       port: 3007,
     },
