@@ -10,7 +10,8 @@ import Tag from './Tag';
 dayjs.extend(duration);
 
 function formatDuration(duration: number) {
-  return dayjs.duration(duration).format('H[h] m[m]');
+  const dur = dayjs.duration(duration);
+  return `${dur.days() * 24 + dur.hours()}h ${dur.minutes()}m`;
 }
 
 type TagsTableProps = {
