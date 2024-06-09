@@ -45,26 +45,12 @@ export function stringToColor(
   return color;
 }
 
-export const tagsColor: Record<
-  string,
-  { backgroundColor: string; color: string }
-> = {
-  bad: {
-    backgroundColor: '#fecaca',
-    color: '#dd2a29',
-  },
-  sleep: {
-    backgroundColor: '#ffef8a',
-    color: '#ca8a03',
-  },
-  ibadet: {
-    backgroundColor: '#bfdbfe',
-    color: '#2463eb',
-  },
-  free: {
-    color: '#24b021',
-    backgroundColor: '#ceeccb',
-  },
+export const tagsColor: Record<string, string> = {
+  bad: '#dd2a29',
+  sleep: '#ca8a03',
+  ibadet: '#2463eb',
+  free: '#24b021',
+  finance: '#d78b12',
 };
 
 export const tagsGroup = {
@@ -83,18 +69,24 @@ const toRGB = (color: string) => {
   return { r, g, b };
 };
 
+export function hashCode(t: string) {
+  var hash = 0,
+    i = 0,
+    len = t.length;
+  while (i < len) {
+    hash = ((hash << 5) - hash + t.charCodeAt(i++)) << 0;
+  }
+  return hash + 2147483647 + 1;
+}
+
 export function getTagColor(tag: string) {
   const definedColor = tagsColor[tag];
+  const color = definedColor || stringToColor(tag, 'dark');
 
-  if (definedColor) {
-    return definedColor;
-  }
-
-  const color = stringToColor(tag, 'dark');
   const { r, g, b } = toRGB(color);
 
   return {
-    color,
+    color: `rgba(${r},${g},${b})`,
     backgroundColor: `rgba(${r},${g},${b},0.2)`,
   };
 }
