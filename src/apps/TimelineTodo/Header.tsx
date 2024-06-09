@@ -1,17 +1,33 @@
-import React from 'react';
 import { SessionType, useStore } from './store';
-import { NavLink, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useSearchParams } from 'react-router-dom';
 import HeaderButton from './HeaderButton';
 import {
   AlarmClockPlusIcon,
+  ArchiveIcon,
   CopyIcon,
+  EllipsisIcon,
   EyeIcon,
   FolderKanbanIcon,
   PencilIcon,
   TrashIcon,
 } from 'lucide-react';
+import SessionButton from './SessionButton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { useEffect, useRef } from 'react';
 
 type HeaderProps = {
   isPreview: boolean;
@@ -19,13 +35,14 @@ type HeaderProps = {
 };
 
 const Header = ({ isPreview, activeSession }: HeaderProps) => {
-  const [, setSearchParams] = useSearchParams();
+  const scrollDivRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     sessions,
     duplicateSession,
     createSession,
-    createEntry,
     deleteSession,
+    archiveSession,
   } = useStore();
 
   const handleCreateSession = () => {
@@ -42,81 +59,119 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
       duplicateSession(activeSession.id, name);
     }
   };
-  const handleCreateEntry = () => {
-    if (!activeSession?.id) {
-      alert('Please open a session');
-      return;
-    }
 
-    createEntry(activeSession.id);
-  };
+  const showArchivedSessions = searchParams.get('showArchived') === 'true';
+  const archivedSessions = sessions.filter((i) => i.archived);
+
+  useEffect(() => {
+    if (scrollDivRef.current) {
+      scrollDivRef.current.scrollTo({
+        left: 99999,
+      });
+    }
+  }, []);
 
   return (
-    <div className="flex gap-2 px-3 pt-3 pb-2 overflow-x-auto w-full">
-      {sessions.map((session) => (
-        <NavLink
-          to={`/cdn/timeline-todo/${session.id}?preview=${isPreview.valueOf()}`}
-          key={session.id}
-        >
+    <div
+      className="flex gap-2 px-3 pt-3 pb-2 overflow-x-auto w-full"
+      ref={scrollDivRef}
+    >
+      {sessions
+        .filter((i) => !i.archived)
+        .map((session) => (
+          <SessionButton
+            session={session}
+            isActive={session.id === activeSession?.id}
+            key={session.id}
+          />
+        ))}
+      {showArchivedSessions &&
+        archivedSessions.map((session) => (
+          <SessionButton
+            session={session}
+            isActive={session.id === activeSession?.id}
+            key={session.id}
+          />
+        ))}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
-            size="sm"
-            className={cn(session.id === activeSession?.id && 'underline')}
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 rounded-full"
           >
-            {session.name}
+            <EllipsisIcon size={16} />
           </Button>
-        </NavLink>
-      ))}
-      <HeaderButton
-        title="Edit"
-        hidden={!isPreview || !activeSession}
-        icon={PencilIcon}
-        onClick={() =>
-          setSearchParams((prev) => {
-            prev.set('preview', 'false');
-            return prev;
-          })
-        }
-      />
-      <HeaderButton
-        title="Preview"
-        hidden={isPreview || !activeSession}
-        icon={EyeIcon}
-        onClick={() =>
-          setSearchParams((prev) => {
-            prev.set('preview', 'true');
-            return prev;
-          })
-        }
-      />
-      <HeaderButton
-        title="Add Entry"
-        hidden={isPreview || !activeSession}
-        icon={AlarmClockPlusIcon}
-        onClick={handleCreateEntry}
-      />
-      <HeaderButton
-        title="Add Session"
-        hidden={isPreview}
-        icon={FolderKanbanIcon}
-        onClick={handleCreateSession}
-      />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuGroup>
+            <HeaderButton
+              title="Edit"
+              hidden={!isPreview || !activeSession}
+              icon={PencilIcon}
+              onClick={() =>
+                setSearchParams((prev) => {
+                  prev.set('preview', 'false');
+                  return prev;
+                })
+              }
+            />
+            <HeaderButton
+              title="Preview"
+              hidden={isPreview || !activeSession}
+              icon={EyeIcon}
+              onClick={() =>
+                setSearchParams((prev) => {
+                  prev.set('preview', 'true');
+                  return prev;
+                })
+              }
+            />
+            <HeaderButton
+              title="Add Session"
+              icon={FolderKanbanIcon}
+              onClick={handleCreateSession}
+            />
 
-      <HeaderButton
-        title="Duplicate Session"
-        hidden={isPreview || !activeSession}
-        icon={CopyIcon}
-        onClick={handleDuplicateSession}
-      />
+            <HeaderButton
+              title="Duplicate Session"
+              hidden={!activeSession}
+              icon={CopyIcon}
+              onClick={handleDuplicateSession}
+            />
 
-      <HeaderButton
-        title="Remove Session"
-        hidden={isPreview || !activeSession}
-        icon={TrashIcon}
-        variant="destructive"
-        onClick={() =>
-          confirm('Are you sure?') && deleteSession(activeSession!.id)
-        }
-      />
+            <HeaderButton
+              title={activeSession?.archived ? 'Unarchive' : 'Archive'}
+              hidden={!activeSession}
+              icon={ArchiveIcon}
+              onClick={() =>
+                archiveSession(activeSession!.id, !activeSession?.archived)
+              }
+            />
+            <HeaderButton
+              title={!showArchivedSessions ? 'Show Archived' : 'Hide Archived'}
+              icon={ArchiveIcon}
+              onClick={() =>
+                setSearchParams((prev) => {
+                  prev.set('showArchived', `${!showArchivedSessions}`);
+                  return prev;
+                })
+              }
+            />
+
+            <HeaderButton
+              title="Remove Session"
+              hidden={!activeSession}
+              icon={TrashIcon}
+              className="text-red-500"
+              onClick={() =>
+                confirm('Are you sure?') && deleteSession(activeSession!.id)
+              }
+            />
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

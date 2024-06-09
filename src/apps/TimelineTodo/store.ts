@@ -2,7 +2,7 @@ import { computed, compute } from 'zustand-computed-state';
 import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import _ from 'lodash';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 export type StoreType = {
@@ -10,6 +10,7 @@ export type StoreType = {
   sessions: Array<{
     id: string;
     name: string;
+    archived?: boolean;
   }>;
 
   entries: Array<{
@@ -30,6 +31,7 @@ export type StoreType = {
 
   createSession: (name: string) => void;
   duplicateSession: (id: string, name: string) => void;
+  archiveSession: (id: string, archived: boolean) => void;
   createEntry: (sessionId: string, time?: number) => void;
   updateEntryTime: (id: string, time: number) => void;
   createTodo: (entryId: string, text: string) => string;
@@ -103,6 +105,15 @@ export const useStore = create<StoreType>()(
                     prev.todos.push(newTodo);
                   });
                 });
+              }),
+            archiveSession: (id, archived) =>
+              set((prev) => {
+                const session = prev.sessions.find(
+                  (session) => session.id === id
+                );
+                if (session) {
+                  session.archived = archived;
+                }
               }),
 
             createEntry: (sessionId, time) =>

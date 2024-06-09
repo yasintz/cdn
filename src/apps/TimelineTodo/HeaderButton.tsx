@@ -1,32 +1,30 @@
-import { Button, ButtonProps } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { LucideIcon } from 'lucide-react';
 
 type HeaderButtonProps = {
-  hidden?: boolean;
-  variant?: ButtonProps['variant'];
   onClick?: () => void;
   icon: LucideIcon;
   title: string;
+  hidden?: boolean;
+  className?: string;
 };
 
 const HeaderButton = ({
   title,
   icon: Icon,
-  variant = 'secondary',
   onClick,
   hidden,
+  className,
 }: HeaderButtonProps) => {
+  if (hidden) {
+    return null;
+  }
+
   return (
-    <Button
-      className={cn({ hidden })}
-      variant={variant}
-      size="sm"
-      onClick={onClick}
-    >
+    <DropdownMenuItem onClick={onClick} className={className}>
       <Icon size={14} className="mr-2" />
       {title}
-    </Button>
+    </DropdownMenuItem>
   );
 };
 
