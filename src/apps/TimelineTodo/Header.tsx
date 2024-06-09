@@ -85,6 +85,24 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
             key={session.id}
           />
         ))}
+      {sessions
+        .filter((i) => !i.archived)
+        .map((session) => (
+          <SessionButton
+            session={session}
+            isActive={session.id === activeSession?.id}
+            key={session.id}
+          />
+        ))}
+      {sessions
+        .filter((i) => !i.archived)
+        .map((session) => (
+          <SessionButton
+            session={session}
+            isActive={session.id === activeSession?.id}
+            key={session.id}
+          />
+        ))}
       {showArchivedSessions &&
         archivedSessions.map((session) => (
           <SessionButton
@@ -96,13 +114,14 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 rounded-full"
+          <div
+            className="min-h-9 min-w-9 rounded-full
+            flex items-center justify-center cursor-pointer
+            border border-input bg-background hover:bg-accent hover:text-accent-foreground
+            "
           >
             <EllipsisIcon size={16} />
-          </Button>
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
