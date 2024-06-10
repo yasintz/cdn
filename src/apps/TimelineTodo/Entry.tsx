@@ -67,7 +67,7 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
-  const { tagsShown, batchTimeUpdatingEnabled } = useUrlState();
+  const { batchTimeUpdatingEnabled } = useUrlState();
 
   const handleCreateTodo = () => {
     const newTodoId = createTodo(entry.id, '');
@@ -131,8 +131,7 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
                 `min-h-5 min-w-5 rounded-full
             flex items-center justify-center cursor-pointer
             border border-input bg-background hover:bg-accent hover:text-accent-foreground
-            `,
-                !tagsShown && 'opacity-50'
+            `
               )}
             >
               <EllipsisIcon size={13} />

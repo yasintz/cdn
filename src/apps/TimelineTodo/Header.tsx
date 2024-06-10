@@ -25,12 +25,8 @@ type HeaderProps = {
 
 const Header = ({ activeSession }: HeaderProps) => {
   const scrollDivRef = useRef<HTMLDivElement>(null);
-  const {
-    setSearchParams,
-    archivedSessionsShown,
-    tagsShown,
-    batchTimeUpdatingEnabled,
-  } = useUrlState();
+  const { setSearchParams, archivedSessionsShown, batchTimeUpdatingEnabled } =
+    useUrlState();
   const {
     sessions,
     duplicateSession,
@@ -100,16 +96,6 @@ const Header = ({ activeSession }: HeaderProps) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
-            <DropdownItem
-              title={tagsShown ? 'Hide Tags' : 'Show Tags'}
-              icon={TagIcon}
-              onClick={() =>
-                setSearchParams((prev) => {
-                  prev.set('tagsShown', `${!tagsShown}`);
-                  return prev;
-                })
-              }
-            />
             <DropdownItem
               title="Add Session"
               icon={FolderKanbanIcon}
