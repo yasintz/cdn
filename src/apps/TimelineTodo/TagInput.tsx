@@ -27,6 +27,8 @@ type TagInputPropsType = {
   entryTags: string[];
   onTagClick: (tag: string) => void;
   children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function TagInput({
@@ -34,6 +36,8 @@ export function TagInput({
   allTags,
   entryTags,
   children,
+  open,
+  onOpenChange,
 }: TagInputPropsType) {
   const [dynamicTag, setDynamicTag] = React.useState('');
   const allTagsList = React.useMemo(
@@ -42,7 +46,7 @@ export function TagInput({
   );
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>

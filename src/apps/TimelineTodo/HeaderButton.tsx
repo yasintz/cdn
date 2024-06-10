@@ -9,7 +9,7 @@ type HeaderButtonProps = {
   className?: string;
 };
 
-const HeaderButton = ({
+const DropdownItem = ({
   title,
   icon: Icon,
   onClick,
@@ -28,4 +28,4 @@ const HeaderButton = ({
   );
 };
 
-export default HeaderButton;
+export default DropdownItem;

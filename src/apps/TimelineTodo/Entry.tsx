@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -12,11 +12,20 @@ import {
   TagIcon,
   AlarmClockPlusIcon,
   Trash2Icon,
+  EllipsisIcon,
+  TrashIcon,
 } from 'lucide-react';
 import Todo from './Todo';
 import { TagInput } from './TagInput';
 import _ from 'lodash';
 import Tag from './Tag';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import DropdownItem from './HeaderButton';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -57,6 +66,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const [tagSelectOpened, setTagSelectOpened] = useState(false);
 
   const handleCreateTodo = () => {
     const newTodoId = createTodo(entry.id, '');
@@ -112,55 +122,83 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
             {dayjs.duration(entry.time).format('HH:mm')}
           </div>
         </div>
-
-        <CalendarPlus2Icon
-          size={13}
-          className={cn(
-            'cursor-pointer',
-            (isPreview || entry.time > ms('24 hours')) && 'hidden'
-          )}
-          onClick={() => updateEntryTime(entry.id, entry.time + ms('24 hours'))}
-        />
-        <CalendarMinus2Icon
-          size={13}
-          className={cn(
-            'cursor-pointer',
-            (isPreview || entry.time < ms('24 hours')) && 'hidden'
-          )}
-          onClick={() => updateEntryTime(entry.id, entry.time - ms('24 hours'))}
-        />
-        <AlarmClockPlusIcon
-          size={13}
-          className={cn('cursor-pointer', isPreview && 'hidden')}
-          onClick={() =>
-            createEntry(entry.sessionId, entry.time + ms('10 minutes'))
-          }
-        />
-        <Trash2Icon
-          className={cn(
-            'cursor-pointer',
-            isPreview && 'hidden',
-            'text-red-400'
-          )}
-          onClick={() => confirm('Are you sure?') && deleteEntry(entry.id)}
-          size={13}
-        />
-        <div className={cn('flex gap-2 items-center')}>
-          {!isPreview && (
-            <TagInput
-              allTags={allTags}
-              entryTags={entry.tags}
-              onTagClick={(tag) => toggleEntryTag(entry.id, tag)}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div
+              className={cn(
+                `min-h-5 min-w-5 rounded-full
+            flex items-center justify-center cursor-pointer
+            border border-input bg-background hover:bg-accent hover:text-accent-foreground
+            `,
+                isPreview && 'opacity-50'
+              )}
             >
-              <div className="text-xs px-2 py-0.5 rounded-full cursor-pointer border">
-                <TagIcon size={13} />
-              </div>
-            </TagInput>
-          )}
-          {entry.tags.map((tag) => (
-            <Tag key={tag} tag={tag} />
-          ))}
-        </div>
+              <EllipsisIcon size={13} />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-50">
+            <DropdownMenuGroup>
+              <DropdownItem
+                title="Move to next day"
+                hidden={entry.time > ms('24 hours')}
+                icon={CalendarPlus2Icon}
+                onClick={() =>
+                  updateEntryTime(entry.id, entry.time + ms('24 hours'))
+                }
+              />
+              <DropdownItem
+                title="Move to today"
+                hidden={entry.time < ms('24 hours')}
+                icon={CalendarMinus2Icon}
+                onClick={() =>
+                  updateEntryTime(entry.id, entry.time - ms('24 hours'))
+                }
+              />
+              <DropdownItem
+                title="Add Tag"
+                icon={TagIcon}
+                onClick={() => setTimeout(() => setTagSelectOpened(true), 250)}
+              />
+
+              <DropdownItem
+                title="Add entry below"
+                icon={AlarmClockPlusIcon}
+                onClick={() =>
+                  createEntry(entry.sessionId, entry.time + ms('10 minutes'))
+                }
+              />
+
+              <DropdownItem
+                title="Remove Entry"
+                icon={TrashIcon}
+                className="text-red-500"
+                onClick={() =>
+                  confirm('Are you sure?') && deleteEntry(entry.id)
+                }
+              />
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <TagInput
+          allTags={allTags}
+          entryTags={entry.tags}
+          onTagClick={(tag) => toggleEntryTag(entry.id, tag)}
+          open={tagSelectOpened}
+          onOpenChange={setTagSelectOpened}
+        >
+          <div />
+        </TagInput>
+        {!isPreview && (
+          <div className={cn('flex gap-2 items-center')}>
+            {entry.tags.map((tag) => (
+              <Tag
+                key={tag}
+                tag={tag}
+                onClick={() => setTimeout(() => setTagSelectOpened(true), 250)}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <div className="ml-8 my-2">
         {entryTodos.length > 0 && (

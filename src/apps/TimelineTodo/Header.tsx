@@ -1,6 +1,6 @@
 import { SessionType, useStore } from './store';
 import { useSearchParams } from 'react-router-dom';
-import HeaderButton from './HeaderButton';
+import DropdownItem from './HeaderButton';
 import {
   AlarmClockPlusIcon,
   ArchiveIcon,
@@ -9,6 +9,7 @@ import {
   EyeIcon,
   FolderKanbanIcon,
   PencilIcon,
+  TagIcon,
   TrashIcon,
 } from 'lucide-react';
 import SessionButton from './SessionButton';
@@ -107,42 +108,30 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
-            <HeaderButton
-              title="Edit"
-              hidden={!isPreview || !activeSession}
-              icon={PencilIcon}
+            <DropdownItem
+              title={isPreview ? 'Show Tags' : 'Hide Tags'}
+              icon={TagIcon}
               onClick={() =>
                 setSearchParams((prev) => {
-                  prev.set('preview', 'false');
+                  prev.set('preview', `${!isPreview}`);
                   return prev;
                 })
               }
             />
-            <HeaderButton
-              title="Preview"
-              hidden={isPreview || !activeSession}
-              icon={EyeIcon}
-              onClick={() =>
-                setSearchParams((prev) => {
-                  prev.set('preview', 'true');
-                  return prev;
-                })
-              }
-            />
-            <HeaderButton
+            <DropdownItem
               title="Add Session"
               icon={FolderKanbanIcon}
               onClick={handleCreateSession}
             />
 
-            <HeaderButton
+            <DropdownItem
               title="Duplicate Session"
               hidden={!activeSession}
               icon={CopyIcon}
               onClick={handleDuplicateSession}
             />
 
-            <HeaderButton
+            <DropdownItem
               title={activeSession?.archived ? 'Unarchive' : 'Archive'}
               hidden={!activeSession}
               icon={ArchiveIcon}
@@ -150,7 +139,7 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
                 archiveSession(activeSession!.id, !activeSession?.archived)
               }
             />
-            <HeaderButton
+            <DropdownItem
               title={!showArchivedSessions ? 'Show Archived' : 'Hide Archived'}
               icon={ArchiveIcon}
               onClick={() =>
@@ -161,7 +150,7 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
               }
             />
 
-            <HeaderButton
+            <DropdownItem
               title="Remove Session"
               hidden={!activeSession}
               icon={TrashIcon}
