@@ -9,7 +9,7 @@ const Tag = ({ tag, onClick }: TagProps) => {
   const { backgroundColor, color } = getTagColor(tag);
   return (
     <div
-      className="text-xs px-2 py-0.5 rounded-full"
+      className="text-xs px-2 py-0.5 rounded-full cursor-pointer"
       style={{
         backgroundColor,
         color,

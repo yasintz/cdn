@@ -190,17 +190,15 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
         >
           <div />
         </TagInput>
-        {tagsShown && (
-          <div className={cn('flex gap-2 items-center')}>
-            {entry.tags.map((tag) => (
-              <Tag
-                key={tag}
-                tag={tag}
-                onClick={() => setTimeout(() => setTagSelectOpened(true), 250)}
-              />
-            ))}
-          </div>
-        )}
+        <div className={cn('flex gap-2 items-center')}>
+          {entry.tags.map((tag) => (
+            <Tag
+              key={tag}
+              tag={tag}
+              onClick={() => setTimeout(() => setTagSelectOpened(true), 250)}
+            />
+          ))}
+        </div>
       </div>
       <div className="ml-8 my-2">
         {entryTodos.length > 0 && (

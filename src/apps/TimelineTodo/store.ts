@@ -166,16 +166,6 @@ export const useStore = create<StoreType>()(
 
                 entry.time = time;
               }),
-            // set((prev) => ({
-            //   entries: prev.entries.map((entry) =>
-            //     entry.id === id
-            //       ? {
-            //           ...entry,
-            //           time,
-            //         }
-            //       : entry
-            //   ),
-            // })),
 
             createTodo: (entryId, text) => {
               const id = uid();
