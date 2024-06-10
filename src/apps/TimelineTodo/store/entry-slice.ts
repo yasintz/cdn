@@ -89,7 +89,7 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
       }
     }),
 
-  ...compute(get, (state) => ({
+  ...compute('entry', get, (state) => ({
     allTags: _.uniq(
       state.entries.reduce(
         (acc, entry) => [...acc, ...entry.tags],
