@@ -1,14 +1,11 @@
 import { SessionType, useStore } from './store';
-import { useSearchParams } from 'react-router-dom';
 import DropdownItem from './HeaderButton';
 import {
-  AlarmClockPlusIcon,
   ArchiveIcon,
+  BoxesIcon,
   CopyIcon,
   EllipsisIcon,
-  EyeIcon,
   FolderKanbanIcon,
-  PencilIcon,
   TagIcon,
   TrashIcon,
 } from 'lucide-react';
@@ -17,27 +14,23 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 import { useEffect, useRef } from 'react';
+import { useUrlState } from './useUrlState';
 
 type HeaderProps = {
-  isPreview: boolean;
   activeSession?: SessionType;
 };
 
-const Header = ({ isPreview, activeSession }: HeaderProps) => {
+const Header = ({ activeSession }: HeaderProps) => {
   const scrollDivRef = useRef<HTMLDivElement>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    setSearchParams,
+    archivedSessionsShown,
+    tagsShown,
+    batchTimeUpdatingEnabled,
+  } = useUrlState();
   const {
     sessions,
     duplicateSession,
@@ -61,7 +54,6 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
     }
   };
 
-  const showArchivedSessions = searchParams.get('showArchived') === 'true';
   const archivedSessions = sessions.filter((i) => i.archived);
 
   useEffect(() => {
@@ -86,7 +78,7 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
             key={session.id}
           />
         ))}
-      {showArchivedSessions &&
+      {archivedSessionsShown &&
         archivedSessions.map((session) => (
           <SessionButton
             session={session}
@@ -109,11 +101,11 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
         <DropdownMenuContent className="w-56">
           <DropdownMenuGroup>
             <DropdownItem
-              title={isPreview ? 'Show Tags' : 'Hide Tags'}
+              title={tagsShown ? 'Hide Tags' : 'Show Tags'}
               icon={TagIcon}
               onClick={() =>
                 setSearchParams((prev) => {
-                  prev.set('preview', `${!isPreview}`);
+                  prev.set('tagsShown', `${!tagsShown}`);
                   return prev;
                 })
               }
@@ -140,11 +132,26 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
               }
             />
             <DropdownItem
-              title={!showArchivedSessions ? 'Show Archived' : 'Hide Archived'}
+              title={!archivedSessionsShown ? 'Show Archived' : 'Hide Archived'}
               icon={ArchiveIcon}
               onClick={() =>
                 setSearchParams((prev) => {
-                  prev.set('showArchived', `${!showArchivedSessions}`);
+                  prev.set('showArchived', `${!archivedSessionsShown}`);
+                  return prev;
+                })
+              }
+            />
+
+            <DropdownItem
+              title={
+                batchTimeUpdatingEnabled
+                  ? 'Disable batch update'
+                  : 'Enable batch update'
+              }
+              icon={BoxesIcon}
+              onClick={() =>
+                setSearchParams((prev) => {
+                  prev.set('batchTimeUpdating', `${!archivedSessionsShown}`);
                   return prev;
                 })
               }

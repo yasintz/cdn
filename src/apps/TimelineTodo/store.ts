@@ -33,7 +33,7 @@ export type StoreType = {
   duplicateSession: (id: string, name: string) => void;
   archiveSession: (id: string, archived: boolean) => void;
   createEntry: (sessionId: string, time?: number) => void;
-  updateEntryTime: (id: string, time: number) => void;
+  updateEntryTime: (id: string, time: number, batchUpdating: boolean) => void;
   createTodo: (entryId: string, text: string) => string;
   toggleTodo: (id: string) => void;
   updateTodoText: (id: string, text: string) => void;
@@ -137,17 +137,45 @@ export const useStore = create<StoreType>()(
                 };
               }),
 
-            updateEntryTime: (id, time) =>
-              set((prev) => ({
-                entries: prev.entries.map((entry) =>
-                  entry.id === id
-                    ? {
-                        ...entry,
-                        time,
-                      }
-                    : entry
-                ),
-              })),
+            updateEntryTime: (id, time, batchUpdating) =>
+              set((prev) => {
+                const entry = prev.entries.find((entry) => entry.id === id);
+
+                if (!entry) {
+                  return;
+                }
+
+                if (batchUpdating) {
+                  const diff = time - entry.time;
+                  const sessionEntries = _.orderBy(
+                    prev.entries.filter(
+                      (entry) => entry.sessionId === entry.sessionId
+                    ),
+                    'time'
+                  );
+
+                  const entryIndex = sessionEntries.findIndex(
+                    (e) => e.id === entry.id
+                  );
+                  sessionEntries.forEach((sessionEntry, index) => {
+                    if (index > entryIndex) {
+                      sessionEntry.time += diff;
+                    }
+                  });
+                }
+
+                entry.time = time;
+              }),
+            // set((prev) => ({
+            //   entries: prev.entries.map((entry) =>
+            //     entry.id === id
+            //       ? {
+            //           ...entry,
+            //           time,
+            //         }
+            //       : entry
+            //   ),
+            // })),
 
             createTodo: (entryId, text) => {
               const id = uid();

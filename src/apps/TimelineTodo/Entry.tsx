@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import DropdownItem from './HeaderButton';
+import { useUrlState } from './useUrlState';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -46,7 +47,6 @@ function showDiff(diff: number) {
 
 type EntryProps = {
   isLast: boolean;
-  isPreview: boolean;
   entry: EntryType & {
     diff: number;
     active: boolean;
@@ -54,7 +54,7 @@ type EntryProps = {
   onEntryCreate: () => void;
 };
 
-const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
+const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
   const {
     updateEntryTime,
     deleteEntry,
@@ -67,6 +67,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
+  const { tagsShown, batchTimeUpdatingEnabled } = useUrlState();
 
   const handleCreateTodo = () => {
     const newTodoId = createTodo(entry.id, '');
@@ -109,7 +110,8 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
               const result = ms(`${h}h`) + ms(`${m}m`);
               updateEntryTime(
                 entry.id,
-                isBelongsToNextDay ? result + ms('24 hours') : result
+                isBelongsToNextDay ? result + ms('24 hours') : result,
+                batchTimeUpdatingEnabled
               );
             }}
             onClick={() => (inputRef?.current as any).showPicker()}
@@ -130,7 +132,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
             flex items-center justify-center cursor-pointer
             border border-input bg-background hover:bg-accent hover:text-accent-foreground
             `,
-                isPreview && 'opacity-50'
+                !tagsShown && 'opacity-50'
               )}
             >
               <EllipsisIcon size={13} />
@@ -143,7 +145,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
                 hidden={entry.time > ms('24 hours')}
                 icon={CalendarPlus2Icon}
                 onClick={() =>
-                  updateEntryTime(entry.id, entry.time + ms('24 hours'))
+                  updateEntryTime(entry.id, entry.time + ms('24 hours'), false)
                 }
               />
               <DropdownItem
@@ -151,7 +153,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
                 hidden={entry.time < ms('24 hours')}
                 icon={CalendarMinus2Icon}
                 onClick={() =>
-                  updateEntryTime(entry.id, entry.time - ms('24 hours'))
+                  updateEntryTime(entry.id, entry.time - ms('24 hours'), false)
                 }
               />
               <DropdownItem
@@ -188,7 +190,7 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
         >
           <div />
         </TagInput>
-        {!isPreview && (
+        {tagsShown && (
           <div className={cn('flex gap-2 items-center')}>
             {entry.tags.map((tag) => (
               <Tag
@@ -207,7 +209,6 @@ const Entry = ({ isLast, entry, isPreview, onEntryCreate }: EntryProps) => {
               <Todo
                 key={todo.id}
                 allTodosRef={allTodosRef}
-                isPreview={isPreview}
                 onEnterPress={handleCreateTodo}
                 todo={todo}
                 previousTodoId={entryTodos[index - 1]?.id}

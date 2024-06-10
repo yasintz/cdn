@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useStore } from './store';
 import ms from 'ms';
 import dayjs from 'dayjs';
@@ -9,15 +9,13 @@ import Header from './Header';
 import Entry from './Entry';
 import TagsTable from './TagsTable';
 import './style.scss';
+import { useUrlState } from './useUrlState';
 
 dayjs.extend(duration);
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
-  const [searchParams] = useSearchParams();
   const [time, setTime] = useState(Date.now());
-
-  const isPreview = searchParams.get('preview') !== 'false';
 
   const { sessions, entries, createEntry } = useStore();
 
@@ -58,7 +56,7 @@ const TimelineTodo = () => {
 
   return (
     <div>
-      <Header isPreview={isPreview} activeSession={session} />
+      <Header activeSession={session} />
 
       <div className="flex gap-2 justify-between">
         <ul
@@ -78,7 +76,6 @@ const TimelineTodo = () => {
               key={entry.id}
               entry={entry}
               isLast={index === sessionEntries.length - 1}
-              isPreview={isPreview}
               onEntryCreate={() => createEntry(session!.id)}
             />
           ))}

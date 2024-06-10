@@ -3,38 +3,28 @@ import { cn } from '@/lib/utils';
 import { TodoType, useStore } from './store';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useUrlState } from './useUrlState';
 
 type TodoProps = {
   todo: TodoType;
   previousTodoId: string | undefined;
-  isPreview: boolean;
   onEnterPress: () => void;
   allTodosRef: React.MutableRefObject<Record<string, HTMLInputElement>>;
 };
 
 const Todo = ({
   todo,
-  isPreview,
   onEnterPress,
   allTodosRef,
   previousTodoId,
 }: TodoProps) => {
-  const { reorderTodo, updateTodoText, deleteTodo, toggleTodo } = useStore();
+  const { updateTodoText, deleteTodo, toggleTodo } = useStore();
   return (
     <li
       className={cn('flex gap-2 items-center', {
         'opacity-60': todo.completed,
       })}
     >
-      <div
-        className={cn('flex flex-col cursor-pointer', isPreview && 'hidden')}
-      >
-        <ChevronUpIcon size={15} onClick={() => reorderTodo(todo.id, 'up')} />
-        <ChevronDownIcon
-          size={15}
-          onClick={() => reorderTodo(todo.id, 'down')}
-        />
-      </div>
       <Checkbox
         checked={todo.completed}
         onCheckedChange={() => toggleTodo(todo.id)}
