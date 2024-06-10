@@ -41,7 +41,7 @@ export function TagInput({
 }: TagInputPropsType) {
   const [dynamicTag, setDynamicTag] = React.useState('');
   const allTagsList = React.useMemo(
-    () => _.uniq([dynamicTag, ...allTags].filter((i) => i)),
+    () => _.uniq([dynamicTag, ...allTags].filter((i) => i).sort()),
     [allTags, dynamicTag]
   );
 
