@@ -137,7 +137,7 @@ const Header = ({ activeSession }: HeaderProps) => {
               icon={BoxesIcon}
               onClick={() =>
                 setSearchParams((prev) => {
-                  prev.set('batchTimeUpdating', `${!archivedSessionsShown}`);
+                  prev.set('batchTimeUpdating', `${!batchTimeUpdatingEnabled}`);
                   return prev;
                 })
               }
