@@ -36,13 +36,17 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
     store: S,
     keepState?: boolean
   ) {
-    await db.get().then((response) => {
-      store.setState(response.state ? response.state : response);
-    });
+    try {
+      await db.get().then((response) => {
+        store.setState(response.state ? response.state : response);
+      });
 
-    store.subscribe((state) => {
-      debouncedSync(JSON.stringify(keepState ? { state } : state));
-    });
+      store.subscribe((state) => {
+        debouncedSync(JSON.stringify(keepState ? { state } : state));
+      });
+    } catch (error) {
+      alert('Database is not working');
+    }
   }
 
   return {

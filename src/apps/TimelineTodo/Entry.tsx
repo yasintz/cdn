@@ -14,6 +14,7 @@ import {
   Trash2Icon,
   EllipsisIcon,
   TrashIcon,
+  RadioIcon,
 } from 'lucide-react';
 import Todo from './Todo';
 import { TagInput } from './TagInput';
@@ -154,6 +155,19 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
                 onClick={() =>
                   updateEntryTime(entry.id, entry.time - ms('24 hours'), false)
                 }
+              />
+              <DropdownItem
+                title="Set to now"
+                icon={RadioIcon}
+                onClick={() => {
+                  const now = dayjs().diff(dayjs().startOf('day'));
+
+                  updateEntryTime(
+                    entry.id,
+                    entry.time > ms('24 hours') ? now + ms('24 hours') : now,
+                    false
+                  );
+                }}
               />
               <DropdownItem
                 title="Add Tag"
