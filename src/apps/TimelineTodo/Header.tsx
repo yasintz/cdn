@@ -85,24 +85,6 @@ const Header = ({ isPreview, activeSession }: HeaderProps) => {
             key={session.id}
           />
         ))}
-      {sessions
-        .filter((i) => !i.archived)
-        .map((session) => (
-          <SessionButton
-            session={session}
-            isActive={session.id === activeSession?.id}
-            key={session.id}
-          />
-        ))}
-      {sessions
-        .filter((i) => !i.archived)
-        .map((session) => (
-          <SessionButton
-            session={session}
-            isActive={session.id === activeSession?.id}
-            key={session.id}
-          />
-        ))}
       {showArchivedSessions &&
         archivedSessions.map((session) => (
           <SessionButton
