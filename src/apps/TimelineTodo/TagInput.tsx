@@ -1,10 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronsUpDownIcon, CheckIcon, XCircleIcon } from 'lucide-react';
+import { CheckIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -20,7 +19,6 @@ import {
 } from '@/components/ui/popover';
 import _ from 'lodash';
 import { StoreType } from './store';
-import { stringToColor } from './helpers';
 
 type TagInputPropsType = {
   allTags: StoreType['allTags'];

@@ -18,6 +18,7 @@ export function gSheetStorageDeprecated(sheetTabId: string): StateStorage {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function handleStoreLoadingState(store: any, loadingStateName: string) {
   const unsub = store.persist.onFinishHydration(() => {
     store.setState({ [loadingStateName]: false });

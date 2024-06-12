@@ -9,7 +9,6 @@ import Header from './Header';
 import Entry from './Entry';
 import TagsTable from './TagsTable';
 import './style.scss';
-import { useUrlState } from './useUrlState';
 
 dayjs.extend(duration);
 

@@ -1,9 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { TodoType, useStore } from './store';
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useUrlState } from './useUrlState';
 
 type TodoProps = {
   todo: TodoType;
