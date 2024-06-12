@@ -8,7 +8,8 @@
     "dev": "vite",
     "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
     "build:vite": "vite build && cp dist/index.html dist/404.html",
-    "build": "tsc && pnpm build:vite && pnpm build:projects"
+    "build": "tsc && pnpm build:vite && pnpm build:projects",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "engines": {
     "node": "18"

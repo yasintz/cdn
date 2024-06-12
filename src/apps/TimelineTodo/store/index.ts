@@ -1,6 +1,5 @@
 import { computed } from 'zustand-computed-state';
 import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
-import _ from 'lodash';
 import { StateCreator, create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
