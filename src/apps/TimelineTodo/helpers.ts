@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { EntryType } from './store';
 
 export function getTagSpentTime(tag: string, entries: EntryType[]) {
@@ -70,9 +71,9 @@ const toRGB = (color: string) => {
 };
 
 export function hashCode(t: string) {
-  var hash = 0,
-    i = 0,
-    len = t.length;
+  let hash = 0,
+    i = 0;
+  const len = t.length;
   while (i < len) {
     hash = ((hash << 5) - hash + t.charCodeAt(i++)) << 0;
   }
@@ -89,4 +90,59 @@ export function getTagColor(tag: string) {
     color: `rgba(${r},${g},${b})`,
     backgroundColor: `rgba(${r},${g},${b},0.2)`,
   };
+}
+
+export function getTagsData(sessionEntries: EntryType[], allTags: string[]) {
+  const tagsWithSpentTimeFn = () => {
+    const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
+    const tags = allTags
+      .filter((tag) => sessionTags.includes(tag))
+      .map((tag) => ({
+        tag,
+        spentTime: getTagSpentTime(tag, sessionEntries),
+        groupedTag: Object.entries(tagsGroup).find(([, value]) =>
+          value.includes(tag)
+        )?.[0],
+      }));
+
+    const unTagged = sessionEntries
+      .filter((entry) => entry.tags.length === 0)
+      .map((entry) => ({
+        ...entry,
+        tags: ['un-categorized'],
+      }));
+
+    unTagged.pop();
+
+    if (unTagged.length > 0) {
+      const unCategorized = {
+        tag: 'un-categorized',
+        groupedTag: undefined,
+        spentTime: getTagSpentTime(
+          'un-categorized',
+          sessionEntries.map(
+            (entry) => unTagged.find((e) => e.id === entry.id) || entry
+          )
+        ),
+      };
+      tags.push(unCategorized);
+    }
+
+    return tags;
+  };
+
+  const tagsWithSpentTime = tagsWithSpentTimeFn();
+
+  const groupedTags = tagsWithSpentTime
+    .filter((i) => !i.groupedTag)
+    .map(({ tag, spentTime }) => {
+      const childs = tagsWithSpentTime.filter((i) => i.groupedTag === tag);
+      return {
+        childs,
+        tag,
+        spentTime,
+      };
+    });
+
+  return { groupedTags, tagsWithSpentTime };
 }

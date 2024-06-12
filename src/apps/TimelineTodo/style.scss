@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 table.tags {
   font-family: arial, sans-serif;
   border-collapse: collapse;
@@ -8,5 +12,14 @@ table.tags {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
+  }
+}
+
+.sessions {
+  .sortable-ghost {
+    button {
+      opacity: 0;
+    }
+    @apply bg-slate-300;
   }
 }

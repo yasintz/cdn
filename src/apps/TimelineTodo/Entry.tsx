@@ -26,7 +26,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import DropdownItem from './HeaderButton';
+import DropdownItem from './DropdownItem';
 import { useUrlState } from './useUrlState';
 
 dayjs.extend(duration);

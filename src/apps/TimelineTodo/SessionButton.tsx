@@ -15,6 +15,7 @@ const SessionButton = ({ session, isActive, variant }: SessionButtonProps) => {
     <NavLink
       to={`/cdn/timeline-todo/${session.id}?${searchParams.toString()}`}
       key={session.id}
+      className="rounded-md"
     >
       <Button
         size="sm"

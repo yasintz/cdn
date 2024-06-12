@@ -7,10 +7,10 @@ import { immer } from 'zustand/middleware/immer';
 import { SessionSliceType, createSessionSlice } from './session-slice';
 import { EntrySliceType, createEntrySlice } from './entry-slice';
 import { TodoSliceType, createTodoSlice } from './todo-slice';
+export type { SessionType } from './session-slice';
 
 export type StoreType = SessionSliceType & EntrySliceType & TodoSliceType;
 
-export type SessionType = StoreType['sessions'][number];
 export type EntryType = StoreType['entries'][number];
 export type TodoType = StoreType['todos'][number];
 

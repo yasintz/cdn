@@ -1,23 +1,33 @@
 import type { EntryType, TodoStoreCreator, TodoType } from '.';
 import { uid } from '@/utils/uid';
 
+export type SessionType = {
+  id: string;
+  name: string;
+  archived?: boolean;
+};
+
 export type SessionSliceType = {
-  sessions: Array<{
-    id: string;
-    name: string;
-    archived?: boolean;
-  }>;
+  sessions: SessionType[];
 
   createSession: (name: string) => void;
   duplicateSession: (id: string, name: string) => void;
   archiveSession: (id: string, archived: boolean) => void;
   deleteSession: (id: string) => void;
+  reorderSessions: (sessionIds: string[]) => void;
 };
 
 export const createSessionSlice: TodoStoreCreator<SessionSliceType> = (
   set
 ) => ({
   sessions: [],
+  reorderSessions: (sessionIds) =>
+    set((prev) => {
+      console.log('working...')
+      prev.sessions.sort(
+        (a, b) => sessionIds.indexOf(a.id) - sessionIds.indexOf(b.id)
+      );
+    }),
   createSession: (name) =>
     set((prev) => ({
       sessions: [
