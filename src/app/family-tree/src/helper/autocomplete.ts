@@ -4,7 +4,7 @@ export function autocomplete(inp: HTMLInputElement, arr: string[]) {
   let currentFocus: number;
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener('input', function (e) {
-    var a,
+    let a,
       b,
       i,
       val = this.value;
@@ -52,7 +52,7 @@ export function autocomplete(inp: HTMLInputElement, arr: string[]) {
   });
   /*execute a function presses a key on the keyboard:*/
   inp.addEventListener('keydown', function (e) {
-    var x = document.getElementById(this.id + 'autocomplete-list');
+    let x = document.getElementById(this.id + 'autocomplete-list');
     // @ts-ignore
     if (x) x = x.getElementsByTagName('div');
     if (e.keyCode == 40) {
@@ -95,7 +95,7 @@ export function autocomplete(inp: HTMLInputElement, arr: string[]) {
   // @ts-ignore
   function removeActive(x) {
     /*a function to remove the "active" class from all autocomplete items:*/
-    for (var i = 0; i < x.length; i++) {
+    for (let i = 0; i < x.length; i++) {
       x[i].classList.remove('autocomplete-active');
     }
   }
@@ -111,8 +111,8 @@ autocomplete.closeAllLists = function closeAllLists(
 ) {
   /*close all autocomplete lists in the document,
       except the one passed as an argument:*/
-  var x = document.getElementsByClassName('autocomplete-items');
-  for (var i = 0; i < x.length; i++) {
+  const x = document.getElementsByClassName('autocomplete-items');
+  for (let i = 0; i < x.length; i++) {
     if (elmnt != x[i] && elmnt != inp) {
       // @ts-ignore
       x[i].parentNode.removeChild(x[i]);

@@ -9,7 +9,7 @@ const dTree = {
   VERSION: '/* @echo DTREE_VERSION */',
 
   init: function (data: any, options = {}) {
-    var opts = _.defaultsDeep(options || {}, {
+    const opts = _.defaultsDeep(options || {}, {
       target: '#graph',
       debug: false,
       width: 600,
@@ -90,7 +90,7 @@ const dTree = {
 
     // @ts-ignore
     var data = this._preprocess(data, opts);
-    var treeBuilder = new TreeBuilder(data.root, data.siblings, opts);
+    const treeBuilder = new TreeBuilder(data.root, data.siblings, opts);
     treeBuilder.create();
 
     // @ts-ignore
@@ -151,9 +151,9 @@ const dTree = {
 
   // @ts-ignore
   _preprocess: function (data, opts) {
-    var siblings: any[] = [];
+    const siblings: any[] = [];
 
-    var root = {
+    const root = {
       name: '',
       id: 'root',
       hidden: true,
@@ -167,7 +167,7 @@ const dTree = {
       mappedParent: any[]
     ) {
       const parentChildren = [];
-      var node = {
+      const node = {
         name: person.name,
         id: person.extra.person.id,
         hidden: false,
@@ -180,8 +180,8 @@ const dTree = {
         noParent: parent === root,
       };
 
-      for (var i = 0; i < person.depthOffset; i++) {
-        var pushNode = {
+      for (let i = 0; i < person.depthOffset; i++) {
+        const pushNode = {
           name: '',
           id: `${person.extra.person.id}_depth_offset_${i}`,
           hidden: true,
@@ -210,8 +210,8 @@ const dTree = {
 
       let isPushed = false;
       _.forEach(person.marriages, function (marriage, index) {
-        var sp = marriage.spouse;
-        var m = {
+        const sp = marriage.spouse;
+        const m = {
           name: '',
           id: `${sp.extra.person.id}_partner_connection`,
           hidden: opts.hideMarriageNodes,
@@ -222,7 +222,7 @@ const dTree = {
           class: marriage.class ? marriage.class : opts.styles.marriageNode,
         };
 
-        var spouse = {
+        const spouse = {
           name: sp.name,
           id: sp.extra.person.id,
           hidden: false,
@@ -295,8 +295,8 @@ const dTree = {
   _sortMarriages: function (marriages, opts) {
     if (marriages != undefined && Array.isArray(marriages)) {
       marriages.sort(function (marriageA, marriageB) {
-        var a = marriageA.spouse;
-        var b = marriageB.spouse;
+        const a = marriageA.spouse;
+        const b = marriageB.spouse;
         return opts.callbacks.nodeSorter.call(
           // @ts-ignore
           this,

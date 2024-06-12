@@ -6,7 +6,7 @@ export function generateId(length: number, chars: string): string {
   if (chars.indexOf('#') > -1) mask += '.,?#$';
 
   let result = '';
-  for (var i = length; i > 0; --i)
+  for (let i = length; i > 0; --i)
     result += mask[Math.floor(Math.random() * mask.length)];
 
   if (!isNaN(result as any)) {

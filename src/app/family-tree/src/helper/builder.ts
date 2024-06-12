@@ -57,14 +57,14 @@ export class PersonBuilder {
     return this.cache('siblings', () =>
       this._getParents()
         .reduce(
-          // eslint-disable-next-line
+           
           (acc, cur) => (acc.push(...this._getChildrenByParent(cur.id)), acc),
           [] as PersonType[]
         )
         .filter((i) => i.id !== this.person.id)
         .reduce(
           (acc, cur) => (
-            // eslint-disable-next-line
+             
             acc.findIndex((p) => p.id === cur.id) === -1 && acc.push(cur), acc
           ),
           [] as PersonType[]
