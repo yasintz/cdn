@@ -64,6 +64,7 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
     allTags,
     createEntry,
     openEntryNote,
+    openedEntryNoteId,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const inputRef = useRef<HTMLInputElement>(null);
@@ -125,11 +126,14 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
             {dayjs.duration(entry.time).format('HH:mm')}
           </div>
         </div>
-        <NotebookTextIcon
-          size={13}
-          className="cursor-pointer"
-          onClick={() => openEntryNote(entry.id)}
-        />
+        {entry.note && (
+          <NotebookTextIcon
+            size={13}
+            color={openedEntryNoteId === entry.id ? 'blue' : 'black'}
+            className="cursor-pointer"
+            onClick={() => openEntryNote(entry.id)}
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div
@@ -153,6 +157,7 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
                   updateEntryTime(entry.id, entry.time + ms('24 hours'), false)
                 }
               />
+
               <DropdownItem
                 title="Move to today"
                 hidden={entry.time < ms('24 hours')}
@@ -160,6 +165,13 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
                 onClick={() =>
                   updateEntryTime(entry.id, entry.time - ms('24 hours'), false)
                 }
+              />
+
+              <DropdownItem
+                title="Add Note"
+                hidden={!!entry.note}
+                icon={NotebookTextIcon}
+                onClick={() => openEntryNote(entry.id)}
               />
               <DropdownItem
                 title="Set to now"

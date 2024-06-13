@@ -9,6 +9,7 @@ import Header from './Header';
 import Entry from './Entry';
 import TagsTable from './TagsTable';
 import './style.scss';
+import NoteInput from './NoteInput';
 
 dayjs.extend(duration);
 
@@ -16,7 +17,7 @@ const TimelineTodo = () => {
   const { sessionId } = useParams();
   const [time, setTime] = useState(Date.now());
 
-  const { sessions, entries, createEntry } = useStore();
+  const { sessions, entries, createEntry, openedEntryNoteId } = useStore();
 
   const session = sessions.find((session) => session.id === sessionId);
   const sessionEntries = useMemo(() => {
@@ -64,7 +65,13 @@ const TimelineTodo = () => {
             height: 'calc(100vh - 3.6rem)',
           }}
         >
-          {session && (
+          {openedEntryNoteId && (
+            <NoteInput
+              entryId={openedEntryNoteId}
+              className="md:hidden min-h-96"
+            />
+          )}
+          {session && !openedEntryNoteId && (
             <TagsTable
               className="md:hidden flex"
               sessionEntries={sessionEntries}
@@ -80,10 +87,17 @@ const TimelineTodo = () => {
           ))}
         </ul>
 
-        {session && (
+        {session && !openedEntryNoteId && (
           <TagsTable
             className="hidden md:flex"
             sessionEntries={sessionEntries}
+          />
+        )}
+
+        {openedEntryNoteId && (
+          <NoteInput
+            entryId={openedEntryNoteId}
+            className="hidden md:flex p-4"
           />
         )}
       </div>
