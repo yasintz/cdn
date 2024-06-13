@@ -6,9 +6,14 @@ import { immer } from 'zustand/middleware/immer';
 import { SessionSliceType, createSessionSlice } from './session-slice';
 import { EntrySliceType, createEntrySlice } from './entry-slice';
 import { TodoSliceType, createTodoSlice } from './todo-slice';
+import { StoreRelations, createStoreRelations } from './relations';
 export type { SessionType } from './session-slice';
 
-export type StoreType = SessionSliceType & EntrySliceType & TodoSliceType;
+export type StoreType = SessionSliceType &
+  EntrySliceType &
+  TodoSliceType & {
+    getRelations: () => StoreRelations;
+  };
 
 export type EntryType = StoreType['entries'][number];
 export type TodoType = StoreType['todos'][number];
@@ -29,6 +34,7 @@ export const useStore = create<StoreType>()(
             ...createSessionSlice(...store),
             ...createEntrySlice(...store),
             ...createTodoSlice(...store),
+            getRelations: () => createStoreRelations(store[1]()),
           } as StoreType),
         {
           name: 'timeline-todo',
@@ -38,6 +44,7 @@ export const useStore = create<StoreType>()(
   )
 );
 
-gSheetStorage('1gI4tbIt1ETMm6aPXNdk5ycHt8tHlJr-TxkbKuAKqBKc').handleStore(
-  useStore
-);
+gSheetStorage(
+  '1gI4tbIt1ETMm6aPXNdk5ycHt8tHlJr-TxkbKuAKqBKc',
+  window.location.href.includes('localhost') ? '1803964356' : '0'
+).handleStore(useStore);

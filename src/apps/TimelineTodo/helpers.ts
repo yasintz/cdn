@@ -57,7 +57,7 @@ export const tagsColor: Record<string, string> = {
 export const tagsGroup = {
   productivity: ['reading', 'podcast', 'spor', 'plan', 'english'],
   work: ['kajabi', 'chat-app', 'nexizon'],
-  bad: ['youtube'],
+  bad: ['youtube', 'timeline-todo'],
 };
 
 const toRGB = (color: string) => {
@@ -93,8 +93,8 @@ export function getTagColor(tag: string) {
 }
 
 export function getTagsData(sessionEntries: EntryType[], allTags: string[]) {
+  const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
   const tagsWithSpentTimeFn = () => {
-    const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
     const tags = allTags
       .filter((tag) => sessionTags.includes(tag))
       .map((tag) => ({
@@ -137,6 +137,7 @@ export function getTagsData(sessionEntries: EntryType[], allTags: string[]) {
     .filter((i) => !i.groupedTag)
     .map(({ tag, spentTime }) => {
       const childs = tagsWithSpentTime.filter((i) => i.groupedTag === tag);
+
       return {
         childs,
         tag,

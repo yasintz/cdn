@@ -6,6 +6,7 @@ export function useUrlState() {
   return {
     archivedSessionsShown: searchParams.get('showArchived') === 'true',
     batchTimeUpdatingEnabled: searchParams.get('batchTimeUpdating') === 'true',
+    sessionSortingEnabled: searchParams.get('sessionSorting') === 'true',
     setSearchParams,
   };
 }

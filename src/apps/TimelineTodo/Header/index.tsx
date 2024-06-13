@@ -11,7 +11,7 @@ type HeaderProps = {
 
 const Header = ({ activeSession }: HeaderProps) => {
   const scrollDivRef = useRef<HTMLDivElement>(null);
-  const { archivedSessionsShown } = useUrlState();
+  const { archivedSessionsShown, sessionSortingEnabled } = useUrlState();
   const { sessions, reorderSessions } = useStore();
 
   const archivedSessions = sessions.filter((i) => i.archived);
@@ -37,6 +37,7 @@ const Header = ({ activeSession }: HeaderProps) => {
       <ReactSortable
         list={unarchivedSessionIds}
         setList={(newList) => reorderSessions(newList.map((i) => i.id))}
+        disabled={!sessionSortingEnabled}
         className="sessions flex gap-2"
       >
         {unarchivedSessions.map((session) => (

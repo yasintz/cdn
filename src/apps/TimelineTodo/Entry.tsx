@@ -47,29 +47,34 @@ function showDiff(diff: number) {
 
 type EntryProps = {
   isLast: boolean;
-  entry: EntryType & {
-    diff: number;
-    active: boolean;
-  };
+  entry: EntryType;
   onEntryCreate: () => void;
+  now: number;
 };
 
-const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
+const Entry = ({
+  isLast,
+  entry: entryProp,
+  onEntryCreate,
+  now,
+}: EntryProps) => {
   const {
     updateEntryTime,
     deleteEntry,
-    todos,
     createTodo,
     toggleEntryTag,
     allTags,
     createEntry,
     openEntryNote,
+    getRelations,
     openedEntryNoteId,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
   const { batchTimeUpdatingEnabled } = useUrlState();
+  const { entries } = getRelations();
+  const entry = entries.find((e) => e.id === entryProp.id)!;
 
   const handleCreateTodo = () => {
     const newTodoId = createTodo(entry.id, '');
@@ -77,7 +82,7 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
       allTodosRef.current[newTodoId]?.focus();
     }, 100);
   };
-  const entryTodos = todos.filter((todo) => todo.entryId === entry.id);
+  const entryTodos = entry.todos();
 
   return (
     <li className="my-2 relative min-h-20">
@@ -90,13 +95,13 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
           }}
         >
           <div className="px-0.5 bg-white rounded-lg border border-slate-300 text-xs text-gray-300 text-center min-w-8">
-            {showDiff(entry.diff)}
+            {showDiff(entry.duration())}
           </div>
         </div>
       )}
 
       <div className="flex gap-2 items-center">
-        {entry.active && (
+        {entry.active(now) && (
           <div className="h-2 w-2 rounded-full bg-red-700 absolute -translate-x-3" />
         )}
 

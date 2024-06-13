@@ -4,6 +4,7 @@ import {
   ArchiveIcon,
   AreaChartIcon,
   BoxesIcon,
+  Columns3Icon,
   CopyIcon,
   EllipsisIcon,
   FolderKanbanIcon,
@@ -24,8 +25,12 @@ type DropdownProps = {
 
 const TimelineOptions = ({ activeSession }: DropdownProps) => {
   const navigate = useNavigate();
-  const { setSearchParams, archivedSessionsShown, batchTimeUpdatingEnabled } =
-    useUrlState();
+  const {
+    setSearchParams,
+    archivedSessionsShown,
+    batchTimeUpdatingEnabled,
+    sessionSortingEnabled,
+  } = useUrlState();
 
   const { duplicateSession, createSession, deleteSession, archiveSession } =
     useStore();
@@ -95,7 +100,20 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
               })
             }
           />
-
+          <DropdownItem
+            title={
+              sessionSortingEnabled
+                ? 'Disable Session Sorting'
+                : 'Enable Session Sorting'
+            }
+            icon={Columns3Icon}
+            onClick={() =>
+              setSearchParams((prev) => {
+                prev.set('sessionSorting', `${!sessionSortingEnabled}`);
+                return prev;
+              })
+            }
+          />
           <DropdownItem
             title={
               batchTimeUpdatingEnabled
