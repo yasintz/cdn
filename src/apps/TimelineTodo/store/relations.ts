@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import type { EntryType, SessionType, StoreType, TodoType } from '.';
+import ms from 'ms';
 
 type RequiredStore = Pick<StoreType, 'sessions' | 'entries' | 'todos'>;
 
@@ -70,8 +71,12 @@ export function createStoreRelations(store: RequiredStore): StoreRelations {
     const prev = () => session()?.entries()[(indexInEntries() || 0) - 1];
     const next = () => session()?.entries()[(indexInEntries() || 0) + 1];
     const duration = () => (next()?.time || 0) - entry.time;
-    const active = (now: number) =>
-      now > entry.time && now < (next()?.time || 0);
+    const active = (now: number) => {
+      const dayCalc = (t: number) =>
+        t > ms('24 hours') - 1 ? t - ms('24 hours') : t;
+
+      return now > dayCalc(entry.time) && now < dayCalc(next()?.time || 0);
+    };
 
     return {
       ...entry,

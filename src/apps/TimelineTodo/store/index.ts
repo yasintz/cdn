@@ -46,5 +46,5 @@ export const useStore = create<StoreType>()(
 
 gSheetStorage(
   '1gI4tbIt1ETMm6aPXNdk5ycHt8tHlJr-TxkbKuAKqBKc',
-  window.location.href.includes('localhost') ? '1803964356' : '0'
+  // window.location.href.includes('localhost') ? '1803964356' : '0'
 ).handleStore(useStore);
