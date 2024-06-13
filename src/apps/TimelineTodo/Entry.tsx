@@ -11,14 +11,13 @@ import {
   PlusIcon,
   TagIcon,
   AlarmClockPlusIcon,
-  Trash2Icon,
   EllipsisIcon,
   TrashIcon,
   RadioIcon,
+  NotebookTextIcon,
 } from 'lucide-react';
 import Todo from './Todo';
 import { TagInput } from './TagInput';
-import _ from 'lodash';
 import Tag from './Tag';
 import {
   DropdownMenu,
@@ -64,6 +63,7 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
     toggleEntryTag,
     allTags,
     createEntry,
+    openEntryNote,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const inputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +125,11 @@ const Entry = ({ isLast, entry, onEntryCreate }: EntryProps) => {
             {dayjs.duration(entry.time).format('HH:mm')}
           </div>
         </div>
+        <NotebookTextIcon
+          size={13}
+          className="cursor-pointer"
+          onClick={() => openEntryNote(entry.id)}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div

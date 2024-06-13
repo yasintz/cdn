@@ -23,7 +23,6 @@ export const createSessionSlice: TodoStoreCreator<SessionSliceType> = (
   sessions: [],
   reorderSessions: (sessionIds) =>
     set((prev) => {
-      console.log('working...')
       prev.sessions.sort(
         (a, b) => sessionIds.indexOf(a.id) - sessionIds.indexOf(b.id)
       );

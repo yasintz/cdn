@@ -9,8 +9,14 @@ export type EntrySliceType = {
     sessionId: string;
     time: number;
     tags: string[];
+    noteUrl?: string;
   }>;
   allTags: Array<string>;
+
+  openedEntryNoteId?: string;
+
+  openEntryNote: (id: string) => void;
+  closeEntryNote: () => void;
 
   createEntry: (sessionId: string, time?: number) => void;
   updateEntryTime: (id: string, time: number, batchUpdating: boolean) => void;
@@ -23,6 +29,10 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
   get
 ) => ({
   entries: [],
+
+  openEntryNote: (id) => set({ openedEntryNoteId: id }),
+  closeEntryNote: () => set({ openedEntryNoteId: undefined }),
+
   createEntry: (sessionId, time) =>
     set((prev) => {
       const sessionEntries = prev.entries.filter(
