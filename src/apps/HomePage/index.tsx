@@ -5,6 +5,7 @@ const HomePage = () => {
   const apps = {
     'family-tree': 'Family Tree',
     'timeline-todo': 'Timeline Todo',
+    'time-tracker': 'Time Tracker',
   };
   return (
     <div className="flex gap-2 p-4">

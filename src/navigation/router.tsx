@@ -1,5 +1,6 @@
 import familyRouter from '@/app/family-tree/router';
 import HomePage from '@/apps/HomePage';
+import TimeTracker from '@/apps/TimeTracker';
 import timelineTodoRouter from '@/apps/TimelineTodo/router';
 import AppLayout from '@/containers/AppLayout';
 import { Outlet, createBrowserRouter } from 'react-router-dom';
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: 'timeline-todo',
         children: timelineTodoRouter,
+      },
+      {
+        path: 'time-tracker',
+        element: <TimeTracker />,
       },
     ],
   },
