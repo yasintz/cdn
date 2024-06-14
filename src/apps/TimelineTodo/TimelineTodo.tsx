@@ -9,6 +9,7 @@ import Entry from './Entry';
 import TagsTable from './TagsTable';
 import './style.scss';
 import NoteInput from './NoteInput';
+import { Button } from '@/components/ui/button';
 
 dayjs.extend(duration);
 
@@ -65,6 +66,15 @@ const TimelineTodo = () => {
               now={now}
             />
           ))}
+          {session && sessionEntries.length === 0 && (
+            <Button
+              onClick={() => createEntry(session.id)}
+              size="sm"
+              variant="ghost"
+            >
+              Create Entry
+            </Button>
+          )}
         </ul>
 
         {session && !openedEntryNoteId && (

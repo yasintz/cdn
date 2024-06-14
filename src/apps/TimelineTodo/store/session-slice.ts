@@ -5,12 +5,15 @@ export type SessionType = {
   id: string;
   name: string;
   archived?: boolean;
+  parentId?: string;
 };
 
 export type SessionSliceType = {
   sessions: SessionType[];
 
-  createSession: (name: string) => void;
+  createSession: (name: string, parentId?: string) => void;
+  changeParent: (name: string, parentId?: string) => void;
+  renameSession: (id: string, name: string) => void;
   duplicateSession: (id: string, name: string) => void;
   archiveSession: (id: string, archived: boolean) => void;
   deleteSession: (id: string) => void;
@@ -27,16 +30,28 @@ export const createSessionSlice: TodoStoreCreator<SessionSliceType> = (
         (a, b) => sessionIds.indexOf(a.id) - sessionIds.indexOf(b.id)
       );
     }),
-  createSession: (name) =>
-    set((prev) => ({
-      sessions: [
-        ...prev.sessions,
-        {
-          id: uid(),
-          name,
-        },
-      ],
-    })),
+  createSession: (name, parentId) =>
+    set((prev) => {
+      prev.sessions.push({
+        id: uid(),
+        name,
+        parentId,
+      });
+    }),
+  renameSession: (id, name) =>
+    set((prev) => {
+      const session = prev.sessions.find((i) => i.id === id);
+      if (session) {
+        session.name = name;
+      }
+    }),
+  changeParent: (id, parentId) =>
+    set((prev) => {
+      const session = prev.sessions.find((i) => i.id === id);
+      if (session) {
+        session.parentId = parentId;
+      }
+    }),
   duplicateSession: (sessionId, name) =>
     set((prev) => {
       const newSession = {
