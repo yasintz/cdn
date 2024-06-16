@@ -15,7 +15,7 @@ type PropsType = {
   tasks: TaskType[];
 };
 const TaskTable = ({ tasks }: PropsType) => {
-  const { updateTaskTitle, deleteTask } = useStore();
+  const { updateTask, deleteTask } = useStore();
   return (
     <div className="rounded-md border">
       <Table>
@@ -35,7 +35,9 @@ const TaskTable = ({ tasks }: PropsType) => {
                   value={task.title}
                   ringDisabled
                   className="border-none"
-                  onChange={(e) => updateTaskTitle(task.id, e.target.value)}
+                  onChange={(e) =>
+                    updateTask(task.id, { title: e.target.value })
+                  }
                 />
               </TableCell>
               <TableCell>

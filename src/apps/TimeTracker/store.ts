@@ -20,8 +20,8 @@ type StoreType = {
     task: Pick<TaskType, 'title' | 'startTime'>
   ) => void;
   stopTask: (id: string) => void;
+  updateTask: (id: string, task: Partial<Omit<TaskType, 'id'>>) => void;
   deleteTask: (id: string) => void;
-  updateTaskTitle: (id: string, title: string) => void;
   addInput: () => void;
   removeInput: (id: string) => void;
 };
@@ -42,11 +42,11 @@ export const useStore = create<StoreType>()(
               set((prev) => {
                 prev.inputs = prev.inputs.filter((i) => i !== id);
               }),
-            updateTaskTitle: (id, title) =>
+            updateTask: (id, updates) =>
               set((prev) => {
                 const task = prev.tasks.find((i) => i.id === id);
                 if (task) {
-                  task.title = title;
+                  Object.assign(task, updates);
                 }
               }),
             stopTask: (id) =>

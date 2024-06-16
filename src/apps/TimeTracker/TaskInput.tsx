@@ -2,6 +2,7 @@ import { useStore } from './store';
 import { Input } from '@/components/ui/input';
 import dayjs from '@/helpers/dayjs';
 import { PlayCircleIcon, StopCircleIcon, Trash2Icon } from 'lucide-react';
+import ms from 'ms';
 import { useState } from 'react';
 
 type StartTaskProps = {
@@ -11,8 +12,7 @@ type StartTaskProps = {
 
 const TaskInput = ({ id, now }: StartTaskProps) => {
   const [title, setTitle] = useState('');
-  const { createTask, stopTask, tasks, updateTaskTitle, removeInput } =
-    useStore();
+  const { createTask, stopTask, tasks, updateTask, removeInput } = useStore();
   const currentTask = tasks.find((i) => i.id === id);
 
   const diff = now - (currentTask?.startTime || 0);
@@ -35,13 +35,37 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
         value={currentTask?.title || title}
         onChange={(e) =>
           currentTask
-            ? updateTaskTitle(currentTask.id, e.target.value)
+            ? updateTask(currentTask.id, { title: e.target.value })
             : setTitle(e.target.value)
         }
         placeholder="Task Title"
         ringDisabled
       />
-      <span>{dayjs.duration(currentTask ? diff : 0).format('HH:mm:ss')}</span>
+      <div className="flex gap-2 items-center cursor-pointer select-none">
+        {currentTask && (
+          <span
+            onClick={() =>
+              updateTask(currentTask.id, {
+                startTime: currentTask.startTime + ms('1 minute'),
+              })
+            }
+          >
+            -
+          </span>
+        )}
+        <span>{dayjs.duration(currentTask ? diff : 0).format('HH:mm:ss')}</span>
+        {currentTask && (
+          <span
+            onClick={() =>
+              updateTask(currentTask.id, {
+                startTime: currentTask.startTime - ms('1 minute'),
+              })
+            }
+          >
+            +
+          </span>
+        )}
+      </div>
       {currentTask ? (
         <StopCircleIcon
           className="text-red-500 cursor-pointer"
