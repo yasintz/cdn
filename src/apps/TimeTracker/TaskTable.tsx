@@ -21,8 +21,7 @@ const TaskTable = ({ tasks }: PropsType) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-24">Id</TableHead>
-            <TableHead>Title</TableHead>
+            <TableHead className="w-72 md:w-auto">Title</TableHead>
             <TableHead className="w-28">Date</TableHead>
             <TableHead className="w-28">Duration</TableHead>
             <TableHead className="w-20" />
@@ -31,7 +30,6 @@ const TaskTable = ({ tasks }: PropsType) => {
         <TableBody>
           {tasks.map((task) => (
             <TableRow key={task.id}>
-              <TableCell className="font-medium">{task.id}</TableCell>
               <TableCell>
                 <Input
                   value={task.title}

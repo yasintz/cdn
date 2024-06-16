@@ -14,10 +14,16 @@ export type TaskType = {
 
 type StoreType = {
   tasks: TaskType[];
-  createTask: (task: Pick<TaskType, 'title' | 'startTime'>) => void;
+  inputs: string[];
+  createTask: (
+    inputId: string,
+    task: Pick<TaskType, 'title' | 'startTime'>
+  ) => void;
   stopTask: (id: string) => void;
   deleteTask: (id: string) => void;
   updateTaskTitle: (id: string, title: string) => void;
+  addInput: () => void;
+  removeInput: (id: string) => void;
 };
 
 export const useStore = create<StoreType>()(
@@ -27,6 +33,15 @@ export const useStore = create<StoreType>()(
         (set) =>
           ({
             tasks: [],
+            inputs: [],
+            addInput: () =>
+              set((prev) => {
+                prev.inputs.push(uid());
+              }),
+            removeInput: (id) =>
+              set((prev) => {
+                prev.inputs = prev.inputs.filter((i) => i !== id);
+              }),
             updateTaskTitle: (id, title) =>
               set((prev) => {
                 const task = prev.tasks.find((i) => i.id === id);
@@ -38,6 +53,7 @@ export const useStore = create<StoreType>()(
               set((prev) => {
                 const task = prev.tasks.find((i) => i.id === id);
                 if (task) {
+                  prev.inputs[prev.inputs.indexOf(id)] = uid();
                   task.endTime = Date.now();
                 }
               }),
@@ -45,10 +61,10 @@ export const useStore = create<StoreType>()(
               set((prev) => {
                 prev.tasks = prev.tasks.filter((i) => i.id !== id);
               }),
-            createTask: (task) =>
+            createTask: (inputId, task) =>
               set((prev) => {
                 prev.tasks.push({
-                  id: uid(),
+                  id: inputId,
                   ...task,
                 });
               }),
