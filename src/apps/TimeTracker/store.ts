@@ -1,4 +1,4 @@
-import { computed } from 'zustand-computed-state';
+import { computed, compute } from 'zustand-computed-state';
 import { persist } from 'zustand/middleware';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
@@ -14,6 +14,7 @@ export type TaskType = {
 
 type StoreType = {
   tasks: TaskType[];
+  taskTags: Record<string, string[]>;
   inputs: string[];
   createTask: (
     inputId: string,
@@ -30,7 +31,7 @@ export const useStore = create<StoreType>()(
   computed(
     immer(
       persist(
-        (set) =>
+        (set, get) =>
           ({
             tasks: [],
             inputs: [],
@@ -68,6 +69,15 @@ export const useStore = create<StoreType>()(
                   ...task,
                 });
               }),
+
+            ...compute(get, (state) => ({
+              taskTags: Object.fromEntries(
+                state.tasks.map((task) => [
+                  task.id,
+                  task.title.split(' ').filter(isTag),
+                ])
+              ),
+            })),
           } as StoreType),
         {
           name: 'time-tracker',
@@ -80,3 +90,7 @@ export const useStore = create<StoreType>()(
 gSheetStorage('1KvjSCdlFvJqE-SoJOLpfOiuGlwqM5aSqwZJy7uAM4zQ').handleStore(
   useStore
 );
+
+export function isTag(t: string) {
+  return t.startsWith('#') && t.length > 2;
+}

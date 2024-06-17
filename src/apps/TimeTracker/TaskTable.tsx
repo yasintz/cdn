@@ -9,13 +9,16 @@ import {
 import { TaskType, useStore } from './store';
 import dayjs from '@/helpers/dayjs';
 import { Input } from '@/components/ui/input';
-import { Trash2Icon } from 'lucide-react';
+import { PencilIcon, Trash2Icon, XCircleIcon } from 'lucide-react';
+import Tag from '../TimelineTodo/Tag';
+import { useState } from 'react';
 
 type PropsType = {
   tasks: TaskType[];
 };
 const TaskTable = ({ tasks }: PropsType) => {
   const { updateTask, deleteTask } = useStore();
+  const [editingTaskId, setEditingTaskId] = useState<string>();
   return (
     <div className="rounded-md border">
       <Table>
@@ -31,14 +34,28 @@ const TaskTable = ({ tasks }: PropsType) => {
           {tasks.map((task) => (
             <TableRow key={task.id}>
               <TableCell>
-                <Input
-                  value={task.title}
-                  ringDisabled
-                  className="border-none"
-                  onChange={(e) =>
-                    updateTask(task.id, { title: e.target.value })
-                  }
-                />
+                {editingTaskId === task.id ? (
+                  <Input
+                    value={task.title}
+                    ringDisabled
+                    className="border-none"
+                    onChange={(e) =>
+                      updateTask(task.id, { title: e.target.value })
+                    }
+                  />
+                ) : (
+                  <div className="flex gap-1">
+                    {task.title
+                      .split(' ')
+                      .map((part) =>
+                        part.startsWith('#') ? (
+                          <Tag tag={part} key={part} />
+                        ) : (
+                          <span>{part}</span>
+                        )
+                      )}
+                  </div>
+                )}
               </TableCell>
               <TableCell>
                 {dayjs(task.startTime).format('MM/DD/YYYY')}
@@ -49,12 +66,25 @@ const TaskTable = ({ tasks }: PropsType) => {
                   .format('HH:mm:ss')}
               </TableCell>
               <TableCell>
-                <Trash2Icon
-                  className="cursor-pointer size-4"
-                  onClick={() =>
-                    confirm('Are you sure?') && deleteTask(task.id)
-                  }
-                />
+                <div className="flex gap-2 items-center justify-center">
+                  <Trash2Icon
+                    className="cursor-pointer size-4"
+                    onClick={() =>
+                      confirm('Are you sure?') && deleteTask(task.id)
+                    }
+                  />
+                  {editingTaskId ? (
+                    <XCircleIcon
+                      className="cursor-pointer size-4"
+                      onClick={() => setEditingTaskId(undefined)}
+                    />
+                  ) : (
+                    <PencilIcon
+                      className="cursor-pointer size-4"
+                      onClick={() => setEditingTaskId(task.id)}
+                    />
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}
