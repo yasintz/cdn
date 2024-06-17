@@ -1,4 +1,3 @@
-import { apps } from '@/apps/HomePage';
 import { Link, useMatches } from 'react-router-dom';
 import {
   Breadcrumb,
@@ -7,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { apps } from '@/apps/HomePage/apps';
 
 const Breadcrumbs = () => {
   const [, matched] = useMatches();
