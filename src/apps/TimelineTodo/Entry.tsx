@@ -85,7 +85,7 @@ const Entry = ({
   const entryTodos = entry.todos();
 
   return (
-    <li className="my-2 relative min-h-20">
+    <div className="my-2 relative min-h-20">
       {!isLast && (
         <div
           className="absolute top-7 -bottom-2 bg-slate-300 flex items-center justify-center"
@@ -258,7 +258,7 @@ const Entry = ({
           </div>
         )}
       </div>
-    </li>
+    </div>
   );
 };
 

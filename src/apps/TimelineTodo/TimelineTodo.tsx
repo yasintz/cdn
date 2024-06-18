@@ -43,12 +43,7 @@ const TimelineTodo = () => {
       <Header activeSession={session} />
 
       <div className="flex gap-2 justify-between">
-        <ul
-          className="py-4 px-6 overflow-y-auto relative flex-1"
-          style={{
-            height: 'calc(100vh - 3.6rem)',
-          }}
-        >
+        <div className="py-4 px-6 overflow-y-auto relative flex-1 h-screen pb-44">
           {openedEntryNoteId && (
             <NoteInput
               entryId={openedEntryNoteId}
@@ -79,7 +74,7 @@ const TimelineTodo = () => {
               Create Entry
             </Button>
           )}
-        </ul>
+        </div>
 
         {session && !openedEntryNoteId && (
           <TagsTable
