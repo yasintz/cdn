@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { compute } from 'zustand-computed-state';
 import { TodoStoreCreator } from '.';
 import { uid } from '@/utils/uid';
+import { tagsChildGroupMap, tagsGroup } from '../utils/tags';
 
 export type EntrySliceType = {
   entries: Array<{
@@ -100,12 +101,27 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
       if (!entry) {
         return;
       }
+      const tagParent = tagsChildGroupMap[tag];
 
       if (entry.tags.includes(tag)) {
         entry.tags = entry.tags.filter((t) => t !== tag);
-      } else {
-        entry.tags = [...(entry.tags || []), tag];
+
+        const isThereAnotherChild = tagsGroup[tagParent].some((t) =>
+          entry.tags.includes(t)
+        );
+
+        if (tagParent && !isThereAnotherChild) {
+          entry.tags = entry.tags.filter((t) => t !== tagParent);
+        }
+
+        return;
       }
+
+      if (tagParent && !entry.tags.includes(tagParent)) {
+        entry.tags = [...(entry.tags || []), tagParent];
+      }
+
+      entry.tags = [...(entry.tags || []), tag];
     }),
 
   ...compute('entry', get, (state) => ({

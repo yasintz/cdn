@@ -62,7 +62,6 @@ const SubMenuOrItem = ({
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
           <DropdownMenuSubContent>
-            <MenuItem tag={tag} entryTags={entryTags} onTagClick={onTagClick} />
             {childs.map((t: string) => (
               <MenuItem
                 key={t}

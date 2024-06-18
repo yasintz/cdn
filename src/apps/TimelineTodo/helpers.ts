@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { EntryType } from './store';
+import { tagsGroup } from './utils/tags';
 
 export function getTagSpentTime(tag: string, entries: EntryType[]) {
   const tagEntries = entries.filter((entry) => entry.tags.includes(tag));
@@ -52,12 +53,6 @@ export const tagsColor: Record<string, string> = {
   ibadet: '#2463eb',
   free: '#24b021',
   finance: '#d78b12',
-};
-
-export const tagsGroup = {
-  productivity: ['reading', 'podcast', 'spor', 'plan', 'english'],
-  work: ['kajabi', 'chat-app', 'nexizon'],
-  bad: ['youtube', 'timeline-todo'],
 };
 
 const toRGB = (color: string) => {
@@ -150,3 +145,5 @@ export function getTagsData(sessionEntries: EntryType[], allTags: string[]) {
 
 export const defaultNoteUrl =
   'https://playground.lexical.dev/?showTreeView=false#doc=H4sIAAAAAAAAE5XOzQrCMBAE4HeZc5DEf_MAnoUexcPSrDUQk7LdFov03UXxUI-ehjl8wzzBIWqRSkkZ_gkpRd9Z32IKwhn-_FMuBiEK1xpLhs99SgbXIndSeMAg5sBZ4a2Bji3DoyWhRqi9wWBg6T7QGSg_9PiVdvp_9_N0PjlNBok6rWjgAO92br_cuPV-dbBbg670Ur_dKdHYSOlzmGvYhdsuLKYXPaCc5RIBAAA';
+
+export { tagsGroup };
