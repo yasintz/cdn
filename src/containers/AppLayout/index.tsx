@@ -7,7 +7,7 @@ type AppLayoutProps = {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   return (
-    <div className="h-full w-full flex flex-col gap-2">
+    <div className="h-full w-full flex flex-col">
       <Breadcrumbs />
       {children}
     </div>
