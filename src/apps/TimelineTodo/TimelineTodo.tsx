@@ -15,7 +15,9 @@ dayjs.extend(duration);
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(dayjs());
+
+  const startOfDayDiff = useMemo(() => now.diff(now.startOf('day')), [now]);
 
   const { createEntry, openedEntryNoteId, getRelations } = useStore();
   const { sessions } = getRelations();
@@ -24,10 +26,9 @@ const TimelineTodo = () => {
   const sessionEntries = useMemo(() => session?.entries() || [], [session]);
 
   useEffect(() => {
-    setNow(dayjs().diff(dayjs().startOf('day')));
     const interval = setInterval(() => {
-      setNow(dayjs().diff(dayjs().startOf('day')));
-    }, ms('1 minute'));
+      setNow(dayjs());
+    }, ms('30 seconds'));
 
     return () => {
       clearInterval(interval);
@@ -35,7 +36,10 @@ const TimelineTodo = () => {
   }, []);
 
   return (
-    <div>
+    <div className="relative">
+      <div className="absolute -top-6 w-full text-center md:-top-10">
+        {now.format('DD MMMM dddd')}
+      </div>
       <Header activeSession={session} />
 
       <div className="flex gap-2 justify-between">
@@ -63,7 +67,7 @@ const TimelineTodo = () => {
               entry={entry}
               isLast={index === sessionEntries.length - 1}
               onEntryCreate={() => createEntry(session!.id)}
-              now={now}
+              now={startOfDayDiff}
             />
           ))}
           {session && sessionEntries.length === 0 && (
