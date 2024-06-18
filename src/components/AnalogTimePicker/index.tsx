@@ -26,8 +26,8 @@ type AnalogTimePickerProps = {
   setTime: (time: number) => void;
 };
 
-const hours = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-const hoursPM = [0, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+const hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const hoursPM = [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
 const minutes = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
 const AnalogTimePicker = ({ time, setTime }: AnalogTimePickerProps) => {
@@ -89,13 +89,12 @@ const AnalogTimePicker = ({ time, setTime }: AnalogTimePickerProps) => {
           style={{
             ...caclculate(250, 30, i),
           }}
-          onClick={() =>
-            showMinutes
-              ? setTime(
-                  time - ms(`${activeMinute} minutes`) + ms(`${item} minutes`)
-                )
-              : setTime(time - ms(`${activeHour} hours`) + ms(`${item} hours`))
-          }
+          onClick={() => {
+            const [h, m] = duration.format('H:m').split(':');
+            const result = ms(`${item} ${showMinutes ? 'minutes' : 'hours'}`);
+
+            setTime(ms(!showMinutes ? `${m} minutes` : `${h} hours`) + result);
+          }}
         >
           {item}
         </div>

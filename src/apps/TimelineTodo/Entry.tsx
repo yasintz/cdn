@@ -32,7 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import AnalogTimePicker from '@/components/AnalogTimePicker';
+import ListTimePicker from '@/components/ListTimePicker';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -116,8 +116,19 @@ const Entry = ({
               {dayjs.duration(entry.time).format('HH:mm')}
             </div>
           </PopoverTrigger>
-          <PopoverContent className="ml-4">
-            <AnalogTimePicker
+          <PopoverContent className="ml-4 h-64 p-0 w-auto">
+            {/* <AnalogTimePicker
+              time={entry.time}
+              setTime={(result) => {
+                const isBelongsToNextDay = entry.time > ms('24 hours') - 1;
+                updateEntryTime(
+                  entry.id,
+                  isBelongsToNextDay ? result + ms('24 hours') : result,
+                  batchTimeUpdatingEnabled
+                );
+              }}
+            /> */}
+            <ListTimePicker
               time={entry.time}
               setTime={(result) => {
                 const isBelongsToNextDay = entry.time > ms('24 hours') - 1;

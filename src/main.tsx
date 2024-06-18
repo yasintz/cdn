@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import '../app/globals.css';
+import '../app/main.scss';
 
 import router from './navigation/router';
 
