@@ -36,14 +36,14 @@ const TimelineTodo = () => {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative flex-1 flex flex-col min-h-0">
       <div className="absolute -top-12 right-2 -z-10">
         {now.format('DD MMMM dddd')}
       </div>
       <Header activeSession={session} />
 
-      <div className="flex gap-2 justify-between">
-        <div className="py-4 px-6 overflow-y-auto relative flex-1 h-screen pb-44">
+      <div className="flex gap-2 justify-between flex-1 min-h-0">
+        <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
           {openedEntryNoteId && (
             <NoteInput
               entryId={openedEntryNoteId}
