@@ -1,7 +1,6 @@
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
 import ms from 'ms';
-import { useEffect } from 'react';
 
 const hours = Array.from(Array(24).keys()).map((a, i) => i);
 const minutes = Array.from(Array(60).keys()).map((a, i) => i);
@@ -50,23 +49,6 @@ const ListTimePicker = ({ time, setTime }: ListTimePickerProps) => {
 
     setTime(ms(!showMinutes ? `${m} minutes` : `${h} hours`) + result);
   };
-
-  useEffect(() => {
-    const activeHourElement = document.getElementById(`hours_${hour}`)!;
-    const activeMinuteElement = document.getElementById(`minutes_${minute}`)!;
-
-    activeHourElement.scrollIntoView();
-    activeMinuteElement.scrollIntoView();
-
-    activeMinuteElement.parentElement?.scrollTo({
-      top: activeMinuteElement.parentElement.scrollTop - 100,
-    });
-    activeHourElement.parentElement?.scrollTo({
-      top: activeHourElement.parentElement.scrollTop - 100,
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="flex h-full">
