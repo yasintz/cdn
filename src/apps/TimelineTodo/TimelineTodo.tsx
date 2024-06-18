@@ -37,7 +37,7 @@ const TimelineTodo = () => {
 
   return (
     <div className="relative">
-      <div className="absolute -top-6 w-full text-center md:-top-10">
+      <div className="absolute -top-12 right-2 -z-10">
         {now.format('DD MMMM dddd')}
       </div>
       <Header activeSession={session} />
