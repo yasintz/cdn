@@ -27,6 +27,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import DropdownItem from './DropdownItem';
 import { useUrlState } from './useUrlState';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import AnalogTimePicker from '@/components/AnalogTimePicker';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -70,7 +76,6 @@ const Entry = ({
     openedEntryNoteId,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
-  const inputRef = useRef<HTMLInputElement>(null);
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
   const { batchTimeUpdatingEnabled } = useUrlState();
   const { entries } = getRelations();
@@ -105,32 +110,26 @@ const Entry = ({
           <div className="h-2 w-2 rounded-full bg-red-700 absolute -translate-x-3" />
         )}
 
-        <div className="w-12 relative">
-          <input
-            className="absolute top-0 opacity-0 w-11"
-            type="time"
-            ref={inputRef}
-            value={dayjs.duration(entry.time).format('HH:mm')}
-            onChange={(event) => {
-              const [h, m] = event.target.value.split(':');
-              const isBelongsToNextDay = entry.time > ms('24 hours') - 1;
-              const result = ms(`${h}h`) + ms(`${m}m`);
-              updateEntryTime(
-                entry.id,
-                isBelongsToNextDay ? result + ms('24 hours') : result,
-                batchTimeUpdatingEnabled
-              );
-            }}
-            onClick={() => (inputRef?.current as any).showPicker()}
-          />
-
-          <div
-            className="font-bold text-purple-500 cursor-pointer"
-            onClick={() => (inputRef?.current as any).showPicker()}
-          >
-            {dayjs.duration(entry.time).format('HH:mm')}
-          </div>
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className="font-bold text-purple-500 cursor-pointer">
+              {dayjs.duration(entry.time).format('HH:mm')}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="ml-4">
+            <AnalogTimePicker
+              time={entry.time}
+              setTime={(result) => {
+                const isBelongsToNextDay = entry.time > ms('24 hours') - 1;
+                updateEntryTime(
+                  entry.id,
+                  isBelongsToNextDay ? result + ms('24 hours') : result,
+                  batchTimeUpdatingEnabled
+                );
+              }}
+            />
+          </PopoverContent>
+        </Popover>
         {entry.note && (
           <NotebookTextIcon
             size={13}

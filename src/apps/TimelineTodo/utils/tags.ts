@@ -13,5 +13,3 @@ export const tagsChildGroupMap: Record<string, string> = Object.entries(
   }),
   {}
 );
-
-console.log({ tagsChildGroupMap });

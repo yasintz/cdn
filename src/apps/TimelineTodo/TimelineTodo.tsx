@@ -7,9 +7,9 @@ import { useEffect, useMemo, useState } from 'react';
 import Header from './Header';
 import Entry from './Entry';
 import TagsTable from './TagsTable';
-import './style.scss';
 import NoteInput from './NoteInput';
 import { Button } from '@/components/ui/button';
+import './style.scss';
 
 dayjs.extend(duration);
 
