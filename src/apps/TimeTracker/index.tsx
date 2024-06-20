@@ -1,5 +1,5 @@
 import TaskTable from './TaskTable';
-import { isTag, useStore } from './store';
+import { useStore } from './store';
 import useNow from '@/hooks/useNow';
 import TaskInput from './TaskInput';
 import CreateInput from './CreateInput';
@@ -12,13 +12,8 @@ const TimeTracker = () => {
   const { tasks, inputs, addInput, taskTags } = useStore();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const allTags = _.uniq(
-    tasks
-      .map((i) => i.title)
-      .join(' ')
-      .split(' ')
-      .filter(isTag)
-  ).sort();
+  const allTags = _.uniq(_.flatten(tasks.map((i) => i.tags))).sort();
+
 
   const onTagToggle = (tag: string) => {
     setSelectedTags((prev) =>

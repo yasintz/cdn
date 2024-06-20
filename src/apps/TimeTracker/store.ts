@@ -4,12 +4,14 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import { uid } from '@/utils/uid';
+import { parseTagsFromTitle } from './helpers';
 
 export type TaskType = {
   id: string;
   title: string;
   startTime: number;
   endTime?: number;
+  tags: string[];
 };
 
 type StoreType = {
@@ -47,7 +49,10 @@ export const useStore = create<StoreType>()(
               set((prev) => {
                 const task = prev.tasks.find((i) => i.id === id);
                 if (task) {
-                  Object.assign(task, updates);
+                  Object.assign(task, {
+                    ...updates,
+                    ...parseTagsFromTitle(updates.title || task.title),
+                  });
                 }
               }),
             stopTask: (id) =>
@@ -67,15 +72,13 @@ export const useStore = create<StoreType>()(
                 prev.tasks.push({
                   id: inputId,
                   ...task,
+                  ...parseTagsFromTitle(task.title),
                 });
               }),
 
             ...compute(get, (state) => ({
               taskTags: Object.fromEntries(
-                state.tasks.map((task) => [
-                  task.id,
-                  task.title.split(' ').filter(isTag),
-                ])
+                state.tasks.map((task) => [task.id, task.tags])
               ),
             })),
           } as StoreType),
@@ -90,7 +93,3 @@ export const useStore = create<StoreType>()(
 gSheetStorage('1KvjSCdlFvJqE-SoJOLpfOiuGlwqM5aSqwZJy7uAM4zQ').handleStore(
   useStore
 );
-
-export function isTag(t: string) {
-  return t.startsWith('#') && t.length > 2;
-}

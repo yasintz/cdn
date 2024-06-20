@@ -5,6 +5,7 @@ import { PlayCircleIcon, StopCircleIcon, Trash2Icon } from 'lucide-react';
 import ms from 'ms';
 import { useState } from 'react';
 import Tag from '../TimelineTodo/Tag';
+import { parseTagsFromTitle } from './helpers';
 
 type StartTaskProps = {
   now: number;
@@ -18,10 +19,7 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
 
   const diff = now - (currentTask?.startTime || 0);
 
-  const taskTitleArray = (currentTask?.title || title).split(' ');
-  const tags = taskTitleArray
-    .filter((i) => i.startsWith('#'))
-    .filter((i) => i.length > 2);
+  const { tags } = parseTagsFromTitle(currentTask?.title || title);
 
   const handleStartStop = () => {
     if (currentTask) {
