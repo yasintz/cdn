@@ -9,6 +9,7 @@ import { parseTagsFromTitle } from './helpers';
 export type TaskType = {
   id: string;
   title: string;
+  titleRaw: string;
   startTime: number;
   endTime?: number;
   tags: string[];

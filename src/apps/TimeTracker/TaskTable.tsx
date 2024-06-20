@@ -73,7 +73,7 @@ const TaskTable = ({ tasks }: PropsType) => {
                       confirm('Are you sure?') && deleteTask(task.id)
                     }
                   />
-                  {editingTaskId ? (
+                  {editingTaskId === task.id ? (
                     <XCircleIcon
                       className="cursor-pointer size-4"
                       onClick={() => setEditingTaskId(undefined)}
