@@ -12,6 +12,14 @@ import { Input } from '@/components/ui/input';
 import { PencilIcon, Trash2Icon, XCircleIcon } from 'lucide-react';
 import Tag from '../TimelineTodo/Tag';
 import { useState } from 'react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import _ from 'lodash';
+import ms from 'ms';
 
 type PropsType = {
   tasks: TaskType[];
@@ -31,63 +39,89 @@ const TaskTable = ({ tasks }: PropsType) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.map((task) => (
-            <TableRow key={task.id}>
-              <TableCell>
-                {editingTaskId === task.id ? (
-                  <Input
-                    value={task.title}
-                    ringDisabled
-                    className="border-none"
-                    onChange={(e) =>
-                      updateTask(task.id, { title: e.target.value })
-                    }
-                  />
-                ) : (
-                  <div className="flex gap-1">
-                    {task.title
-                      .split(' ')
-                      .map((part) =>
-                        part.startsWith('#') ? (
-                          <Tag tag={part} key={part} />
-                        ) : (
-                          <span>{part}</span>
-                        )
+          {_.orderBy(tasks, 'startTime')
+            .toReversed()
+            .map((task) => {
+              const duration = (task.endTime || 0) - task.startTime;
+              const isBiggerThanOneDay = duration > ms('24 hours');
+              return (
+                <TableRow key={task.id}>
+                  <TableCell>
+                    {editingTaskId === task.id ? (
+                      <Input
+                        value={task.title}
+                        ringDisabled
+                        className="border-none"
+                        onChange={(e) =>
+                          updateTask(task.id, { title: e.target.value })
+                        }
+                      />
+                    ) : (
+                      <div className="flex gap-1">
+                        {task.title
+                          .split(' ')
+                          .map((part) =>
+                            part.startsWith('#') ? (
+                              <Tag tag={part} key={part} />
+                            ) : (
+                              <span key={part}>{part}</span>
+                            )
+                          )}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {dayjs(task.startTime).format('MM/DD/YYYY')}
+                  </TableCell>
+                  <TableCell>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <div>
+                            {isBiggerThanOneDay && (
+                              <>{Math.floor(duration / ms('1 hour'))}:</>
+                            )}
+                            {dayjs
+                              .duration(duration)
+                              .format(
+                                isBiggerThanOneDay ? 'mm:ss' : 'HH:mm:ss'
+                              )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            {dayjs(task.startTime).format('HH:mm')}
+                            {' - '}
+                            {dayjs(task.endTime).format('HH:mm')}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2 items-center justify-center">
+                      <Trash2Icon
+                        className="cursor-pointer size-4"
+                        onClick={() =>
+                          confirm('Are you sure?') && deleteTask(task.id)
+                        }
+                      />
+                      {editingTaskId === task.id ? (
+                        <XCircleIcon
+                          className="cursor-pointer size-4"
+                          onClick={() => setEditingTaskId(undefined)}
+                        />
+                      ) : (
+                        <PencilIcon
+                          className="cursor-pointer size-4"
+                          onClick={() => setEditingTaskId(task.id)}
+                        />
                       )}
-                  </div>
-                )}
-              </TableCell>
-              <TableCell>
-                {dayjs(task.startTime).format('MM/DD/YYYY')}
-              </TableCell>
-              <TableCell>
-                {dayjs
-                  .duration((task.endTime || 0) - task.startTime)
-                  .format('HH:mm:ss')}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2 items-center justify-center">
-                  <Trash2Icon
-                    className="cursor-pointer size-4"
-                    onClick={() =>
-                      confirm('Are you sure?') && deleteTask(task.id)
-                    }
-                  />
-                  {editingTaskId === task.id ? (
-                    <XCircleIcon
-                      className="cursor-pointer size-4"
-                      onClick={() => setEditingTaskId(undefined)}
-                    />
-                  ) : (
-                    <PencilIcon
-                      className="cursor-pointer size-4"
-                      onClick={() => setEditingTaskId(task.id)}
-                    />
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
         </TableBody>
       </Table>
     </div>
