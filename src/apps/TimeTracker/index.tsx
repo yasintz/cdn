@@ -12,8 +12,7 @@ const TimeTracker = () => {
   const { tasks, inputs, addInput, taskTags } = useStore();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const allTags = _.uniq(_.flatten(tasks.map((i) => i.tags))).sort();
-
+  const allTags = _.uniq(_.flatten(Object.values(taskTags))).sort();
 
   const onTagToggle = (tag: string) => {
     setSelectedTags((prev) =>

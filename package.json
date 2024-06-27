@@ -102,6 +102,6 @@
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.0",
     "zustand": "^4.5.2",
-    "zustand-computed-state": "^0.1.5"
+    "zustand-computed-state": "^0.1.8"
   }
 }
