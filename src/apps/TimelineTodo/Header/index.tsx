@@ -31,36 +31,39 @@ const Header = ({ activeSession }: HeaderProps) => {
   }, []);
 
   return (
-    <div
-      className="flex flex-col gap-3 px-3 pt-3 pb-2 overflow-x-auto w-full"
-      ref={scrollDivRef}
-    >
-      <div className="flex gap-2 w-full">
-        <SessionList
-          sessions={unarchivedSessions}
-          reorderSessions={reorderSessions}
-          activeSessionId={activeSession?.parentId || activeSession?.id}
-          sortEnabled={sessionSortingEnabled}
-        />
-        {archivedSessionsShown &&
-          archivedSessions.map((session) => (
-            <SessionButton
-              session={session}
-              isActive={session.id === activeSession?.id}
-              key={session.id}
-            />
-          ))}
-
+    <div className="flex">
+      <div
+        className="flex flex-col gap-3 px-3 pt-3 pb-2 overflow-x-auto w-full"
+        ref={scrollDivRef}
+      >
+        <div className="flex gap-2 w-full">
+          <SessionList
+            sessions={unarchivedSessions}
+            reorderSessions={reorderSessions}
+            activeSessionId={activeSession?.parentId || activeSession?.id}
+            sortEnabled={sessionSortingEnabled}
+          />
+          {archivedSessionsShown &&
+            archivedSessions.map((session) => (
+              <SessionButton
+                session={session}
+                isActive={session.id === activeSession?.id}
+                key={session.id}
+              />
+            ))}
+        </div>
+        {activeSession && sessionChilds.length > 0 && (
+          <SessionList
+            sessions={sessionChilds}
+            reorderSessions={reorderSessions}
+            activeSessionId={activeSession?.id}
+            sortEnabled={sessionSortingEnabled}
+          />
+        )}
+      </div>
+      <div className='pt-3 px-2'>
         <TimelineOptions activeSession={activeSession} />
       </div>
-      {activeSession && sessionChilds.length > 0 && (
-        <SessionList
-          sessions={sessionChilds}
-          reorderSessions={reorderSessions}
-          activeSessionId={activeSession?.id}
-          sortEnabled={sessionSortingEnabled}
-        />
-      )}
     </div>
   );
 };
