@@ -47,6 +47,9 @@ importers:
       chart.js:
         specifier: ^4.4.3
         version: 4.4.3
+      class-transformer:
+        specifier: ^0.5.1
+        version: 0.5.1
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -119,6 +122,9 @@ importers:
       react-spring-bottom-sheet:
         specifier: ^3.4.1
         version: 3.4.1(@types/react@18.2.48)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
       showdown:
         specifier: ^2.1.0
         version: 2.1.0
@@ -1589,6 +1595,9 @@ packages:
     resolution: {integrity: sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==}
     engines: {node: '>=6.0'}
 
+  class-transformer@0.5.1:
+    resolution: {integrity: sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==}
+
   class-variance-authority@0.7.0:
     resolution: {integrity: sha512-jFI8IQw4hczaL4ALINxqLEXQbWcNjoSkloa4IaufXCJr6QawJyw7tuRysRsrE8w2p/4gGaxKIt/hX3qz/IbD1A==}
 
@@ -2667,6 +2676,9 @@ packages:
   rechoir@0.8.0:
     resolution: {integrity: sha512-/vxpCXddiX8NGfGO/mTafwjq4aFa/71pvamip0++IQk3zG8cbCj0fifNPrjjF1XMXUne91jL9OoxmdykoEtifQ==}
     engines: {node: '>= 10.13.0'}
+
+  reflect-metadata@0.2.2:
+    resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
   regenerator-runtime@0.14.1:
     resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
@@ -4661,6 +4673,8 @@ snapshots:
 
   chrome-trace-event@1.0.3: {}
 
+  class-transformer@0.5.1: {}
+
   class-variance-authority@0.7.0:
     dependencies:
       clsx: 2.0.0
@@ -5704,6 +5718,8 @@ snapshots:
   rechoir@0.8.0:
     dependencies:
       resolve: 1.22.1
+
+  reflect-metadata@0.2.2: {}
 
   regenerator-runtime@0.14.1: {}
 
