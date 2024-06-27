@@ -25,7 +25,7 @@ const SessionSelect = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>{children || <div />}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="h-64 overflow-y-scroll">
         {sessions.map((s) => (
           <DropdownMenuItem key={s.id} onClick={() => onSelect(s)}>
             {s.name}
