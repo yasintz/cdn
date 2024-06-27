@@ -3,36 +3,20 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { cn } from '@/lib/utils';
-import { EntryType, useStore } from './store';
+import { EntryType, useStore } from '../store';
 import ms from 'ms';
-import {
-  CalendarPlus2Icon,
-  CalendarMinus2Icon,
-  PlusIcon,
-  TagIcon,
-  AlarmClockPlusIcon,
-  EllipsisIcon,
-  TrashIcon,
-  RadioIcon,
-  NotebookTextIcon,
-} from 'lucide-react';
-import Todo from './Todo';
-import { TagInput } from './TagInput';
-import Tag from './Tag';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import DropdownItem from './DropdownItem';
-import { useUrlState } from './useUrlState';
+import { PlusIcon, NotebookTextIcon } from 'lucide-react';
+import Todo from '../Todo';
+import { TagInput } from '../TagInput';
+import Tag from '../Tag';
+import { useUrlState } from '../useUrlState';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
 import ListTimePicker from '@/components/ListTimePicker';
+import Options from './Options';
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -66,11 +50,9 @@ const Entry = ({
 }: EntryProps) => {
   const {
     updateEntryTime,
-    deleteEntry,
     createTodo,
     toggleEntryTag,
     allTags,
-    createEntry,
     openEntryNote,
     getRelations,
     openedEntryNoteId,
@@ -138,83 +120,7 @@ const Entry = ({
             onClick={() => openEntryNote(entry.id)}
           />
         )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div
-              className={cn(
-                `min-h-5 min-w-5 rounded-full
-            flex items-center justify-center cursor-pointer
-            border border-input bg-background hover:bg-accent hover:text-accent-foreground
-            `
-              )}
-            >
-              <EllipsisIcon size={13} />
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-50">
-            <DropdownMenuGroup>
-              <DropdownItem
-                title="Move to next day"
-                hidden={entry.time > ms('24 hours')}
-                icon={CalendarPlus2Icon}
-                onClick={() =>
-                  updateEntryTime(entry.id, entry.time + ms('24 hours'), false)
-                }
-              />
-
-              <DropdownItem
-                title="Move to today"
-                hidden={entry.time < ms('24 hours')}
-                icon={CalendarMinus2Icon}
-                onClick={() =>
-                  updateEntryTime(entry.id, entry.time - ms('24 hours'), false)
-                }
-              />
-
-              <DropdownItem
-                title="Add Note"
-                hidden={!!entry.note}
-                icon={NotebookTextIcon}
-                onClick={() => openEntryNote(entry.id)}
-              />
-              <DropdownItem
-                title="Set to now"
-                icon={RadioIcon}
-                onClick={() => {
-                  const now = dayjs().diff(dayjs().startOf('day'));
-
-                  updateEntryTime(
-                    entry.id,
-                    entry.time > ms('24 hours') ? now + ms('24 hours') : now,
-                    false
-                  );
-                }}
-              />
-              <DropdownItem
-                title="Add Tag"
-                icon={TagIcon}
-                onClick={() => setTimeout(() => setTagSelectOpened(true), 250)}
-              />
-
-              <DropdownItem
-                title="Add entry below"
-                icon={AlarmClockPlusIcon}
-                onClick={() =>
-                  createEntry(entry.sessionId, entry.time + ms('10 minutes'))
-                }
-              />
-
-              <DropdownItem
-                title="Remove Entry"
-                icon={TrashIcon}
-                className="text-red-500"
-                onClick={() =>
-                  confirm('Are you sure?') && deleteEntry(entry.id)
-                }
-              />
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Options entry={entry} onShowTags={() => setTagSelectOpened(true)} />
         <TagInput
           allTags={allTags}
           entryTags={entry.tags}

@@ -3,6 +3,7 @@ import { compute } from 'zustand-computed-state';
 import { TodoStoreCreator } from '.';
 import { uid } from '@/utils/uid';
 import { tagsChildGroupMap, tagsGroup } from '../utils/tags';
+import { cloneEntry } from './utils';
 
 export type EntrySliceType = {
   entries: Array<{
@@ -24,6 +25,7 @@ export type EntrySliceType = {
   updateEntryTime: (id: string, time: number, batchUpdating: boolean) => void;
   deleteEntry: (id: string) => void;
   toggleEntryTag: (id: string, tag: string) => void;
+  duplicateEntry: (id: string, newSessionId?: string) => void;
 };
 
 export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
@@ -93,6 +95,32 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
     set((prev) => ({
       entries: prev.entries.filter((session) => session.id !== id),
     })),
+
+  duplicateEntry: (entryId, newSessionId) =>
+    set((prev) => {
+      const relations = get().getRelations();
+      const entry = relations.entries.find((entry) => entry.id === entryId);
+      const session = entry?.session();
+
+      if (!entry || !session) {
+        return;
+      }
+
+      const sessionEntries = session.entries();
+      const entryIndex = sessionEntries.findIndex((e) => e.id === entry.id);
+      const nextEntry = sessionEntries[entryIndex + 1];
+
+      const newEntry = cloneEntry(entry);
+      const newNextEntry = cloneEntry(nextEntry);
+
+      if (newSessionId) {
+        newEntry.entry.sessionId = newSessionId;
+        newNextEntry.entry.sessionId = newSessionId;
+      }
+
+      prev.todos.push(...newEntry.todos, ...newNextEntry.todos);
+      prev.entries.push(newEntry.entry, newNextEntry.entry);
+    }),
 
   toggleEntryTag: (id, tag) =>
     set((prev) => {

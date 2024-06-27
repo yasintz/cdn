@@ -18,12 +18,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { useUrlState } from '../useUrlState';
 import { useNavigate } from 'react-router-dom';
 import SubMenu from './SubMenu';
 import { useState } from 'react';
+import SessionSelect from '../components/SessionSelect';
 
 type DropdownProps = {
   activeSession?: SessionType;
@@ -195,23 +195,14 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
       {showSessionsDropdown && (
-        <DropdownMenu open onOpenChange={() => setShowSessionsDropdown(false)}>
-          <DropdownMenuTrigger asChild>
-            <div />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {sessions
-              .filter((s) => !s.parentId && activeSession?.id !== s.id)
-              .map((s) => (
-                <DropdownMenuItem
-                  key={s.id}
-                  onClick={() => changeParent(activeSession!.id, s.id)}
-                >
-                  {s.name}
-                </DropdownMenuItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SessionSelect
+          open
+          onOpenChange={() => setShowSessionsDropdown(false)}
+          sessions={sessions.filter(
+            (s) => !s.parentId && activeSession?.id !== s.id
+          )}
+          onSelect={(s) => changeParent(activeSession!.id, s.id)}
+        />
       )}
     </>
   );

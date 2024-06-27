@@ -9,7 +9,8 @@ type SessionWithRelation = SessionType & {
   todos: () => TodoWithRelation[];
 };
 
-type EntryWithRelation = EntryType & {
+export type EntryWithRelation = EntryType & {
+  entryData: () => EntryType;
   session: () => SessionWithRelation | undefined;
   todos: () => TodoWithRelation[];
   next: () => EntryWithRelation | undefined;
@@ -20,6 +21,7 @@ type EntryWithRelation = EntryType & {
 
 type TodoWithRelation = TodoType & {
   entry: () => EntryWithRelation | undefined;
+  todo: () => TodoType;
 };
 
 export type StoreRelations = {
@@ -86,6 +88,7 @@ export function createStoreRelations(store: RequiredStore): StoreRelations {
       next,
       prev,
       active,
+      entryData: () => entry,
     };
   }
 
@@ -102,6 +105,7 @@ export function createStoreRelations(store: RequiredStore): StoreRelations {
     return {
       ...todo,
       entry,
+      todo: () => todo,
     };
   }
 
