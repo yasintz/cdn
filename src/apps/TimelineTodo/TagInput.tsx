@@ -61,7 +61,7 @@ const SubMenuOrItem = ({
           <Tag tag={tag} />
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
-          <DropdownMenuSubContent>
+          <DropdownMenuSubContent className="ml-2">
             {childs.map((t: string) => (
               <MenuItem
                 key={t}
@@ -119,14 +119,16 @@ export function TagInput({
           ringDisabled
         />
 
-        {allTagsList.map((tag) => (
-          <SubMenuOrItem
-            key={tag}
-            entryTags={entryTags}
-            onTagClick={onTagClick}
-            tag={tag}
-          />
-        ))}
+        <div className="flex flex-col max-h-64 overflow-y-scroll">
+          {allTagsList.map((tag) => (
+            <SubMenuOrItem
+              key={tag}
+              entryTags={entryTags}
+              onTagClick={onTagClick}
+              tag={tag}
+            />
+          ))}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
