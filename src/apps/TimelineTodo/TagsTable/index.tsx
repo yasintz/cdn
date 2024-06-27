@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { EntryType, useStore } from './store';
-import { getTagColor, getTagsData } from './helpers';
+import { EntryType, useStore } from '../store';
+import { getTagColor, getTagsData } from '../helpers';
 import { cn } from '@/lib/utils';
 import _ from 'lodash';
-import Tag from './Tag';
+import Tag from '../Tag';
+import ms from 'ms';
 
 dayjs.extend(duration);
 
@@ -28,14 +29,21 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
     [allTags, sessionEntries]
   );
 
+  const totalSpentTime = groupedTags.reduce(
+    (acc, cur) => acc + cur.spentTime,
+    0
+  );
+
   return (
     <div className={cn('flex-1 px-4', className)}>
-      <div className="w-full max-w-96">
+      <div className="w-full">
         <table className="tags">
           <tbody>
             <tr>
               <th>Tag</th>
               <th>Spent Time</th>
+              <th>24h/%</th>
+              <th>Total/%</th>
             </tr>
             {_.orderBy(groupedTags, 'spentTime', 'desc').map(
               ({ tag, childs, spentTime }) => {
@@ -60,6 +68,10 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
                         </div>
                       </td>
                       <td>{formatDuration(spentTime)}</td>
+                      <td>{((100 * spentTime) / ms('24 h')).toFixed(1)}%</td>
+                      <td>
+                        {((100 * spentTime) / totalSpentTime).toFixed(1)}%
+                      </td>
                     </tr>
 
                     {expandedTags.includes(tag) &&
@@ -76,6 +88,15 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
                             </div>
                           </td>
                           <td>{formatDuration(child.spentTime)}</td>
+                          <td>
+                            {((100 * child.spentTime) / ms('24 h')).toFixed(1)}%
+                          </td>
+                          <td>
+                            {((100 * child.spentTime) / totalSpentTime).toFixed(
+                              1
+                            )}
+                            %
+                          </td>
                         </tr>
                       ))}
                   </React.Fragment>
@@ -91,6 +112,8 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
                   groupedTags.reduce((acc, cur) => acc + cur.spentTime, 0)
                 )}
               </th>
+              <th></th>
+              <th></th>
             </tr>
           </tbody>
         </table>
