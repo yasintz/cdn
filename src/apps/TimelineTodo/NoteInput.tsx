@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import { useStore } from './store';
 import { Trash2Icon, XCircleIcon } from 'lucide-react';
 import NoteBook from '@/components/NoteBook';
+import { useRef } from 'react';
 
 type NoteInputProps = {
   entryId: string;
@@ -12,6 +13,7 @@ const NoteInput = ({ entryId, className }: NoteInputProps) => {
   const { entries, closeEntryNote, updateEntryNote } = useStore();
 
   const openedEntry = entries.find((i) => i.id === entryId);
+  const entryNote = useRef(openedEntry?.note).current;
 
   if (!openedEntry) {
     return null;
@@ -37,7 +39,7 @@ const NoteInput = ({ entryId, className }: NoteInputProps) => {
       <div className="flex flex-col flex-1 max-h-96">
         <NoteBook
           id={openedEntry.id}
-          initialDoc={openedEntry.note}
+          initialDoc={entryNote}
           onChange={(doc) => updateEntryNote(openedEntry.id, doc)}
         />
       </div>

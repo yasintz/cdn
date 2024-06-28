@@ -47,6 +47,7 @@ const TimelineTodo = () => {
         <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
           {openedEntryNoteId && (
             <NoteInput
+              key={openedEntryNoteId}
               entryId={openedEntryNoteId}
               className="md:hidden min-h-96"
             />
