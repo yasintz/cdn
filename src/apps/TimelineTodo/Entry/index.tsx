@@ -110,7 +110,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           )}
         </div>
       </div>
-      {nextEntry && nextEntry.time !== entry.time + entry.duration && (
+      {(!nextEntry || nextEntry.time !== entry.time + entry.duration) && (
         <div className="flex">
           <EntryTime
             time={entry.time + entry.duration}
