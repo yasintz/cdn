@@ -9,8 +9,8 @@ import Entry from './Entry';
 import TagsTable from './TagsTable';
 import NoteInput from './NoteInput';
 import { Button } from '@/components/ui/button';
-import './style.scss';
 import DayView, { getDayViewItemStyle } from './DayView';
+import './style.scss';
 
 dayjs.extend(duration);
 

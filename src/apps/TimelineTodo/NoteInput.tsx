@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { useStore } from './store';
 import { Trash2Icon, XCircleIcon } from 'lucide-react';
+import NoteBook from '@/components/NoteBook';
 
 type NoteInputProps = {
   entryId: string;
@@ -17,25 +18,29 @@ const NoteInput = ({ entryId, className }: NoteInputProps) => {
   }
 
   return (
-    <div className={cn('flex-1 flex flex-col relative', className)}>
-      <div className="absolute top-14 right-7 flex gap-2">
-        <Trash2Icon
-          className="text-red-500 cursor-pointer"
-          onClick={() => updateEntryNote(entryId, '')}
-          size={14}
-        />
-        <XCircleIcon
-          className="cursor-pointer"
-          onClick={closeEntryNote}
-          size={14}
+    <div className={cn('flex-1 flex flex-col relative border-l', className)}>
+      <div className="flex justify-between">
+        <h3 className="text-lg font-bold">Notes</h3>
+        <div className="flex gap-2">
+          <Trash2Icon
+            className="text-red-500 cursor-pointer"
+            onClick={() => updateEntryNote(entryId, '')}
+            size={14}
+          />
+          <XCircleIcon
+            className="cursor-pointer"
+            onClick={closeEntryNote}
+            size={14}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col flex-1 max-h-96">
+        <NoteBook
+          id={openedEntry.id}
+          initialDoc={openedEntry.note}
+          onChange={(doc) => updateEntryNote(openedEntry.id, doc)}
         />
       </div>
-      <h3 className="text-lg font-bold">Notes</h3>
-      <textarea
-        className="flex-1 p-2 border focus:outline-none rounded-md"
-        value={openedEntry.note || ''}
-        onChange={(e) => updateEntryNote(openedEntry.id, e.target.value)}
-      />
     </div>
   );
 };
