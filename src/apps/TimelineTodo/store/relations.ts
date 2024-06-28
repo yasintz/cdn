@@ -15,7 +15,7 @@ export type EntryWithRelation = EntryType & {
   todos: () => TodoWithRelation[];
   next: () => EntryWithRelation | undefined;
   prev: () => EntryWithRelation | undefined;
-  duration: () => number;
+  durationDeprecated: () => number;
   active: (now: number) => boolean;
 };
 
@@ -72,7 +72,7 @@ export function createStoreRelations(store: RequiredStore): StoreRelations {
 
     const prev = () => session()?.entries()[(indexInEntries() || 0) - 1];
     const next = () => session()?.entries()[(indexInEntries() || 0) + 1];
-    const duration = () => (next()?.time || 0) - entry.time;
+    const durationDeprecated = () => (next()?.time || 0) - entry.time;
     const active = (now: number) => {
       const dayCalc = (t: number) =>
         t > ms('24 hours') - 1 ? t - ms('24 hours') : t;
@@ -84,7 +84,7 @@ export function createStoreRelations(store: RequiredStore): StoreRelations {
       ...entry,
       todos,
       session,
-      duration,
+      durationDeprecated,
       next,
       prev,
       active,

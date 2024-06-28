@@ -10,6 +10,7 @@ import TagsTable from './TagsTable';
 import NoteInput from './NoteInput';
 import { Button } from '@/components/ui/button';
 import './style.scss';
+import DayView, { getDayViewItemStyle } from './DayView';
 
 dayjs.extend(duration);
 
@@ -56,15 +57,40 @@ const TimelineTodo = () => {
               sessionEntries={sessionEntries}
             />
           )}
-          {sessionEntries.map((entry, index) => (
-            <Entry
-              key={entry.id}
-              entry={entry}
-              isLast={index === sessionEntries.length - 1}
-              onEntryCreate={() => createEntry(session!.id)}
-              now={startOfDayDiff}
-            />
-          ))}
+          {session?.view === 'day-view' && (
+            <DayView
+              startTime={sessionEntries[0].time}
+              endTime={sessionEntries[sessionEntries.length - 1].time}
+            >
+              {sessionEntries.map((entry, index) => (
+                <div
+                  key={entry.id}
+                  style={getDayViewItemStyle({
+                    startTime: entry.time,
+                    endTime: entry.time + entry.durationDeprecated(),
+                  })}
+                  className="border p-4 rounded-md"
+                >
+                  <Entry
+                    entry={entry}
+                    isLast={index === sessionEntries.length - 1}
+                    onEntryCreate={() => createEntry(session!.id)}
+                    now={startOfDayDiff}
+                  />
+                </div>
+              ))}
+            </DayView>
+          )}
+          {(!session?.view || session.view === 'note') &&
+            sessionEntries.map((entry, index) => (
+              <Entry
+                key={entry.id}
+                entry={entry}
+                isLast={index === sessionEntries.length - 1}
+                onEntryCreate={() => createEntry(session!.id)}
+                now={startOfDayDiff}
+              />
+            ))}
           {session && sessionEntries.length === 0 && (
             <Button
               onClick={() => createEntry(session.id)}

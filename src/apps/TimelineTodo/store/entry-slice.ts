@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { compute } from 'zustand-computed-state';
-import { TodoStoreCreator } from '.';
+import { EntryType, TodoStoreCreator } from '.';
 import { uid } from '@/utils/uid';
 import { tagsChildGroupMap, tagsGroup } from '../utils/tags';
 import { cloneEntry } from './utils';
@@ -10,6 +10,7 @@ export type EntrySliceType = {
     id: string;
     sessionId: string;
     time: number;
+    duration: number;
     tags: string[];
     note?: string;
   }>;
@@ -17,6 +18,7 @@ export type EntrySliceType = {
 
   openedEntryNoteId?: string;
 
+  updateEntry: (id: string, value: Partial<Omit<EntryType, 'id'>>) => void;
   updateEntryNote: (id: string, value: string) => void;
   openEntryNote: (id: string) => void;
   closeEntryNote: () => void;
@@ -45,6 +47,15 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
       }
     }),
 
+  updateEntry: (id, newValues) =>
+    set((prev) => {
+      const entry = prev.entries.find((e) => e.id === id);
+
+      if (entry) {
+        Object.assign(entry, newValues);
+      }
+    }),
+
   createEntry: (sessionId, time) =>
     set((prev) => {
       const sessionEntries = prev.entries.filter(
@@ -53,17 +64,13 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
 
       const lastEntry = _.last(_.orderBy(sessionEntries, 'time'));
 
-      return {
-        entries: [
-          ...prev.entries,
-          {
-            id: uid(),
-            sessionId,
-            time: time || (lastEntry?.time || 0) + 1000 * 60 * 5,
-            tags: [],
-          },
-        ],
-      };
+      prev.entries.push({
+        id: uid(),
+        sessionId,
+        time: time || (lastEntry?.time || 0) + 1000 * 60 * 5,
+        tags: [],
+        duration: 0,
+      });
     }),
   updateEntryTime: (id, time, batchUpdating) =>
     set((prev) => {

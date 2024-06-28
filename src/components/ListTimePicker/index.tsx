@@ -55,8 +55,8 @@ const ListTimePicker = ({ time, setTime }: ListTimePickerProps) => {
     const activeHourElement = document.getElementById(`hours_${hour}`)!;
     const activeMinuteElement = document.getElementById(`minutes_${minute}`)!;
 
-    activeHourElement.scrollIntoView();
-    activeMinuteElement.scrollIntoView();
+    activeHourElement?.scrollIntoView();
+    activeMinuteElement?.scrollIntoView();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

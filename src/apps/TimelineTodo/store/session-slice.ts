@@ -1,11 +1,14 @@
 import type { EntryType, TodoStoreCreator, TodoType } from '.';
 import { uid } from '@/utils/uid';
 
+type ViewType = 'note' | 'day-view';
+
 export type SessionType = {
   id: string;
   name: string;
   archived?: boolean;
   parentId?: string;
+  view?: ViewType;
 };
 
 export type SessionSliceType = {
@@ -15,6 +18,7 @@ export type SessionSliceType = {
   changeParent: (name: string, parentId?: string) => void;
   renameSession: (id: string, name: string) => void;
   duplicateSession: (id: string, name: string) => void;
+  updateSession: (id: string, values: Partial<Omit<SessionType, 'id'>>) => void;
   archiveSession: (id: string, archived: boolean) => void;
   deleteSession: (id: string) => void;
   reorderSessions: (sessionIds: string[]) => void;
@@ -43,6 +47,13 @@ export const createSessionSlice: TodoStoreCreator<SessionSliceType> = (
       const session = prev.sessions.find((i) => i.id === id);
       if (session) {
         session.name = name;
+      }
+    }),
+  updateSession: (id, values) =>
+    set((prev) => {
+      const session = prev.sessions.find((i) => i.id === id);
+      if (session) {
+        Object.assign(session, values);
       }
     }),
   changeParent: (id, parentId) =>

@@ -5,11 +5,13 @@ import {
   AreaChartIcon,
   ArrowUpNarrowWideIcon,
   BoxesIcon,
+  CalendarIcon,
   Columns3Icon,
   CopyIcon,
   EllipsisIcon,
   FilePenLineIcon,
   FolderKanbanIcon,
+  NotebookIcon,
   ReplaceIcon,
   SendToBackIcon,
   TrashIcon,
@@ -47,6 +49,7 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
     archiveSession,
     changeParent,
     renameSession,
+    updateSession,
   } = useStore();
 
   const handleCreateSession = (parentId?: string) => {
@@ -132,6 +135,24 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
               }
             />
           </SubMenu>
+          {activeSession && (
+            <SubMenu title="View">
+              <DropdownItem
+                title="Note View"
+                icon={NotebookIcon}
+                onClick={() =>
+                  updateSession(activeSession.id, { view: 'note' })
+                }
+              />
+              <DropdownItem
+                title="Day View"
+                icon={CalendarIcon}
+                onClick={() =>
+                  updateSession(activeSession.id, { view: 'day-view' })
+                }
+              />
+            </SubMenu>
+          )}
           <SubMenu title="Move">
             <DropdownItem
               title="Move to base"
