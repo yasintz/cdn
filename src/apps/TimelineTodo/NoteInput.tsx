@@ -7,16 +7,27 @@ import { useRef } from 'react';
 type NoteInputProps = {
   entryId: string;
   className?: string;
+  simple?: boolean;
 };
 
-const NoteInput = ({ entryId, className }: NoteInputProps) => {
+const NoteInput = ({ entryId, className, simple }: NoteInputProps) => {
   const { entries, closeEntryNote, updateEntryNote } = useStore();
 
-  const openedEntry = entries.find((i) => i.id === entryId);
-  const entryNote = useRef(openedEntry?.note).current;
+  const entry = entries.find((i) => i.id === entryId);
+  const entryNote = useRef(entry?.note).current;
 
-  if (!openedEntry) {
+  if (!entry) {
     return null;
+  }
+
+  if (simple) {
+    return (
+      <NoteBook
+        id={entry.id}
+        initialDoc={entryNote}
+        onChange={(doc) => updateEntryNote(entry.id, doc)}
+      />
+    );
   }
 
   return (
@@ -38,9 +49,9 @@ const NoteInput = ({ entryId, className }: NoteInputProps) => {
       </div>
       <div className="flex flex-col flex-1 max-h-96">
         <NoteBook
-          id={openedEntry.id}
+          id={entry.id}
           initialDoc={entryNote}
-          onChange={(doc) => updateEntryNote(openedEntry.id, doc)}
+          onChange={(doc) => updateEntryNote(entry.id, doc)}
         />
       </div>
     </div>

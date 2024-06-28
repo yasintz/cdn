@@ -20,6 +20,7 @@ export function getDayViewItemStyle({
     top: startTime * msSize,
     left: 75,
     height: (endTime - startTime) * msSize,
+    width: 'calc(100% - 54px)'
   };
 }
 
