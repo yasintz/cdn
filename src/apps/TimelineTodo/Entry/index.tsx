@@ -42,11 +42,16 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
   };
   const entryTodos = entry.todos();
   const isDayView = entrySession?.view === 'day-view';
+  const entryEndTime = entry.time + entry.duration;
 
   return (
     <>
       <div className="my-2 relative min-h-20">
-        <EntryDuration entry={entry} editable />
+        <EntryDuration
+          duration={entry.duration}
+          onChange={(duration) => updateEntry(entry.id, { duration })}
+          editable
+        />
         <div className="flex gap-2 items-center">
           {entry.active(now) && (
             <div className="h-2 w-2 rounded-full bg-red-700 absolute -translate-x-3" />
@@ -110,15 +115,20 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           )}
         </div>
       </div>
-      {(!nextEntry || nextEntry.time !== entry.time + entry.duration) && (
-        <div className="flex">
-          <EntryTime
-            time={entry.time + entry.duration}
-            editable
-            onChange={(time) =>
-              updateEntry(entry.id, { duration: time - entry.time })
-            }
-          />
+      {(!nextEntry || nextEntry.time !== entryEndTime) && (
+        <div className="my-2 relative min-h-20">
+          {nextEntry && (
+            <EntryDuration duration={nextEntry.time - entryEndTime} />
+          )}
+          <div className="flex">
+            <EntryTime
+              time={entryEndTime}
+              editable
+              onChange={(time) =>
+                updateEntry(entry.id, { duration: time - entry.time })
+              }
+            />
+          </div>
         </div>
       )}
     </>

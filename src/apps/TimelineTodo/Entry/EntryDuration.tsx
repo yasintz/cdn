@@ -1,24 +1,26 @@
 import React from 'react';
 import { showDiff } from './utils';
-import { EntryWithRelation } from '../store/relations';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
 import ListTimePicker from '@/components/ListTimePicker';
-import { useStore } from '../store';
 
 type EntryDurationProps = {
-  entry: EntryWithRelation;
+  duration: number;
+  onChange?: (duration: number) => void;
   editable?: boolean;
 };
 
-const EntryDuration = ({ entry, editable }: EntryDurationProps) => {
-  const { updateEntry } = useStore();
+const EntryDuration = ({
+  duration,
+  onChange,
+  editable,
+}: EntryDurationProps) => {
   const component = (
     <div className="px-0.5 bg-white rounded-lg border border-slate-300 text-xs text-gray-300 text-center min-w-8 cursor-pointer">
-      {showDiff(entry.duration)}
+      {showDiff(duration)}
     </div>
   );
 
@@ -37,8 +39,8 @@ const EntryDuration = ({ entry, editable }: EntryDurationProps) => {
           </PopoverTrigger>
           <PopoverContent className="ml-4 h-64 p-0 w-auto">
             <ListTimePicker
-              time={entry.duration}
-              setTime={(result) => updateEntry(entry.id, { duration: result })}
+              time={duration}
+              setTime={(result) => onChange?.(result)}
             />
           </PopoverContent>
         </Popover>
