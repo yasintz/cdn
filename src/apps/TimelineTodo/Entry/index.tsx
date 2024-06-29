@@ -124,13 +124,14 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           onChange={(time) =>
             updateEntry(entry.id, { duration: time - entry.time })
           }
-          onFill={() =>
+          onFill={
             nextEntry &&
-            createEntry(
-              entry.sessionId,
-              entryEndTime,
-              nextEntry.time - entryEndTime
-            )
+            (() =>
+              createEntry(
+                entry.sessionId,
+                entryEndTime,
+                nextEntry.time - entryEndTime
+              ))
           }
         />
       )}
