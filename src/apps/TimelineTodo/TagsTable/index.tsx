@@ -29,10 +29,16 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
     [allTags, sessionEntries]
   );
 
-  const totalSpentTime = groupedTags.reduce(
-    (acc, cur) => acc + cur.spentTime,
+  const entryDurationTotal = sessionEntries.reduce(
+    (acc, cur) => acc + cur.duration,
     0
   );
+
+  const lastEntry = sessionEntries[sessionEntries.length - 1];
+  const totalSpentTime =
+    lastEntry.time + lastEntry.duration - sessionEntries[0].time;
+
+  const totalDiff = totalSpentTime - entryDurationTotal;
 
   return (
     <div className={cn('flex-1 px-4', className)}>
@@ -103,15 +109,24 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
                 );
               }
             )}
+            {totalDiff > 0 && (
+              <tr>
+                <td>
+                  <div className="flex gap-2 cursor-pointer">
+                    <Tag tag={'empty slots'} />
+                  </div>
+                </td>
+                <td>{formatDuration(totalDiff)}</td>
+                <td>{((100 * totalDiff) / ms('24 h')).toFixed(1)}%</td>
+                <td>{((100 * totalDiff) / totalSpentTime).toFixed(1)}%</td>
+              </tr>
+            )}
 
             <tr>
               <th>Total</th>
 
-              <th>
-                {formatDuration(
-                  groupedTags.reduce((acc, cur) => acc + cur.spentTime, 0)
-                )}
-              </th>
+              <th>{formatDuration(totalSpentTime)}</th>
+
               <th></th>
               <th></th>
             </tr>

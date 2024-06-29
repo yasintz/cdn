@@ -8,14 +8,7 @@ export function getTagSpentTime(tag: string, entries: EntryType[]) {
   let total = 0;
 
   tagEntries.forEach((entry) => {
-    const entryBaseIndex = entries.indexOf(entry);
-    const nextEntry = entries[entryBaseIndex + 1];
-
-    if (nextEntry) {
-      const diff = nextEntry.time - entry.time;
-
-      total += diff;
-    }
+    total += entry.duration;
   });
 
   return total;
@@ -106,8 +99,6 @@ export function getTagsData(sessionEntries: EntryType[], allTags: string[]) {
         ...entry,
         tags: ['un-categorized'],
       }));
-
-    unTagged.pop();
 
     if (unTagged.length > 0) {
       const unCategorized = {

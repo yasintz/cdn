@@ -9,6 +9,7 @@ import Options from './Options';
 import EntryTime from './EntryTime';
 import EntryDuration from './EntryDuration';
 import NoteInput from '../NoteInput';
+import EmptySlot from './EmptySlot';
 
 type EntryProps = {
   isLast: boolean;
@@ -26,6 +27,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
     getRelations,
     openedEntryNoteId,
     updateEntry,
+    createEntry,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
@@ -116,20 +118,21 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
         </div>
       </div>
       {(!nextEntry || nextEntry.time !== entryEndTime) && (
-        <div className="my-2 relative min-h-20">
-          {nextEntry && (
-            <EntryDuration duration={nextEntry.time - entryEndTime} />
-          )}
-          <div className="flex">
-            <EntryTime
-              time={entryEndTime}
-              editable
-              onChange={(time) =>
-                updateEntry(entry.id, { duration: time - entry.time })
-              }
-            />
-          </div>
-        </div>
+        <EmptySlot
+          duration={nextEntry ? nextEntry.time - entryEndTime : undefined}
+          time={entryEndTime}
+          onChange={(time) =>
+            updateEntry(entry.id, { duration: time - entry.time })
+          }
+          onFill={() =>
+            nextEntry &&
+            createEntry(
+              entry.sessionId,
+              entryEndTime,
+              nextEntry.time - entryEndTime
+            )
+          }
+        />
       )}
     </>
   );
