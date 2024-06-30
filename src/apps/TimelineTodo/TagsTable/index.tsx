@@ -35,8 +35,10 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
   );
 
   const lastEntry = sessionEntries[sessionEntries.length - 1];
-  const totalSpentTime =
-    lastEntry.time + lastEntry.duration - sessionEntries[0].time;
+
+  const totalSpentTime = lastEntry
+    ? lastEntry.time + lastEntry.duration - sessionEntries[0].time
+    : 0;
 
   const totalDiff = totalSpentTime - entryDurationTotal;
 

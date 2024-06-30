@@ -4,7 +4,8 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import { uid } from '@/utils/uid';
-import { parseTagsFromTitle } from './helpers';
+import { parseTagsFromTitle } from '../helpers';
+import { getTaskTags } from './computed/task';
 
 export type TaskType = {
   id: string;
@@ -12,7 +13,6 @@ export type TaskType = {
   titleRaw: string;
   startTime: number;
   endTime?: number;
-  tags: string[];
 };
 
 type StoreType = {
@@ -79,7 +79,7 @@ export const useStore = create<StoreType>()(
 
             ...compute(get, (state) => ({
               taskTags: Object.fromEntries(
-                state.tasks.map((task) => [task.id, task.tags])
+                state.tasks.map((task) => [task.id, getTaskTags(task)])
               ),
             })),
           } as StoreType),
