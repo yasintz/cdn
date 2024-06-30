@@ -141,7 +141,7 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
       if (entry.tags.includes(tag)) {
         entry.tags = entry.tags.filter((t) => t !== tag);
 
-        const isThereAnotherChild = tagsGroup[tagParent].some((t) =>
+        const isThereAnotherChild = tagsGroup[tagParent]?.some((t) =>
           entry.tags.includes(t)
         );
 
