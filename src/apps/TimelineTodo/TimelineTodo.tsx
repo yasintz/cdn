@@ -1,4 +1,10 @@
 import { useParams } from 'react-router-dom';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useStore } from './store';
 import ms from 'ms';
 import dayjs from 'dayjs';
@@ -20,7 +26,8 @@ const TimelineTodo = () => {
 
   const startOfDayDiff = useMemo(() => now.diff(now.startOf('day')), [now]);
 
-  const { createEntry, openedEntryNoteId, getRelations } = useStore();
+  const { createEntry, openedEntryNoteId, getRelations, closeEntryNote } =
+    useStore();
   const { sessions } = getRelations();
 
   const session = sessions.find((session) => session.id === sessionId);
@@ -45,14 +52,7 @@ const TimelineTodo = () => {
 
       <div className="flex gap-2 justify-between flex-1 min-h-0">
         <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
-          {openedEntryNoteId && (
-            <NoteInput
-              key={openedEntryNoteId}
-              entryId={openedEntryNoteId}
-              className="md:hidden min-h-96"
-            />
-          )}
-          {session && !openedEntryNoteId && (
+          {session && (
             <TagsTable
               className="md:hidden flex"
               sessionEntries={sessionEntries}
@@ -103,19 +103,25 @@ const TimelineTodo = () => {
           )}
         </div>
 
-        {session && !openedEntryNoteId && (
+        {session && (
           <TagsTable
             className="hidden md:flex"
             sessionEntries={sessionEntries}
           />
         )}
-
-        {openedEntryNoteId && (
-          <NoteInput
-            entryId={openedEntryNoteId}
-            className="hidden md:flex p-4"
-          />
-        )}
+        <Dialog
+          open={!!openedEntryNoteId}
+          onOpenChange={() => closeEntryNote()}
+        >
+          <DialogContent className="h-full max-w-[500px] md:h-[400px] md:max-w-[800px]">
+            <div>
+              <DialogHeader>
+                <DialogTitle>Edit Note</DialogTitle>
+              </DialogHeader>
+              <NoteInput entryId={openedEntryNoteId} simple />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

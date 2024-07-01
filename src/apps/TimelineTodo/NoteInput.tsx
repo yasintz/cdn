@@ -5,7 +5,7 @@ import NoteBook from '@/components/NoteBook';
 import { useRef } from 'react';
 
 type NoteInputProps = {
-  entryId: string;
+  entryId?: string;
   className?: string;
   simple?: boolean;
 };
@@ -37,7 +37,7 @@ const NoteInput = ({ entryId, className, simple }: NoteInputProps) => {
         <div className="flex gap-2">
           <Trash2Icon
             className="text-red-500 cursor-pointer"
-            onClick={() => updateEntryNote(entryId, '')}
+            onClick={() => updateEntryNote(entry.id, '')}
             size={14}
           />
           <XCircleIcon
