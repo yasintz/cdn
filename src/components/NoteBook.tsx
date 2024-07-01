@@ -16,6 +16,7 @@ const NoteBook = ({ id, initialDoc, onChange }: NoteBookProps) => {
     const docHas = `#doc=${initialDoc}`;
 
     uri.searchParams.set(noteIdKey, id);
+    uri.searchParams.set('autoSave', 'true');
     if (initialDoc) {
       uri.hash = docHas;
     }
