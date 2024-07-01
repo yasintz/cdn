@@ -7,9 +7,18 @@ type SessionButtonProps = {
   session: SessionType;
   isActive: boolean;
   variant?: ButtonProps['variant'];
+  size?: ButtonProps['size'];
+  children?: React.ReactNode;
+  className?: string;
 };
 
-const SessionButton = ({ session, isActive, variant }: SessionButtonProps) => {
+const SessionButton = ({
+  session,
+  isActive,
+  variant,
+  children,
+  size = 'sm',
+}: SessionButtonProps) => {
   const [searchParams] = useSearchParams();
   return (
     <NavLink
@@ -18,11 +27,12 @@ const SessionButton = ({ session, isActive, variant }: SessionButtonProps) => {
       className="rounded-md"
     >
       <Button
-        size="sm"
+        size={size}
         variant={variant || (isActive ? 'default' : 'outline')}
         className={cn(session.archived && 'opacity-50')}
       >
         {session.name}
+        {children}
       </Button>
     </NavLink>
   );

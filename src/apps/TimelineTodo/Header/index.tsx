@@ -18,10 +18,6 @@ const Header = ({ activeSession }: HeaderProps) => {
   const archivedSessions = parentSessions.filter((i) => i.archived);
   const unarchivedSessions = parentSessions.filter((i) => !i.archived);
 
-  const sessionChilds = sessions.filter(
-    (i) => i.parentId === (activeSession?.parentId || activeSession?.id)
-  );
-
   useEffect(() => {
     if (scrollDivRef.current) {
       scrollDivRef.current.scrollTo({
@@ -40,7 +36,7 @@ const Header = ({ activeSession }: HeaderProps) => {
           <SessionList
             sessions={unarchivedSessions}
             reorderSessions={reorderSessions}
-            activeSessionId={activeSession?.parentId || activeSession?.id}
+            activeSession={activeSession}
             sortEnabled={sessionSortingEnabled}
           />
           {archivedSessionsShown &&
@@ -52,16 +48,8 @@ const Header = ({ activeSession }: HeaderProps) => {
               />
             ))}
         </div>
-        {activeSession && sessionChilds.length > 0 && (
-          <SessionList
-            sessions={sessionChilds}
-            reorderSessions={reorderSessions}
-            activeSessionId={activeSession?.id}
-            sortEnabled={sessionSortingEnabled}
-          />
-        )}
       </div>
-      <div className='pt-3 px-2'>
+      <div className="pt-3 px-2">
         <TimelineOptions activeSession={activeSession} />
       </div>
     </div>

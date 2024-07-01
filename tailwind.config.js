@@ -74,6 +74,12 @@ module.exports = {
       maxWidth: {
         84: '21rem',
       },
+      boxShadow: {
+        border: '0 0 0 1px rgb(0 0 0 / 0.05)',
+        'border-2': '0 0 0 2px rgb(0 0 0 / 0.05)',
+        'border-4': '0 0 0 4px rgb(0 0 0 / 0.05)',
+        'border-8': '0 0 0 8px rgb(0 0 0 / 0.05)',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
