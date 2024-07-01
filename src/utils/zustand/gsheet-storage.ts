@@ -2,6 +2,7 @@ import _debounce from 'lodash/debounce';
 import { create } from 'zustand';
 import { StateStorage } from 'zustand/middleware';
 import { googleSheetDB, googleSheetDbDeprecated } from '../googleSheetDb';
+import ms from 'ms';
 
 export function gSheetStorageDeprecated(sheetTabId: string): StateStorage {
   const db = googleSheetDbDeprecated(sheetTabId);
@@ -37,10 +38,14 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
     store: S,
     keepState?: boolean
   ) {
-    try {
-      await db.get().then((response) => {
+    const sync = () => {
+      return db.get().then((response) => {
         store.setState(response.state ? response.state : response);
       });
+    };
+    try {
+      await sync();
+      setInterval(sync, ms('1 minute'));
 
       store.subscribe((state) => {
         debouncedSync(JSON.stringify(keepState ? { state } : state));
