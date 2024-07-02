@@ -28,6 +28,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
     openedEntryNoteId,
     updateEntry,
     createEntry,
+    updateEntryTimeWithPrev,
   } = useStore();
   const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
@@ -62,7 +63,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           <EntryTime
             time={entry.time}
             editable
-            onChange={(time) => updateEntry(entry.id, { time })}
+            onChange={(time) => updateEntryTimeWithPrev(entry.id, time)}
           />
           {entry.note && (
             <NotebookTextIcon

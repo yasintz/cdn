@@ -113,7 +113,7 @@ const TimelineTodo = () => {
           open={!!openedEntryNoteId}
           onOpenChange={() => closeEntryNote()}
         >
-          <DialogContent className="h-full max-w-[500px] md:h-[400px] md:max-w-[800px] px-0">
+          <DialogContent className="h-full max-w-full md:h-[400px] md:max-w-[800px] px-0">
             <div>
               <DialogHeader className='px-4 mb-2'>
                 <DialogTitle>Edit Note</DialogTitle>

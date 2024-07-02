@@ -11,6 +11,7 @@ import {
   RadioIcon,
   NotebookTextIcon,
   CopyIcon,
+  ArrowUpIcon,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -31,12 +32,13 @@ type OptionsProps = {
 
 const Options = ({ entry, onShowTags }: OptionsProps) => {
   const {
-    updateEntryTime,
     deleteEntry,
     createEntry,
     openEntryNote,
     duplicateEntry,
     sessions,
+    updateEntry,
+    stickEntryToPrev,
   } = useStore();
 
   const [showCopyToSectionList, setShowCopyToSectionList] = useState(false);
@@ -70,7 +72,7 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
                 hidden={entry.time > ms('24 hours')}
                 icon={CalendarPlus2Icon}
                 onClick={() =>
-                  updateEntryTime(entry.id, entry.time + ms('24 hours'), false)
+                  updateEntry(entry.id, { time: entry.time + ms('24 hours') })
                 }
               />
 
@@ -79,7 +81,7 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
                 hidden={entry.time < ms('24 hours')}
                 icon={CalendarMinus2Icon}
                 onClick={() =>
-                  updateEntryTime(entry.id, entry.time - ms('24 hours'), false)
+                  updateEntry(entry.id, { time: entry.time - ms('24 hours') })
                 }
               />
 
@@ -88,13 +90,16 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
                 icon={RadioIcon}
                 onClick={() => {
                   const now = dayjs().diff(dayjs().startOf('day'));
-
-                  updateEntryTime(
-                    entry.id,
-                    entry.time > ms('24 hours') ? now + ms('24 hours') : now,
-                    false
-                  );
+                  updateEntry(entry.id, {
+                    time:
+                      entry.time > ms('24 hours') ? now + ms('24 hours') : now,
+                  });
                 }}
+              />
+              <DropdownItem
+                title="Stick to the prev"
+                icon={ArrowUpIcon}
+                onClick={() => stickEntryToPrev(entry.id)}
               />
             </SubMenu>
             <DropdownItem
@@ -112,7 +117,11 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
               title="Add entry below"
               icon={AlarmClockPlusIcon}
               onClick={() =>
-                createEntry(entry.sessionId, entry.time + ms('10 minutes'))
+                createEntry(
+                  entry.sessionId,
+                  entry.time + entry.duration,
+                  ms('10 minutes')
+                )
               }
             />
 

@@ -2,6 +2,12 @@ import { NavLink, useSearchParams } from 'react-router-dom';
 import { SessionType } from './store';
 import { Button, ButtonProps } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type SessionButtonProps = {
   session: SessionType;
@@ -20,7 +26,8 @@ const SessionButton = ({
   size = 'sm',
 }: SessionButtonProps) => {
   const [searchParams] = useSearchParams();
-  return (
+
+  const link = (
     <NavLink
       to={`/cdn/timeline-todo/${session.id}?${searchParams.toString()}`}
       key={session.id}
@@ -36,6 +43,21 @@ const SessionButton = ({
       </Button>
     </NavLink>
   );
+
+  if (session.tooltipText) {
+    return (
+      <TooltipProvider>
+        <Tooltip delayDuration={0} open={isActive ? true : undefined}>
+          <TooltipTrigger asChild>{link}</TooltipTrigger>
+          <TooltipContent className="mb-2">
+            <p>{session.tooltipText}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return link;
 };
 
 export default SessionButton;

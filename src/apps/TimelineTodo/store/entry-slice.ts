@@ -21,10 +21,11 @@ export type EntrySliceType = {
   updateEntry: (id: string, value: Partial<Omit<EntryType, 'id'>>) => void;
   updateEntryNote: (id: string, value: string) => void;
   openEntryNote: (id: string) => void;
+  stickEntryToPrev: (id: string) => void;
   closeEntryNote: () => void;
 
   createEntry: (sessionId: string, time?: number, duration?: number) => void;
-  updateEntryTime: (id: string, time: number, batchUpdating: boolean) => void;
+  updateEntryTimeWithPrev: (id: string, time: number) => void;
   deleteEntry: (id: string) => void;
   toggleEntryTag: (id: string, tag: string) => void;
   duplicateEntry: (id: string, newSessionId?: string) => void;
@@ -72,30 +73,41 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
         duration: duration || 0,
       });
     }),
-  updateEntryTime: (id, time, batchUpdating) =>
+  updateEntryTimeWithPrev: (id, time) =>
     set((prev) => {
       const entry = prev.entries.find((entry) => entry.id === id);
+      const relations = prev.getRelations();
+      const prevEntryId = relations.entries
+        .find((i) => i.id === id)
+        ?.prev()?.id;
+      const prevEntry = prev.entries.find((e) => e.id === prevEntryId);
 
       if (!entry) {
         return;
       }
 
-      if (batchUpdating) {
-        const diff = time - entry.time;
-        const sessionEntries = _.orderBy(
-          prev.entries.filter((entry) => entry.sessionId === entry.sessionId),
-          'time'
-        );
+      if (prevEntry) {
+        const prevEntryEndTime = prevEntry.time + prevEntry.duration;
+        if (prevEntryEndTime === entry.time) {
+          prevEntry.duration = time - prevEntry.time;
+        }
+      }
+      entry.time = time;
+    }),
 
-        const entryIndex = sessionEntries.findIndex((e) => e.id === entry.id);
-        sessionEntries.forEach((sessionEntry, index) => {
-          if (index > entryIndex) {
-            sessionEntry.time += diff;
-          }
-        });
+  stickEntryToPrev: (id) =>
+    set((prev) => {
+      const entry = prev.entries.find((entry) => entry.id === id);
+      const relations = prev.getRelations();
+      const prevEntry = relations.entries.find((i) => i.id === id)?.prev();
+
+      if (!entry) {
+        return;
       }
 
-      entry.time = time;
+      if (prevEntry) {
+        entry.time = prevEntry.time + prevEntry.duration;
+      }
     }),
 
   deleteEntry: (id) =>

@@ -1,4 +1,4 @@
-import type { EntryType, TodoStoreCreator, TodoType } from '.';
+import type { EntryType, TodoStoreCreator, TodoType } from '..';
 import { uid } from '@/utils/uid';
 
 type ViewType = 'note' | 'day-view';
@@ -9,15 +9,21 @@ export type SessionType = {
   archived?: boolean;
   parentId?: string;
   view?: ViewType;
+  createdAt: number;
+  tooltipText?: string;
 };
 
 export type SessionSliceType = {
   sessions: SessionType[];
 
-  createSession: (name: string, parentId?: string) => void;
+  createSession: (
+    params: Pick<SessionType, 'name' | 'parentId' | 'tooltipText'>
+  ) => void;
   changeParent: (name: string, parentId?: string) => void;
-  renameSession: (id: string, name: string) => void;
-  duplicateSession: (id: string, name: string) => void;
+  duplicateSession: (
+    id: string,
+    params: Pick<SessionType, 'name' | 'parentId' | 'tooltipText'>
+  ) => void;
   updateSession: (id: string, values: Partial<Omit<SessionType, 'id'>>) => void;
   archiveSession: (id: string, archived: boolean) => void;
   deleteSession: (id: string) => void;
@@ -34,20 +40,13 @@ export const createSessionSlice: TodoStoreCreator<SessionSliceType> = (
         (a, b) => sessionIds.indexOf(a.id) - sessionIds.indexOf(b.id)
       );
     }),
-  createSession: (name, parentId) =>
+  createSession: (params) =>
     set((prev) => {
       prev.sessions.push({
         id: uid(),
-        name,
-        parentId,
+        ...params,
+        createdAt: Date.now(),
       });
-    }),
-  renameSession: (id, name) =>
-    set((prev) => {
-      const session = prev.sessions.find((i) => i.id === id);
-      if (session) {
-        session.name = name;
-      }
     }),
   updateSession: (id, values) =>
     set((prev) => {
@@ -63,11 +62,12 @@ export const createSessionSlice: TodoStoreCreator<SessionSliceType> = (
         session.parentId = parentId;
       }
     }),
-  duplicateSession: (sessionId, name) =>
+  duplicateSession: (sessionId, params) =>
     set((prev) => {
-      const newSession = {
+      const newSession: SessionType = {
         id: uid(),
-        name,
+        ...params,
+        createdAt: Date.now(),
       };
 
       prev.sessions.push(newSession);

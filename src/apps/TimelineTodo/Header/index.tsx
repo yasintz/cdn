@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { SessionType, useStore } from '../store';
 import SessionButton from '../SessionButton';
 import { useUrlState } from '../useUrlState';
-import TimelineOptions from './Dropdown';
+import TimelineOptions from './TimelineOptions';
 import SessionList from '../components/SessionList';
 
 type HeaderProps = {

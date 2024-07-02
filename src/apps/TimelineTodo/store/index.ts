@@ -3,11 +3,11 @@ import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import { StateCreator, create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { SessionSliceType, createSessionSlice } from './session-slice';
+import { SessionSliceType, createSessionSlice } from './session/session-slice';
 import { EntrySliceType, createEntrySlice } from './entry-slice';
 import { TodoSliceType, createTodoSlice } from './todo-slice';
 import { StoreRelations, createStoreRelations } from './relations';
-export type { SessionType } from './session-slice';
+export type { SessionType } from './session/session-slice';
 
 export type StoreType = SessionSliceType &
   EntrySliceType &

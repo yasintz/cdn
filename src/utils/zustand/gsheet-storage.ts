@@ -45,7 +45,9 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
     };
     try {
       await sync();
-      setInterval(sync, ms('1 minute'));
+      setTimeout(() => {
+        setInterval(sync, ms('1 minute'));
+      }, ms('10 minutes'));
 
       store.subscribe((state) => {
         debouncedSync(JSON.stringify(keepState ? { state } : state));

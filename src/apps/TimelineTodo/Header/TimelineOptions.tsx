@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import SubMenu from './SubMenu';
 import { useState } from 'react';
 import SessionSelect from '../components/SessionSelect';
+import SessionDialog, { SessionDialogInput } from '../components/SessionDialog';
 
 type DropdownProps = {
   activeSession?: SessionType;
@@ -33,7 +34,20 @@ type DropdownProps = {
 
 const TimelineOptions = ({ activeSession }: DropdownProps) => {
   const navigate = useNavigate();
+  const [showUpdateSessionDialog, setShowUpdateSessionDialog] = useState(false);
   const [showSessionsDropdown, setShowSessionsDropdown] = useState(false);
+  const initialCreateSessionInput: SessionDialogInput & {
+    parentId?: string;
+    duplicateSessionId?: string;
+    open: boolean;
+  } = {
+    open: false,
+    name: '',
+    tooltip: '',
+  };
+  const [createSessionInput, setCreateSessionInput] = useState(
+    initialCreateSessionInput
+  );
   const {
     setSearchParams,
     archivedSessionsShown,
@@ -48,24 +62,30 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
     deleteSession,
     archiveSession,
     changeParent,
-    renameSession,
     updateSession,
   } = useStore();
 
-  const handleCreateSession = (parentId?: string) => {
-    const name = prompt('What is the session name?');
-
-    if (name) {
-      createSession(name, parentId);
+  const handleCreateSession = () => {
+    if (createSessionInput.duplicateSessionId) {
+      duplicateSession(
+        createSessionInput.duplicateSessionId,
+        createSessionInput
+      );
+    } else {
+      createSession(createSessionInput);
     }
+    setCreateSessionInput(initialCreateSessionInput);
   };
-  const handleDuplicateSession = () => {
-    const name = prompt('What is the session name?');
 
-    if (name && activeSession) {
-      duplicateSession(activeSession.id, name);
-    }
+  const handleUpdateSession = (value: SessionDialogInput) => {
+    if (!activeSession) return;
+
+    updateSession(activeSession.id, {
+      name: value.name,
+      tooltipText: value.tooltip || '',
+    });
   };
+
   return (
     <>
       <DropdownMenu>
@@ -84,35 +104,42 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
             <DropdownItem
               title="Add Session"
               icon={FolderKanbanIcon}
-              onClick={() => handleCreateSession()}
+              onClick={() =>
+                setCreateSessionInput({
+                  ...initialCreateSessionInput,
+                  open: true,
+                })
+              }
             />
             <DropdownItem
               title="Add Sub Session"
               icon={ReplaceIcon}
               hidden={!activeSession}
               onClick={() =>
-                handleCreateSession(
-                  activeSession?.parentId || activeSession?.id
-                )
+                setCreateSessionInput({
+                  ...initialCreateSessionInput,
+                  open: true,
+                  parentId: activeSession?.parentId || activeSession?.id,
+                })
               }
             />
             <DropdownItem
               title="Duplicate Session"
               hidden={!activeSession}
               icon={CopyIcon}
-              onClick={handleDuplicateSession}
+              onClick={() =>
+                setCreateSessionInput({
+                  ...initialCreateSessionInput,
+                  open: true,
+                  duplicateSessionId: activeSession?.id,
+                })
+              }
             />
             <DropdownItem
-              title="Rename Session"
+              title="Update Session"
               hidden={!activeSession}
               icon={FilePenLineIcon}
-              onClick={() =>
-                renameSession(
-                  activeSession!.id,
-                  prompt('Session Name?', activeSession?.name) ||
-                    activeSession!.name
-                )
-              }
+              onClick={() => setShowUpdateSessionDialog(true)}
             />
           </SubMenu>
           <SubMenu title="Archive">
@@ -223,6 +250,29 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
             (s) => !s.parentId && activeSession?.id !== s.id
           )}
           onSelect={(s) => changeParent(activeSession!.id, s.id)}
+        />
+      )}
+      <SessionDialog
+        title="Create Session"
+        buttonText="Create"
+        onChange={setCreateSessionInput}
+        value={createSessionInput}
+        onSubmit={handleCreateSession}
+        open={createSessionInput.open}
+        onOpenChange={(open) =>
+          setCreateSessionInput((prev) => ({ ...prev, open }))
+        }
+      />
+      {activeSession && (
+        <SessionDialog
+          title="Update Session"
+          onChange={handleUpdateSession}
+          value={{
+            name: activeSession.name,
+            tooltip: activeSession.tooltipText,
+          }}
+          open={showUpdateSessionDialog}
+          onOpenChange={setShowUpdateSessionDialog}
         />
       )}
     </>
