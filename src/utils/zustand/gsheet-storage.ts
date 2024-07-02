@@ -43,14 +43,21 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
         store.setState(response.state ? response.state : response);
       });
     };
+
+    let interval: NodeJS.Timer;
+
+    function restartInterval() {
+      clearInterval(interval);
+      interval = setInterval(sync, ms('2 minute'));
+    }
+
     try {
       await sync();
-      setTimeout(() => {
-        setInterval(sync, ms('1 minute'));
-      }, ms('10 minutes'));
+      restartInterval();
 
       store.subscribe((state) => {
         debouncedSync(JSON.stringify(keepState ? { state } : state));
+        restartInterval();
       });
     } catch (error) {
       alert('Database is not working');
