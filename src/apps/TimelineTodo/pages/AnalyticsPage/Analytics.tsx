@@ -1,5 +1,5 @@
 import React from 'react';
-import { SessionType } from '../../store/session-slice';
+import { SessionType } from '../../store/session/session-slice';
 import {
   Chart as ChartJS,
   ArcElement,
