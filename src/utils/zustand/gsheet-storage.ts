@@ -44,7 +44,7 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
       });
     };
 
-    let interval: NodeJS.Timer;
+    let interval: any;
 
     function restartInterval() {
       clearInterval(interval);
