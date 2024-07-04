@@ -3,7 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { TaskType, useStore } from './store';
 import dayjs from '@/helpers/dayjs';
 import { Input } from '@/components/ui/input';
-import { PencilIcon, Trash2Icon, XCircleIcon } from 'lucide-react';
+import { PencilIcon, PlayIcon, Trash2Icon, XCircleIcon } from 'lucide-react';
 import Tag from '../TimelineTodo/Tag';
 import {
   Tooltip,
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/tooltip';
 import ms from 'ms';
 import { useTaskComputed } from './store/computed/task';
+import { uid } from '@/utils/uid';
 
 type TaskRowProps = {
   task: TaskType;
@@ -25,7 +26,7 @@ const TaskRow = ({
   editingTaskId,
   setEditingTaskId,
 }: TaskRowProps) => {
-  const { updateTask, deleteTask } = useStore();
+  const { createTask, updateTask, deleteTask } = useStore();
   const task = useTaskComputed(taskData);
   const isBiggerThanOneDay = task.duration > ms('24 hours');
   return (
@@ -93,6 +94,12 @@ const TaskRow = ({
               onClick={() => setEditingTaskId(task.id)}
             />
           )}
+          <PlayIcon
+            className="cursor-pointer size-4"
+            onClick={() =>
+              createTask(uid(), { title: task.title, startTime: Date.now() })
+            }
+          />
         </div>
       </TableCell>
     </TableRow>

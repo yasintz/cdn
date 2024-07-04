@@ -75,6 +75,10 @@ export const useStore = create<StoreType>()(
                   ...task,
                   ...parseTagsFromTitle(task.title),
                 });
+
+                if (!prev.inputs.includes(inputId)) {
+                  prev.inputs.push(inputId);
+                }
               }),
 
             ...compute(get, (state) => ({
