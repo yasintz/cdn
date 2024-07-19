@@ -60,7 +60,10 @@ const TimelineTodo = () => {
           <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
             {detailPanel('flex md:hidden')}
             {session.view === 'day-view' && (
-              <SessionDayView sessionEntries={sessionEntries} />
+              <SessionDayView
+                sessionEntries={sessionEntries}
+                startOfDayDiff={startOfDayDiff}
+              />
             )}
 
             {(!session.view || session.view === 'note') && (

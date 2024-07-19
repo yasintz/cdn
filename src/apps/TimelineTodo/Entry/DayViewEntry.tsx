@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { getDayViewItemStyle } from '../DayView/utils';
 import { getTagColor } from '../utils/tags';
 import { useUrlQ } from '../useUrlState';
+import { showDiff } from './utils';
 
 type DayViewEntryProps = {
   entry: EntryType;
@@ -50,7 +51,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
       <div className="text-xs">
         {dayjs.duration(startTime).format('HH:mm')}
         {' - '}
-        {dayjs.duration(endTime).format('HH:mm')}
+        {dayjs.duration(endTime).format('HH:mm')} ({showDiff(entry.duration)})
       </div>
     </div>
   );

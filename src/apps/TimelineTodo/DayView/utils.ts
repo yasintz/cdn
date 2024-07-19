@@ -35,8 +35,9 @@ export function getDayViewItemStyle({
   return {
     position: 'absolute',
     top: startTime * msSize,
-    left: 75,
+    left: 54,
     height: (endTime - startTime) * msSize - 2,
     width: 'calc(100% - 54px)',
+    zIndex: 1,
   };
 }
