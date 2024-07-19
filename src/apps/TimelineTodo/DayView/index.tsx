@@ -3,6 +3,8 @@ import { getHours, hourSize, msSize } from './utils';
 import HourItem from './HourItem';
 import dayjs from '@/helpers/dayjs';
 import { DayViewContext } from './context';
+import { positiveNumber } from '@/utils';
+import ms from 'ms';
 
 type DayViewProps = {
   startTime: number;
@@ -36,6 +38,10 @@ const DayView = ({ startTime, endTime, now, children }: DayViewProps) => {
             hourMs={hourMs}
             hourSize={hourSize}
             printNext={index === hours.length - 1}
+            hidden={
+              typeof now === 'number' &&
+              positiveNumber(hourMs - now) < ms('15 minutes')
+            }
           />
         ))}
         {children}
