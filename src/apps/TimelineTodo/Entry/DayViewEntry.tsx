@@ -2,7 +2,7 @@ import { EntryType, useStore } from '../store';
 import dayjs from '@/helpers/dayjs';
 import ms from 'ms';
 import { cn } from '@/lib/utils';
-import { getDayViewItemStyle } from '../DayView/utils';
+import { useDayViewItemStyle } from '../DayView/utils';
 import { getTagColor } from '../utils/tags';
 import { useUrlQ } from '../useUrlState';
 import { showDiff } from './utils';
@@ -22,7 +22,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
   const endTime = entry.time + entry.duration;
   const isSmall = entry.duration < ms('40 minutes');
 
-  const dayViewPositionStyle = getDayViewItemStyle({
+  const dayViewPositionStyle = useDayViewItemStyle({
     startTime,
     endTime,
   });
@@ -47,7 +47,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
       }}
       onClick={() => setParams({ dayViewSelectedEntryId: entry.id })}
     >
-      <div className="text-sm">{entryTodos.map((i) => i.text).join(' ~ ')}</div>
+      <div className="text-sm font-medium">{entryTodos.map((i) => i.text).join(' ~ ')}</div>
       <div className="text-xs">
         {dayjs.duration(startTime).format('HH:mm')}
         {' - '}

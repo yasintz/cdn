@@ -218,7 +218,7 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
           open
           onOpenChange={() => setShowSessionsDropdown(false)}
           sessions={sessions.filter(
-            (s) => !s.parentId && activeSession?.id !== s.id
+            (s) => !s.parentId && activeSession?.id !== s.id && !s.archived
           )}
           onSelect={(s) => changeParent(activeSession!.id, s.id)}
         />

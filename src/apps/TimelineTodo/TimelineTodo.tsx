@@ -12,6 +12,7 @@ import './style.scss';
 import EditNoteDialog from './EditNoteDialog';
 import { cn } from '@/lib/utils';
 import Entry from './Entry';
+import { Button } from '@/components/ui/button';
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
@@ -19,7 +20,7 @@ const TimelineTodo = () => {
 
   const startOfDayDiff = useMemo(() => now.diff(now.startOf('day')), [now]);
 
-  const { getRelations } = useStore();
+  const { getRelations, createEntry } = useStore();
   const { sessions } = getRelations();
   const { dayViewSelectedEntryId } = useUrlQ();
 
@@ -42,8 +43,13 @@ const TimelineTodo = () => {
   const detailPanel = (className: string) => (
     <div className={cn('flex-1 flex-col px-4', className)}>
       <TagsTable sessionEntries={sessionEntries} />
-      {dayViewSelectedEntry && session?.view === 'day-view' && (
+      {dayViewSelectedEntry && session?.view !== 'note' && (
         <Entry entry={dayViewSelectedEntry} now={0} />
+      )}
+      {sessionEntries.length === 0 && session && (
+        <Button onClick={() => createEntry(session.id, 0, 10)}>
+          Create Entry
+        </Button>
       )}
     </div>
   );
@@ -59,14 +65,14 @@ const TimelineTodo = () => {
         <div className="flex gap-2 justify-between flex-1 min-h-0">
           <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
             {detailPanel('flex md:hidden')}
-            {session.view === 'day-view' && (
+            {(!session.view || session.view === 'day-view') && (
               <SessionDayView
                 sessionEntries={sessionEntries}
                 startOfDayDiff={startOfDayDiff}
               />
             )}
 
-            {(!session.view || session.view === 'note') && (
+            {session.view === 'note' && (
               <SessionNoteView
                 session={session}
                 sessionEntries={sessionEntries}

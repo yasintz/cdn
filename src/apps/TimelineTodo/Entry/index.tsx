@@ -17,14 +17,8 @@ type EntryProps = {
 };
 
 const Entry = ({ entry: entryProp, now }: EntryProps) => {
-  const {
-    toggleEntryTag,
-    allTags,
-    getRelations,
-    updateEntry,
-    createEntry,
-    updateEntryTimeWithPrev,
-  } = useStore();
+  const { toggleEntryTag, allTags, getRelations, updateEntry, createEntry } =
+    useStore();
   const { editNoteEntryId, setParams } = useUrlQ();
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
   const { entries } = getRelations();
@@ -49,7 +43,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           <EntryTime
             time={entry.time}
             editable
-            onChange={(time) => updateEntryTimeWithPrev(entry.id, time)}
+            onChange={(time) => updateEntry(entry.id, { time })}
           />
           {entry.note && (
             <NotebookTextIcon

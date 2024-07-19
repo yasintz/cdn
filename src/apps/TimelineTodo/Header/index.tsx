@@ -18,6 +18,11 @@ const Header = ({ activeSession }: HeaderProps) => {
   const archivedSessions = parentSessions.filter((i) => i.archived);
   const unarchivedSessions = parentSessions.filter((i) => !i.archived);
 
+  const isChildSession = !!activeSession?.parentId;
+
+  const childSessionSiblings = sessions.filter(
+    (s) => s.parentId === activeSession?.parentId
+  );
   useEffect(() => {
     if (scrollDivRef.current) {
       scrollDivRef.current.scrollTo({
@@ -34,7 +39,11 @@ const Header = ({ activeSession }: HeaderProps) => {
       >
         <div className="flex gap-2 w-full">
           <SessionList
-            sessions={unarchivedSessions}
+            sessions={
+              isChildSession && sessionSortingEnabled
+                ? childSessionSiblings
+                : unarchivedSessions
+            }
             reorderSessions={reorderSessions}
             activeSession={activeSession}
             sortEnabled={sessionSortingEnabled}

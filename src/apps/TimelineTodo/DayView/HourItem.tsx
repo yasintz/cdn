@@ -16,7 +16,7 @@ const HourItem = ({ hourMs, hourSize, printNext }: HourItemProps) => {
         height: hourSize,
       }}
     >
-      <div className="w-14 h-full -translate-y-4 bg-white text-gray-500">
+      <div className="w-14 h-full -translate-y-4 bg-white text-gray-500 select-none">
         {dayjs.duration(hourMs).format('HH:mm')}
       </div>
       {printNext && (
