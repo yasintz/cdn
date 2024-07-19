@@ -1,55 +1,41 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { EntryType, useStore } from '../store';
-import { PlusIcon, NotebookTextIcon } from 'lucide-react';
-import Todo from '../Todo';
+import { NotebookTextIcon } from 'lucide-react';
 import { TagInput } from '../TagInput';
 import Tag from '../Tag';
 import Options from './Options';
 import EntryTime from './EntryTime';
 import EntryDuration from './EntryDuration';
-import NoteInput from '../NoteInput';
 import EmptySlot from './EmptySlot';
+import EntryTodos from './EntryTodos';
+import { useUrlQ } from '../useUrlState';
 
 type EntryProps = {
-  isLast: boolean;
   entry: EntryType;
-  onEntryCreate: () => void;
   now: number;
 };
 
 const Entry = ({ entry: entryProp, now }: EntryProps) => {
   const {
-    createTodo,
     toggleEntryTag,
     allTags,
-    openEntryNote,
     getRelations,
-    openedEntryNoteId,
     updateEntry,
     createEntry,
     updateEntryTimeWithPrev,
   } = useStore();
-  const allTodosRef = useRef<Record<string, HTMLInputElement>>({});
+  const { editNoteEntryId, setParams } = useUrlQ();
   const [tagSelectOpened, setTagSelectOpened] = useState(false);
   const { entries } = getRelations();
   const entry = entries.find((e) => e.id === entryProp.id)!;
-  const entrySession = entry.session();
   const nextEntry = entry.next();
 
-  const handleCreateTodo = () => {
-    const newTodoId = createTodo(entry.id, '');
-    setTimeout(() => {
-      allTodosRef.current[newTodoId]?.focus();
-    }, 100);
-  };
-  const entryTodos = entry.todos();
-  const isDayView = entrySession?.view === 'day-view';
   const entryEndTime = entry.time + entry.duration;
 
   return (
     <>
-      <div className="my-2 relative min-h-20">
+      <div className="relative min-h-20 my-2">
         <EntryDuration
           duration={entry.duration}
           onChange={(duration) => updateEntry(entry.id, { duration })}
@@ -68,9 +54,9 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           {entry.note && (
             <NotebookTextIcon
               size={13}
-              color={openedEntryNoteId === entry.id ? 'blue' : 'black'}
+              color={editNoteEntryId === entry.id ? 'blue' : 'black'}
               className="cursor-pointer"
-              onClick={() => openEntryNote(entry.id)}
+              onClick={() => setParams({ editNoteEntryId: entry.id })}
             />
           )}
           <Options entry={entry} onShowTags={() => setTagSelectOpened(true)} />
@@ -93,30 +79,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
             ))}
           </div>
         </div>
-        {isDayView && <NoteInput entryId={entry.id} simple />}
-        <div className={cn('ml-8 my-2', isDayView && 'hidden')}>
-          {entryTodos.length > 0 && (
-            <ul className={cn(entryTodos.length === 1 && 'py-3')}>
-              {entryTodos.map((todo, index) => (
-                <Todo
-                  key={todo.id}
-                  allTodosRef={allTodosRef}
-                  onEnterPress={handleCreateTodo}
-                  todo={todo}
-                  previousTodoId={entryTodos[index - 1]?.id}
-                />
-              ))}
-            </ul>
-          )}
-          {entryTodos.length === 0 && (
-            <div
-              className="text-sm flex gap-1 items-center py-3.5 opacity-5 cursor-pointer"
-              onClick={handleCreateTodo}
-            >
-              <PlusIcon size={12} /> Add todo
-            </div>
-          )}
-        </div>
+        <EntryTodos entryId={entry.id} />
       </div>
       {(!nextEntry || nextEntry.time !== entryEndTime) && (
         <EmptySlot

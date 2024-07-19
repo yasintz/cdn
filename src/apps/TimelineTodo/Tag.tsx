@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { getTagColor } from './helpers';
+import { getTagColor } from './utils/tags';
 
 type TagProps = {
   tag: string;

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { SessionType, useStore } from '../store';
 import SessionButton from '../SessionButton';
-import { useUrlState } from '../useUrlState';
+import { useUrlQ } from '../useUrlState';
 import TimelineOptions from './TimelineOptions';
 import SessionList from '../components/SessionList';
 
@@ -11,8 +11,8 @@ type HeaderProps = {
 
 const Header = ({ activeSession }: HeaderProps) => {
   const scrollDivRef = useRef<HTMLDivElement>(null);
-  const { archivedSessionsShown, sessionSortingEnabled } = useUrlState();
   const { sessions, reorderSessions } = useStore();
+  const { showArchived, sessionSortingEnabled } = useUrlQ();
 
   const parentSessions = sessions.filter((i) => !i.parentId);
   const archivedSessions = parentSessions.filter((i) => i.archived);
@@ -39,7 +39,7 @@ const Header = ({ activeSession }: HeaderProps) => {
             activeSession={activeSession}
             sortEnabled={sessionSortingEnabled}
           />
-          {archivedSessionsShown &&
+          {showArchived &&
             archivedSessions.map((session) => (
               <SessionButton
                 session={session}

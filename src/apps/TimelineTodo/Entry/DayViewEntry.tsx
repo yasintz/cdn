@@ -1,0 +1,59 @@
+import { EntryType, useStore } from '../store';
+import dayjs from '@/helpers/dayjs';
+import ms from 'ms';
+import { cn } from '@/lib/utils';
+import { getDayViewItemStyle } from '../DayView/utils';
+import { getTagColor } from '../utils/tags';
+import { useUrlQ } from '../useUrlState';
+
+type DayViewEntryProps = {
+  entry: EntryType;
+};
+
+const DayViewEntry = (props: DayViewEntryProps) => {
+  const { getRelations } = useStore();
+  const { dayViewSelectedEntryId, setParams } = useUrlQ();
+
+  const relations = getRelations();
+  const entry = relations.entries.find((e) => e.id === props.entry.id)!;
+  const entryTodos = entry.todos();
+  const startTime = entry.time;
+  const endTime = entry.time + entry.duration;
+  const isSmall = entry.duration < ms('40 minutes');
+
+  const dayViewPositionStyle = getDayViewItemStyle({
+    startTime,
+    endTime,
+  });
+
+  const lastTag = entry.tags[entry.tags.length - 1];
+  const isActive = dayViewSelectedEntryId === entry.id;
+
+  const { backgroundColor, color } = getTagColor(lastTag || 'un-categorized');
+
+  return (
+    <div
+      className={cn(
+        'flex border px-4 rounded-md cursor-pointer',
+        !isSmall && 'flex-col',
+        isSmall && 'items-center gap-4'
+      )}
+      style={{
+        ...dayViewPositionStyle,
+        backgroundColor,
+        color,
+        borderColor: isActive ? '#1276f0' : backgroundColor,
+      }}
+      onClick={() => setParams({ dayViewSelectedEntryId: entry.id })}
+    >
+      <div className="text-sm">{entryTodos.map((i) => i.text).join(' ~ ')}</div>
+      <div className="text-xs">
+        {dayjs.duration(startTime).format('HH:mm')}
+        {' - '}
+        {dayjs.duration(endTime).format('HH:mm')}
+      </div>
+    </div>
+  );
+};
+
+export default DayViewEntry;

@@ -1,28 +1,6 @@
 import React from 'react';
-import { getHours } from './utils';
-import ms from 'ms';
+import { getHours, hourSize } from './utils';
 import HourItem from './HourItem';
-
-const hourSize = 350;
-const msSize = hourSize / ms('1 hour');
-
-type DayViewItemStyleParams = {
-  startTime: number;
-  endTime: number;
-};
-
-export function getDayViewItemStyle({
-  startTime,
-  endTime,
-}: DayViewItemStyleParams): React.CSSProperties {
-  return {
-    position: 'absolute',
-    top: startTime * msSize,
-    left: 75,
-    height: (endTime - startTime) * msSize,
-    width: 'calc(100% - 54px)'
-  };
-}
 
 type DayViewProps = {
   startTime: number;

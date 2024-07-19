@@ -3,6 +3,7 @@ import { useStore } from './store';
 import { Trash2Icon, XCircleIcon } from 'lucide-react';
 import NoteBook from '@/components/NoteBook';
 import { useRef } from 'react';
+import { useUrlQ } from './useUrlState';
 
 type NoteInputProps = {
   entryId?: string;
@@ -11,7 +12,8 @@ type NoteInputProps = {
 };
 
 const NoteInput = ({ entryId, className, simple }: NoteInputProps) => {
-  const { entries, closeEntryNote, updateEntryNote } = useStore();
+  const { entries, updateEntryNote } = useStore();
+  const { deleteParam } = useUrlQ();
 
   const entry = entries.find((i) => i.id === entryId);
   const entryNote = useRef(entry?.note).current;
@@ -42,7 +44,7 @@ const NoteInput = ({ entryId, className, simple }: NoteInputProps) => {
           />
           <XCircleIcon
             className="cursor-pointer"
-            onClick={closeEntryNote}
+            onClick={() => deleteParam('editNoteEntryId')}
             size={14}
           />
         </div>

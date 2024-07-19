@@ -24,6 +24,7 @@ import { EntryType, useStore } from '../store';
 import SubMenu from '../Header/SubMenu';
 import { useState } from 'react';
 import SessionSelect from '../components/SessionSelect';
+import { useUrlQ } from '../useUrlState';
 
 type OptionsProps = {
   entry: EntryType;
@@ -34,7 +35,6 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
   const {
     deleteEntry,
     createEntry,
-    openEntryNote,
     duplicateEntry,
     sessions,
     updateEntry,
@@ -42,6 +42,8 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
   } = useStore();
 
   const [showCopyToSectionList, setShowCopyToSectionList] = useState(false);
+  const { setParams } = useUrlQ();
+
   return (
     <>
       <DropdownMenu>
@@ -111,7 +113,7 @@ const Options = ({ entry, onShowTags }: OptionsProps) => {
               title="Add Note"
               hidden={!!entry.note}
               icon={NotebookTextIcon}
-              onClick={() => openEntryNote(entry.id)}
+              onClick={() => setParams({ editNoteEntryId: entry.id })}
             />
             <DropdownItem
               title="Add entry below"

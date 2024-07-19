@@ -4,7 +4,6 @@ import {
   ArchiveIcon,
   AreaChartIcon,
   ArrowUpNarrowWideIcon,
-  BoxesIcon,
   CalendarIcon,
   Columns3Icon,
   CopyIcon,
@@ -21,7 +20,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useUrlState } from '../useUrlState';
+import { useUrlQ } from '../useUrlState';
 import { useNavigate } from 'react-router-dom';
 import SubMenu from './SubMenu';
 import { useState } from 'react';
@@ -48,12 +47,7 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
   const [createSessionInput, setCreateSessionInput] = useState(
     initialCreateSessionInput
   );
-  const {
-    setSearchParams,
-    archivedSessionsShown,
-    batchTimeUpdatingEnabled,
-    sessionSortingEnabled,
-  } = useUrlState();
+  const { showArchived, sessionSortingEnabled, setParams } = useUrlQ();
 
   const {
     sessions,
@@ -152,14 +146,9 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
               }
             />
             <DropdownItem
-              title={!archivedSessionsShown ? 'Show Archived' : 'Hide Archived'}
+              title={!showArchived ? 'Show Archived' : 'Hide Archived'}
               icon={ArchiveIcon}
-              onClick={() =>
-                setSearchParams((prev) => {
-                  prev.set('showArchived', `${!archivedSessionsShown}`);
-                  return prev;
-                })
-              }
+              onClick={() => setParams({ showArchived: !showArchived })}
             />
           </SubMenu>
           {activeSession && (
@@ -203,10 +192,7 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
             }
             icon={Columns3Icon}
             onClick={() =>
-              setSearchParams((prev) => {
-                prev.set('sessionSorting', `${!sessionSortingEnabled}`);
-                return prev;
-              })
+              setParams({ sessionSortingEnabled: !sessionSortingEnabled })
             }
           />
           <DropdownItem
@@ -214,21 +200,6 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
             hidden={!activeSession}
             icon={AreaChartIcon}
             onClick={() => navigate('analytics')}
-          />
-
-          <DropdownItem
-            title={
-              batchTimeUpdatingEnabled
-                ? 'Disable batch update'
-                : 'Enable batch update'
-            }
-            icon={BoxesIcon}
-            onClick={() =>
-              setSearchParams((prev) => {
-                prev.set('batchTimeUpdating', `${!batchTimeUpdatingEnabled}`);
-                return prev;
-              })
-            }
           />
 
           <DropdownItem

@@ -1,19 +1,3 @@
-import _ from 'lodash';
-import { EntryType } from './store';
-import { tagsGroup } from './utils/tags';
-
-export function getTagSpentTime(tag: string, entries: EntryType[]) {
-  const tagEntries = entries.filter((entry) => entry.tags.includes(tag));
-
-  let total = 0;
-
-  tagEntries.forEach((entry) => {
-    total += entry.duration;
-  });
-
-  return total;
-}
-
 export function stringToColor(
   str: string,
   level: 'dark' | 'light' | 'normal' = 'normal'
@@ -48,7 +32,7 @@ export const tagsColor: Record<string, string> = {
   finance: '#d78b12',
 };
 
-const toRGB = (color: string) => {
+export const toRGB = (color: string) => {
   const { style } = new Option();
   style.color = color;
   const rgb = style.color;
@@ -67,74 +51,5 @@ export function hashCode(t: string) {
   }
   return hash + 2147483647 + 1;
 }
-
-export function getTagColor(tag: string) {
-  const definedColor = tagsColor[tag];
-  const color = definedColor || stringToColor(tag, 'dark');
-
-  const { r, g, b } = toRGB(color);
-
-  return {
-    color: `rgba(${r},${g},${b})`,
-    backgroundColor: `rgba(${r},${g},${b},0.2)`,
-  };
-}
-
-export function getTagsData(sessionEntries: EntryType[], allTags: string[]) {
-  const sessionTags = _.flatten(sessionEntries.map((i) => i.tags));
-  const tagsWithSpentTimeFn = () => {
-    const tags = allTags
-      .filter((tag) => sessionTags.includes(tag))
-      .map((tag) => ({
-        tag,
-        spentTime: getTagSpentTime(tag, sessionEntries),
-        groupedTag: Object.entries(tagsGroup).find(([, value]) =>
-          value.includes(tag)
-        )?.[0],
-      }));
-
-    const unTagged = sessionEntries
-      .filter((entry) => entry.tags.length === 0)
-      .map((entry) => ({
-        ...entry,
-        tags: ['un-categorized'],
-      }));
-
-    if (unTagged.length > 0) {
-      const unCategorized = {
-        tag: 'un-categorized',
-        groupedTag: undefined,
-        spentTime: getTagSpentTime(
-          'un-categorized',
-          sessionEntries.map(
-            (entry) => unTagged.find((e) => e.id === entry.id) || entry
-          )
-        ),
-      };
-      tags.push(unCategorized);
-    }
-
-    return tags;
-  };
-
-  const tagsWithSpentTime = tagsWithSpentTimeFn();
-
-  const groupedTags = tagsWithSpentTime
-    .filter((i) => !i.groupedTag)
-    .map(({ tag, spentTime }) => {
-      const childs = tagsWithSpentTime.filter((i) => i.groupedTag === tag);
-
-      return {
-        childs,
-        tag,
-        spentTime,
-      };
-    });
-
-  return { groupedTags, tagsWithSpentTime };
-}
-
 export const defaultNoteUrl =
   'https://playground.lexical.dev/?showTreeView=false#doc=H4sIAAAAAAAAE5XOzQrCMBAE4HeZc5DEf_MAnoUexcPSrDUQk7LdFov03UXxUI-ehjl8wzzBIWqRSkkZ_gkpRd9Z32IKwhn-_FMuBiEK1xpLhs99SgbXIndSeMAg5sBZ4a2Bji3DoyWhRqi9wWBg6T7QGSg_9PiVdvp_9_N0PjlNBok6rWjgAO92br_cuPV-dbBbg670Ur_dKdHYSOlzmGvYhdsuLKYXPaCc5RIBAAA';
-
-export { tagsGroup };

@@ -14,7 +14,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import { useStore } from '../../store';
 import _ from 'lodash';
-import { getTagColor, getTagsData } from '../../helpers';
+import { getTagColor, getTagsData } from '../../utils/tags';
 
 ChartJS.register(
   ArcElement,

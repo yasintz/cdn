@@ -2,11 +2,11 @@ import React, { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { EntryType, useStore } from '../store';
-import { getTagColor, getTagsData } from '../helpers';
 import { cn } from '@/lib/utils';
 import _ from 'lodash';
 import Tag from '../Tag';
 import ms from 'ms';
+import { getTagColor, getTagsData } from '../utils/tags';
 
 dayjs.extend(duration);
 
@@ -43,7 +43,7 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
   const totalDiff = totalSpentTime - entryDurationTotal;
 
   return (
-    <div className={cn('flex-1 px-4', className)}>
+    <div className={cn('px-4', className)}>
       <div className="w-full">
         <table className="tags">
           <tbody>

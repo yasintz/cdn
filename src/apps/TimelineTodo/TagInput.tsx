@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import _ from 'lodash';
 import { StoreType } from './store';
-import { tagsGroup } from './helpers';
 import Tag from './Tag';
+import { tagsGroup } from './utils/tags';
 
 const allChilds = _.flatten(Object.values(tagsGroup));
 
