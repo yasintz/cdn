@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { EntryType, useStore } from '../store';
-import { cn } from '@/lib/utils';
 import _ from 'lodash';
 import Tag from '../Tag';
 import ms from 'ms';
@@ -43,7 +42,7 @@ const TagsTable = ({ sessionEntries, className }: TagsTableProps) => {
   const totalDiff = totalSpentTime - entryDurationTotal;
 
   return (
-    <div className={cn('px-4', className)}>
+    <div className={className}>
       <div className="w-full">
         <table className="tags">
           <tbody>

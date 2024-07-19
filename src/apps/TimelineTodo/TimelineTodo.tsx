@@ -40,7 +40,7 @@ const TimelineTodo = () => {
   }, []);
 
   const detailPanel = (className: string) => (
-    <div className={cn('flex-1 flex-col', className)}>
+    <div className={cn('flex-1 flex-col px-4', className)}>
       <TagsTable sessionEntries={sessionEntries} />
       {dayViewSelectedEntry && session?.view === 'day-view' && (
         <Entry entry={dayViewSelectedEntry} now={0} />
