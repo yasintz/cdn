@@ -35,7 +35,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
     <div
       className={cn(
         'flex border px-4 rounded-md cursor-pointer',
-        !isSmall && 'flex-col',
+        !isSmall && 'flex-col pt-2',
         isSmall && 'items-center gap-4'
       )}
       style={{
