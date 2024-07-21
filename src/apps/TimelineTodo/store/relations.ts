@@ -4,7 +4,7 @@ import ms from 'ms';
 
 type RequiredStore = Pick<StoreType, 'sessions' | 'entries' | 'todos'>;
 
-type SessionWithRelation = SessionType & {
+export type SessionWithRelation = SessionType & {
   entries: () => EntryWithRelation[];
   todos: () => TodoWithRelation[];
 };

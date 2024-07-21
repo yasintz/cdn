@@ -4,16 +4,12 @@ import { useStore } from './store';
 import ms from 'ms';
 import { useEffect, useMemo, useState } from 'react';
 import Header from './Header';
-import TagsTable from './TagsTable';
 import { useUrlQ } from './useUrlState';
 import SessionNoteView from './SessionNoteView';
 import SessionDayView from './SessionDayView';
-import './style.scss';
 import EditNoteDialog from './EditNoteDialog';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import NoteInput from './NoteInput';
+import RightPanel from './RightPanel';
+import './style.scss';
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
@@ -21,7 +17,7 @@ const TimelineTodo = () => {
 
   const startOfDayDiff = useMemo(() => now.diff(now.startOf('day')), [now]);
 
-  const { getRelations, createEntry, updateEntry } = useStore();
+  const { getRelations } = useStore();
   const { sessions } = getRelations();
   const { dayViewSelectedEntryId } = useUrlQ();
 
@@ -41,32 +37,6 @@ const TimelineTodo = () => {
     };
   }, []);
 
-  const detailPanel = (className: string) => (
-    <div
-      className={cn('flex-1 flex-col px-4 gap-3 overflow-y-scroll', className)}
-    >
-      {dayViewSelectedEntry && session?.view !== 'note' ? (
-        <>
-          <Input
-            key={dayViewSelectedEntry.id}
-            value={dayViewSelectedEntry.title}
-            onChange={(e) =>
-              updateEntry(dayViewSelectedEntry.id, { title: e.target.value })
-            }
-          />
-          <NoteInput entryId={dayViewSelectedEntry.id} simple />
-        </>
-      ) : (
-        <TagsTable sessionEntries={sessionEntries} />
-      )}
-      {sessionEntries.length === 0 && session && (
-        <Button onClick={() => createEntry(session.id, 0, 10)}>
-          Create Entry
-        </Button>
-      )}
-    </div>
-  );
-
   return (
     <div className="relative flex-1 flex flex-col min-h-0">
       <div className="absolute -top-12 right-2 -z-10">
@@ -77,7 +47,12 @@ const TimelineTodo = () => {
       {session && (
         <div className="flex gap-2 justify-between flex-1 min-h-0">
           <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
-            {detailPanel('flex md:hidden')}
+            <RightPanel
+              dayViewSelectedEntry={dayViewSelectedEntry}
+              session={session}
+              sessionEntries={sessionEntries}
+              className="flex md:hidden"
+            />
             {(!session.view || session.view === 'day-view') && (
               <SessionDayView
                 sessionEntries={sessionEntries}
@@ -93,7 +68,12 @@ const TimelineTodo = () => {
               />
             )}
           </div>
-          {detailPanel('hidden md:flex')}
+          <RightPanel
+            dayViewSelectedEntry={dayViewSelectedEntry}
+            session={session}
+            sessionEntries={sessionEntries}
+            className="hidden md:flex"
+          />
           <EditNoteDialog />
         </div>
       )}
