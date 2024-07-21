@@ -48,7 +48,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
       onClick={() => setParams({ dayViewSelectedEntryId: entry.id })}
     >
       <div className="text-sm font-medium">
-        {entryTodos.map((i) => i.text).join(' ~ ')}
+        {entry.title || entryTodos.map((i) => i.text).join(' ~ ')}
       </div>
       <div className="text-xs">
         {dayjs.duration(startTime).format('HH:mm')}

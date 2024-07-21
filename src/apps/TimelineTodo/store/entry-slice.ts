@@ -8,6 +8,7 @@ import { cloneEntry } from './utils';
 export type EntrySliceType = {
   entries: Array<{
     id: string;
+    title: string;
     sessionId: string;
     time: number;
     duration: number;
@@ -71,6 +72,7 @@ export const createEntrySlice: TodoStoreCreator<EntrySliceType> = (
         time: time || (lastEntry?.time || 0) + 1000 * 60 * 5,
         tags: [],
         duration: duration || 0,
+        title: '',
       });
     }),
   updateEntryTimeWithPrev: (id, time) =>

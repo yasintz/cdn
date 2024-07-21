@@ -11,8 +11,9 @@ import SessionDayView from './SessionDayView';
 import './style.scss';
 import EditNoteDialog from './EditNoteDialog';
 import { cn } from '@/lib/utils';
-import Entry from './Entry';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import NoteInput from './NoteInput';
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
@@ -20,7 +21,7 @@ const TimelineTodo = () => {
 
   const startOfDayDiff = useMemo(() => now.diff(now.startOf('day')), [now]);
 
-  const { getRelations, createEntry } = useStore();
+  const { getRelations, createEntry, updateEntry } = useStore();
   const { sessions } = getRelations();
   const { dayViewSelectedEntryId } = useUrlQ();
 
@@ -41,10 +42,22 @@ const TimelineTodo = () => {
   }, []);
 
   const detailPanel = (className: string) => (
-    <div className={cn('flex-1 flex-col px-4', className)}>
-      <TagsTable sessionEntries={sessionEntries} />
-      {dayViewSelectedEntry && session?.view !== 'note' && (
-        <Entry entry={dayViewSelectedEntry} now={0} showEndTime />
+    <div
+      className={cn('flex-1 flex-col px-4 gap-3 overflow-y-scroll', className)}
+    >
+      {dayViewSelectedEntry && session?.view !== 'note' ? (
+        <>
+          <Input
+            key={dayViewSelectedEntry.id}
+            value={dayViewSelectedEntry.title}
+            onChange={(e) =>
+              updateEntry(dayViewSelectedEntry.id, { title: e.target.value })
+            }
+          />
+          <NoteInput entryId={dayViewSelectedEntry.id} simple />
+        </>
+      ) : (
+        <TagsTable sessionEntries={sessionEntries} />
       )}
       {sessionEntries.length === 0 && session && (
         <Button onClick={() => createEntry(session.id, 0, 10)}>
