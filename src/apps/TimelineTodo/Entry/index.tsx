@@ -14,9 +14,10 @@ import { useUrlQ } from '../useUrlState';
 type EntryProps = {
   entry: EntryType;
   now: number;
+  showEndTime?: boolean;
 };
 
-const Entry = ({ entry: entryProp, now }: EntryProps) => {
+const Entry = ({ entry: entryProp, now, showEndTime }: EntryProps) => {
   const { toggleEntryTag, allTags, getRelations, updateEntry, createEntry } =
     useStore();
   const { editNoteEntryId, setParams } = useUrlQ();
@@ -75,7 +76,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
         </div>
         <EntryTodos entryId={entry.id} />
       </div>
-      {(!nextEntry || nextEntry.time !== entryEndTime) && (
+      {(!nextEntry || nextEntry.time !== entryEndTime || showEndTime) && (
         <EmptySlot
           duration={nextEntry ? nextEntry.time - entryEndTime : undefined}
           time={entryEndTime}
@@ -84,6 +85,7 @@ const Entry = ({ entry: entryProp, now }: EntryProps) => {
           }
           onFill={
             nextEntry &&
+            nextEntry.time !== entryEndTime &&
             (() =>
               createEntry(
                 entry.sessionId,

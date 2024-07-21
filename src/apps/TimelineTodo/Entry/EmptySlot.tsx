@@ -6,13 +6,13 @@ type EmptySlotProps = {
   duration?: number;
   time: number;
   onChange: (time: number) => void;
-  onFill?: () => void;
+  onFill?: (() => void) | false;
 };
 
 const EmptySlot = ({ duration, time, onChange, onFill }: EmptySlotProps) => {
   return (
     <div className="my-2 relative min-h-20">
-      {duration && <EntryDuration duration={duration} />}
+      {!!duration && <EntryDuration duration={duration} />}
       <div className="flex">
         <EntryTime time={time} editable onChange={(t) => onChange(t)} />
       </div>

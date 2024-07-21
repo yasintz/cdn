@@ -44,7 +44,7 @@ const TimelineTodo = () => {
     <div className={cn('flex-1 flex-col px-4', className)}>
       <TagsTable sessionEntries={sessionEntries} />
       {dayViewSelectedEntry && session?.view !== 'note' && (
-        <Entry entry={dayViewSelectedEntry} now={0} />
+        <Entry entry={dayViewSelectedEntry} now={0} showEndTime />
       )}
       {sessionEntries.length === 0 && session && (
         <Button onClick={() => createEntry(session.id, 0, 10)}>

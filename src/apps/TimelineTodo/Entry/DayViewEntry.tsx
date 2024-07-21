@@ -35,7 +35,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
   return (
     <div
       className={cn(
-        'flex border px-4 rounded-md cursor-pointer',
+        'flex border px-4 rounded-md select-none cursor-grab',
         !isSmall && 'flex-col pt-2',
         isSmall && 'items-center gap-4'
       )}
@@ -47,7 +47,9 @@ const DayViewEntry = (props: DayViewEntryProps) => {
       }}
       onClick={() => setParams({ dayViewSelectedEntryId: entry.id })}
     >
-      <div className="text-sm font-medium">{entryTodos.map((i) => i.text).join(' ~ ')}</div>
+      <div className="text-sm font-medium">
+        {entryTodos.map((i) => i.text).join(' ~ ')}
+      </div>
       <div className="text-xs">
         {dayjs.duration(startTime).format('HH:mm')}
         {' - '}
