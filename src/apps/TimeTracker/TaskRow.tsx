@@ -77,6 +77,7 @@ const TaskRow = ({
           </Tooltip>
         </TooltipProvider>
       </TableCell>
+      <TableCell>${(task.totalPrice || 0).toFixed(2)}</TableCell>
       <TableCell>
         <div className="flex gap-2 items-center justify-center">
           <Trash2Icon

@@ -13,6 +13,7 @@ export type TaskType = {
   titleRaw: string;
   startTime: number;
   endTime?: number;
+  priceHr?: number;
 };
 
 type StoreType = {

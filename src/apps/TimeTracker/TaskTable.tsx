@@ -23,6 +23,7 @@ const TaskTable = ({ tasks }: PropsType) => {
             <TableHead className="w-72 md:w-auto">Title</TableHead>
             <TableHead className="w-28">Date</TableHead>
             <TableHead className="w-28">Duration</TableHead>
+            <TableHead className="w-28">Price</TableHead>
             <TableHead className="w-20" />
           </TableRow>
         </TableHeader>
