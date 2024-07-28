@@ -1,9 +1,7 @@
 import React from 'react';
 import { TreeView, useAppContext } from '../app/ctx';
 
-type SettingsPageProps = {};
-
-const SettingsPage = (props: SettingsPageProps) => {
+const SettingsPage = () => {
   const { setTreeView, treeView, treeDepth, setTreeDepth } = useAppContext();
   return (
     <div>

@@ -3,9 +3,7 @@ import { useParams } from 'react-router-dom';
 import CreatePerson from '../../../app/CreatePerson';
 import { useAppContext } from '../../../app/ctx';
 
-type PersonUpdatePageProps = {};
-
-const PersonUpdatePage = (props: PersonUpdatePageProps) => {
+const PersonUpdatePage = () => {
   const { updatePerson } = useAppContext();
   const { person: personList } = useAppContext();
   const { personId } = useParams<{ personId: string }>();

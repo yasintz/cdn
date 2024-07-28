@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // @ts-ignore
 import TreeBuilder from './builder.js';
 import _ from 'lodash';
