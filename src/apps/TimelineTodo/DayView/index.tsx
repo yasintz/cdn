@@ -15,8 +15,8 @@ type DayViewProps = {
 
 const DayView = ({ startTime, endTime, now, children }: DayViewProps) => {
   const { hours, startHourMs, endHourMs, totalSize } = getHours(
-    startTime,
-    endTime
+    Math.min(startTime, now || startTime),
+    Math.max(endTime, now || endTime)
   );
 
   return (
