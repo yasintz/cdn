@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,10 +10,12 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Calendar } from '@/components/ui/calendar';
 
 export type SessionDialogInput = {
   name: string;
   tooltip?: string;
+  date?: number;
 };
 
 type SessionDialogProps<T> = {
@@ -37,10 +39,15 @@ function SessionDialog<T extends SessionDialogInput>({
   onSubmit,
   title,
 }: SessionDialogProps<T>) {
+  const date = useMemo(
+    () => (value.date ? new Date(value.date) : undefined),
+    [value.date]
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-      <DialogContent className="max-w-full md:max-w-[400px]">
+      <DialogContent className="max-w-full md:max-w-[428px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -66,6 +73,18 @@ function SessionDialog<T extends SessionDialogInput>({
             />
           </div>
         </div>
+        <div className="grid grid-cols-4 gap-4">
+          <Label htmlFor="username" className="text-right">
+            Date
+          </Label>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => onChange({ ...value, date: d?.getTime() })}
+            className="rounded-md border col-span-3"
+          />
+        </div>
+
         {buttonText && onSubmit && (
           <DialogFooter>
             <Button onClick={onSubmit}>{buttonText}</Button>

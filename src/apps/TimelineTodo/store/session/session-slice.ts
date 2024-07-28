@@ -11,6 +11,7 @@ export type SessionType = {
   view?: ViewType;
   createdAt: number;
   tooltipText?: string;
+  date?: number;
 };
 
 export type SessionSliceType = {

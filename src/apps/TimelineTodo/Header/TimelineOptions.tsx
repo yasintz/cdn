@@ -83,6 +83,7 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
     updateSession(activeSession.id, {
       name: value.name,
       tooltipText: value.tooltip || '',
+      date: value.date,
     });
   };
 
@@ -260,6 +261,7 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
           value={{
             name: activeSession.name,
             tooltip: activeSession.tooltipText,
+            date: activeSession.date,
           }}
           open={showUpdateSessionDialog}
           onOpenChange={setShowUpdateSessionDialog}
