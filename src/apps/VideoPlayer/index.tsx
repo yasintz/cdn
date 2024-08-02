@@ -1,6 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import srtParser2 from 'srt-parser-2';
 import './style.scss';
+import { Button } from '@/components/ui/button';
+import { downloadJsonFile } from '@/utils/file';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { InfoIcon } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const parser = new srtParser2();
 
@@ -9,6 +20,7 @@ const VideoPlayer = () => {
   const [srt, setSrt] = useState<string>();
   const [activeSubtitle, setActiveSubtitle] = useState<string>();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [adjust, setAdjust] = useState(0);
 
   const videoUrl = useMemo(() => {
     if (!videoFile) {
@@ -25,10 +37,31 @@ const VideoPlayer = () => {
       return [];
     }
 
-    const srtArray = parser.fromSrt(srt);
+    let arr: ReturnType<(typeof parser)['fromSrt']> = [];
 
-    return srtArray;
-  }, [srt]);
+    if (srt[0] === '[') {
+      arr = JSON.parse(srt) as any;
+    } else {
+      arr = parser.fromSrt(srt);
+    }
+
+    const adjustSeconds = adjust / 1000;
+    return arr.map((i) => ({
+      ...i,
+      startSeconds: i.startSeconds + adjustSeconds,
+      endSeconds: i.endSeconds + adjustSeconds,
+    }));
+  }, [adjust, srt]);
+
+  const onSubtitleUploaded = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (e) => {
+      setSrt(e.target?.result as string);
+    });
+
+    reader.readAsText(e.target.files?.[0] as any);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,19 +88,7 @@ const VideoPlayer = () => {
     return (
       <div>
         <label>
-          Subtitle:{' '}
-          <input
-            type="file"
-            onChange={(e) => {
-              const reader = new FileReader();
-
-              reader.addEventListener('load', (e) => {
-                setSrt(e.target?.result as string);
-              });
-
-              reader.readAsText(e.target.files?.[0] as any);
-            }}
-          />
+          Subtitle: <input type="file" onChange={onSubtitleUploaded} />
         </label>
 
         <label>
@@ -84,7 +105,7 @@ const VideoPlayer = () => {
   }
 
   return (
-    <div>
+    <div className="p-4">
       <div className="video-player">
         <video src={videoUrl} ref={videoRef} controls />
         {srt && (
@@ -94,11 +115,52 @@ const VideoPlayer = () => {
           />
         )}
       </div>
-      <button
-        onClick={() => videoRef.current?.parentElement?.requestFullscreen()}
-      >
-        Full Screen
-      </button>
+      <div className="flex gap-4 mt-2">
+        <Button
+          onClick={() => videoRef.current?.parentElement?.requestFullscreen()}
+        >
+          Full Screen
+        </Button>
+        {srt && (
+          <div className="flex flex-col gap-2">
+            <Label className="flex gap-2">
+              <span>Adjust</span>
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <InfoIcon size={16} />
+                  </TooltipTrigger>
+                  <TooltipContent className="mb-2">
+                    <pre>
+                      Increase: If you see captions before the voice
+                      <br />
+                      Decrease: If you see captions after the voice
+                    </pre>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Label>
+            <Input
+              placeholder="Adjust"
+              type="number"
+              value={adjust}
+              onChange={(e) => setAdjust(parseFloat(e.target.value))}
+            />
+            <Button
+              onClick={() =>
+                downloadJsonFile(subtitle, `${videoFile.name}-subtitle.json`)
+              }
+            >
+              Download Adjusted Subtitle
+            </Button>
+
+            <label>
+              Change Subtitle:{' '}
+              <input type="file" onChange={onSubtitleUploaded} />
+            </label>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
