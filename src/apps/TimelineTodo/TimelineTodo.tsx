@@ -10,10 +10,12 @@ import SessionDayView from './SessionDayView';
 import EditNoteDialog from './EditNoteDialog';
 import RightPanel from './RightPanel';
 import './style.scss';
+import { useExternalCalendars } from './utils/calendar';
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
   const [now, setNow] = useState(dayjs());
+  useExternalCalendars();
 
   const startOfDayDiff = useMemo(() => now.diff(now.startOf('day')), [now]);
 
@@ -23,10 +25,9 @@ const TimelineTodo = () => {
 
   const session = sessions.find((session) => session.id === sessionId);
   const sessionEntries = useMemo(() => session?.entries() || [], [session]);
-  const dayViewSelectedEntry = sessionEntries.find(
+  const selectedEntry = sessionEntries.find(
     (i) => i.id === dayViewSelectedEntryId
   );
-
   useEffect(() => {
     const interval = setInterval(() => {
       setNow(dayjs());
@@ -48,7 +49,7 @@ const TimelineTodo = () => {
         <div className="flex gap-2 justify-between flex-1 min-h-0">
           <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
             <RightPanel
-              dayViewSelectedEntry={dayViewSelectedEntry}
+              selectedEntry={selectedEntry}
               session={session}
               sessionEntries={sessionEntries}
               className="flex md:hidden"
@@ -69,7 +70,7 @@ const TimelineTodo = () => {
             )}
           </div>
           <RightPanel
-            dayViewSelectedEntry={dayViewSelectedEntry}
+            selectedEntry={selectedEntry}
             session={session}
             sessionEntries={sessionEntries}
             className="hidden md:flex"

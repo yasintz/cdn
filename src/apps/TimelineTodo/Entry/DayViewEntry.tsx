@@ -16,8 +16,9 @@ const DayViewEntry = (props: DayViewEntryProps) => {
   const { dayViewSelectedEntryId, setParams } = useUrlQ();
 
   const relations = getRelations();
-  const entry = relations.entries.find((e) => e.id === props.entry.id)!;
-  const entryTodos = entry.todos();
+  const entry =
+    relations.entries.find((e) => e.id === props.entry.id) || props.entry;
+
   const startTime = entry.time;
   const endTime = entry.time + entry.duration;
   const isSmall = entry.duration < ms('40 minutes');
@@ -47,9 +48,7 @@ const DayViewEntry = (props: DayViewEntryProps) => {
       }}
       onClick={() => setParams({ dayViewSelectedEntryId: entry.id })}
     >
-      <div className="text-sm font-medium">
-        {entry.title || entryTodos.map((i) => i.text).join(' ~ ')}
-      </div>
+      <div className="text-sm font-medium">{entry.title}</div>
       <div className="text-xs">
         {dayjs.duration(startTime).format('HH:mm')}
         {' - '}

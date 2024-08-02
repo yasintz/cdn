@@ -14,4 +14,9 @@ export const apps = {
     image:
       'https://cdn.dribbble.com/users/5840087/screenshots/14061542/media/d3e37dc3707cede8f9d1fe9d3f6ad001.jpg?resize=400x0',
   },
+  'video-player': {
+    title: 'Video Player',
+    image:
+      'https://static.vecteezy.com/system/resources/previews/001/812/859/non_2x/video-player-play-button-simple-outline-color-icon-isolated-on-white-cartoon-hand-draw-illustration-vector.jpg',
+  },
 };

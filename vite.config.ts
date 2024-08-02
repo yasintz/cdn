@@ -12,7 +12,7 @@ export default defineConfig(async ({ mode }) => {
     ],
     base: `/cdn/`,
     server: {
-      port: 3007,
+      port: 3008,
     },
   };
 });

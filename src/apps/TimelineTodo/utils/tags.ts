@@ -15,7 +15,7 @@ export function getTagSpentTime(tag: string, entries: EntryType[]) {
 }
 export const tagsGroup: Record<string, string[]> = {
   productivity: ['reading', 'podcast', 'spor', 'plan', 'english'],
-  work: ['kajabi', 'chat-app', 'nexizon'],
+  work: ['kajabi', 'chat-app', 'nexizon', 'c:Kajabi'],
   bad: ['youtube', 'timeline-todo'],
 };
 
@@ -26,7 +26,9 @@ export const tagsColor: Record<string, string> = {
   free: '#24b021',
   finance: '#d78b12',
   kajabi: '#1276f0',
+  'c:Kajabi': '#1276f0',
   spor: '#4876a3',
+  'c:Main': '#985df6',
 };
 
 export const tagsChildGroupMap: Record<string, string> = Object.entries(

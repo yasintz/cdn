@@ -14,6 +14,7 @@ export type EntrySliceType = {
     duration: number;
     tags: string[];
     note?: string;
+    externalCalendarEventId?: string;
   }>;
   allTags: Array<string>;
 

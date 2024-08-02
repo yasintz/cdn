@@ -34,6 +34,8 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
+        env:
+          VITE_EXTERNAL_CALENDARS: ${{ secrets.VITE_EXTERNAL_CALENDARS }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

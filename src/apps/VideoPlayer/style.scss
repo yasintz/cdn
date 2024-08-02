@@ -1,0 +1,17 @@
+.video-player {
+  position: relative;
+  video {
+    width: 100%;
+    height: 100%;
+  }
+
+  pre {
+    position: absolute;
+    bottom: 58px;
+    width: 100%;
+    text-align: center;
+    color: rgb(243, 243, 243);
+    z-index: 999;
+    font-size: 24px;
+  }
+}

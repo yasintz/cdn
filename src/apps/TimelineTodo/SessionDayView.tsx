@@ -1,4 +1,3 @@
-import React from 'react';
 import { EntryWithRelation } from './store/relations';
 import DayView from './DayView';
 import DayViewEntry from './Entry/DayViewEntry';
@@ -17,6 +16,7 @@ const SessionDayView = ({
   const endTime = sessionEntries.length
     ? sessionEntries[sessionEntries.length - 1].time
     : ms('24 hours');
+
   return (
     <>
       <DayView startTime={startTime} endTime={endTime} now={startOfDayDiff}>

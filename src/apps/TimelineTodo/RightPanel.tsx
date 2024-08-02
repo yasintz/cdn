@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import React from 'react';
 import { EntryWithRelation, SessionWithRelation } from './store/relations';
 import { Input } from '@/components/ui/input';
 import NoteInput from './NoteInput';
@@ -10,14 +9,14 @@ import EntryTimeDetail from './Entry/EntryTimeDetail';
 
 type RightPanelProps = {
   className?: string;
-  dayViewSelectedEntry: EntryWithRelation | undefined;
+  selectedEntry: EntryWithRelation | undefined;
   session: SessionWithRelation | undefined;
   sessionEntries: EntryWithRelation[];
 };
 
 const RightPanel = ({
   className,
-  dayViewSelectedEntry,
+  selectedEntry,
   session,
   sessionEntries,
 }: RightPanelProps) => {
@@ -26,21 +25,17 @@ const RightPanel = ({
     <div
       className={cn('flex-1 flex-col px-4 gap-3 overflow-y-scroll', className)}
     >
-      {dayViewSelectedEntry && session?.view !== 'note' ? (
+      {selectedEntry && session?.view !== 'note' ? (
         <>
-          <EntryTimeDetail entry={dayViewSelectedEntry} />
+          <EntryTimeDetail entry={selectedEntry} />
           <Input
-            value={dayViewSelectedEntry.title || ''}
+            value={selectedEntry.title || ''}
             onChange={(e) =>
-              updateEntry(dayViewSelectedEntry.id, { title: e.target.value })
+              updateEntry(selectedEntry.id, { title: e.target.value })
             }
             ringDisabled
           />
-          <NoteInput
-            key={dayViewSelectedEntry.id}
-            entryId={dayViewSelectedEntry.id}
-            simple
-          />
+          <NoteInput key={selectedEntry.id} entryId={selectedEntry.id} simple />
         </>
       ) : (
         <TagsTable sessionEntries={sessionEntries} />
