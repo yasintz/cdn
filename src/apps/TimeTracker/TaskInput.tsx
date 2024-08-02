@@ -30,6 +30,26 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
 
   const { tags } = parseTagsFromTitle(currentTask?.title || title);
 
+  const currentTaskDuration = dayjs.duration(currentTask ? diff : 0);
+
+  const setStartTime = (time: string, type: string) => {
+    if (!currentTask) {
+      return;
+    }
+
+    const formatKey = {
+      hour: 'H',
+      minute: 'm',
+    }[type];
+
+    const timeByType = parseInt(currentTaskDuration.format(formatKey), 10);
+    const newValue = ms(`${time} ${type}`);
+    const adjusted = currentTask.startTime + ms(`${timeByType} ${type}`);
+    const startTime = adjusted - newValue;
+
+    updateTask(currentTask.id, { startTime });
+  };
+
   const handleStartStop = () => {
     if (currentTask) {
       stopTask(id);
@@ -74,7 +94,7 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
             <span
               onClick={() =>
                 updateTask(currentTask.id, {
-                  startTime: currentTask.startTime + ms('1 minute'),
+                  startTime: currentTask.startTime + ms('10 minute'),
                 })
               }
             >
@@ -84,9 +104,25 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
           <TooltipProvider>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild disabled={!currentTaskTotalPrice}>
-                <span>
-                  {dayjs.duration(currentTask ? diff : 0).format('HH:mm:ss')}
-                </span>
+                <div className="flex">
+                  <input
+                    className="w-7 text-center focus:outline-none"
+                    value={currentTaskDuration.format('HH')}
+                    onChange={(e) => setStartTime(e.target.value, 'hour')}
+                  />
+                  :
+                  <input
+                    className="w-7 text-center focus:outline-none"
+                    value={currentTaskDuration.format('mm')}
+                    onChange={(e) => setStartTime(e.target.value, 'minute')}
+                  />
+                  :
+                  <input
+                    className="w-7 text-center focus:outline-none"
+                    value={currentTaskDuration.format('ss')}
+                    onChange={() => null}
+                  />
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 ${currentTaskTotalPrice?.toFixed(2)}
