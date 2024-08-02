@@ -14,4 +14,17 @@
     z-index: 999;
     font-size: 24px;
   }
+
+  .ej-trans-sub {
+    display: none;
+  }
+
+  .ejoy-sub-clzz {
+    color: white !important;
+    background: transparent !important;
+
+    &:hover {
+      color: #1296ba !important;
+    }
+  }
 }
