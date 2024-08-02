@@ -87,7 +87,12 @@ const VideoPlayer = () => {
     <div>
       <div className="video-player">
         <video src={videoUrl} ref={videoRef} controls />
-        {srt && <pre className="video-player-caption">{activeSubtitle}</pre>}
+        {srt && (
+          <pre
+            className="video-player-caption"
+            dangerouslySetInnerHTML={{ __html: activeSubtitle || '' }}
+          />
+        )}
       </div>
       <button
         onClick={() => videoRef.current?.parentElement?.requestFullscreen()}
