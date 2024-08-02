@@ -87,7 +87,7 @@ const VideoPlayer = () => {
     <div>
       <div className="video-player">
         <video src={videoUrl} ref={videoRef} controls />
-        <pre className='video-player-caption'>{activeSubtitle}</pre>
+        {srt && <pre className="video-player-caption">{activeSubtitle}</pre>}
       </div>
       <button
         onClick={() => videoRef.current?.parentElement?.requestFullscreen()}
