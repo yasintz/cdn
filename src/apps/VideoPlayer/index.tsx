@@ -1,166 +1,46 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import srtParser2 from 'srt-parser-2';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import OldVideoPlayer from './old';
 import './style.scss';
 import { Button } from '@/components/ui/button';
-import { downloadJsonFile } from '@/utils/file';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { InfoIcon } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-
-const parser = new srtParser2();
 
 const VideoPlayer = () => {
-  const [videoFile, setVideoFile] = useState<File>();
-  const [srt, setSrt] = useState<string>();
-  const [activeSubtitle, setActiveSubtitle] = useState<string>();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [adjust, setAdjust] = useState(0);
-
-  const videoUrl = useMemo(() => {
-    if (!videoFile) {
-      return undefined;
-    }
-
-    const objectUrl = URL.createObjectURL(videoFile);
-
-    return objectUrl;
-  }, [videoFile]);
-
-  const subtitle = useMemo(() => {
-    if (!srt) {
-      return [];
-    }
-
-    let arr: ReturnType<(typeof parser)['fromSrt']> = [];
-
-    if (srt[0] === '[') {
-      arr = JSON.parse(srt) as any;
-    } else {
-      arr = parser.fromSrt(srt);
-    }
-
-    const adjustSeconds = adjust / 1000;
-    return arr.map((i) => ({
-      ...i,
-      startSeconds: i.startSeconds + adjustSeconds,
-      endSeconds: i.endSeconds + adjustSeconds,
-    }));
-  }, [adjust, srt]);
-
-  const onSubtitleUploaded = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const reader = new FileReader();
-
-    reader.addEventListener('load', (e) => {
-      setSrt(e.target?.result as string);
-    });
-
-    reader.readAsText(e.target.files?.[0] as any);
-  };
+  const [searchParams] = useSearchParams();
+  const videoId = searchParams.get('video_id');
+  const season = searchParams.get('s');
+  const episode = searchParams.get('e');
+  const [subtitle, setSubtitle] = useState('');
+  const parentDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!videoRef.current || !subtitle.length) {
-        return;
+    window.addEventListener('message', function (event) {
+      if (event.origin.includes('streambucket')) {
+        setSubtitle(event.data);
       }
+    });
+  }, []);
 
-      const currentSeconds = videoRef?.current?.currentTime;
-
-      const currentSubtitle = subtitle.find(
-        (s) =>
-          s.startSeconds <= currentSeconds && s.endSeconds >= currentSeconds
-      );
-
-      setActiveSubtitle(currentSubtitle?.text);
-    }, 250);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [subtitle]);
-
-  if (!videoFile) {
-    return (
-      <div>
-        <label>
-          Subtitle: <input type="file" onChange={onSubtitleUploaded} />
-        </label>
-
-        <label>
-          Video:{' '}
-          <input
-            type="file"
-            onChange={(e) => {
-              setVideoFile(e.target.files?.[0]);
-            }}
-          />
-        </label>
-      </div>
-    );
+  if (!videoId) {
+    return <OldVideoPlayer />;
   }
 
   return (
-    <div className="p-4">
-      <div className="video-player">
-        <video src={videoUrl} ref={videoRef} controls />
-        {srt && (
-          <pre
-            className="video-player-caption"
-            dangerouslySetInnerHTML={{ __html: activeSubtitle || '' }}
-          />
-        )}
+    <div>
+      <div className="w-full relative" ref={parentDivRef}>
+        <iframe
+          className="w-full h-full min-h-96"
+          src={`https://multiembed.mov/directstream.php?video_id=${videoId}${
+            season ? `&s=${season}&e=${episode}` : ''
+          }`}
+        />
+        <div
+          className="video-player-caption w-full text-center mt-2 absolute bottom-24 z-50 text-white text-3xl"
+          dangerouslySetInnerHTML={{ __html: subtitle }}
+        />
       </div>
-      <div className="flex gap-4 mt-2">
-        <Button
-          onClick={() => videoRef.current?.parentElement?.requestFullscreen()}
-        >
-          Full Screen
-        </Button>
-        {srt && (
-          <div className="flex flex-col gap-2">
-            <Label className="flex gap-2">
-              <span>Adjust</span>
-              <TooltipProvider>
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <InfoIcon size={16} />
-                  </TooltipTrigger>
-                  <TooltipContent className="mb-2">
-                    <pre>
-                      Increase: If you see captions before the voice
-                      <br />
-                      Decrease: If you see captions after the voice
-                    </pre>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Label>
-            <Input
-              placeholder="Adjust"
-              type="number"
-              value={adjust}
-              onChange={(e) => setAdjust(parseFloat(e.target.value))}
-            />
-            <Button
-              onClick={() =>
-                downloadJsonFile(subtitle, `${videoFile.name}-subtitle.json`)
-              }
-            >
-              Download Adjusted Subtitle
-            </Button>
-
-            <label>
-              Change Subtitle:{' '}
-              <input type="file" onChange={onSubtitleUploaded} />
-            </label>
-          </div>
-        )}
-      </div>
+      <Button onClick={() => parentDivRef.current?.requestFullscreen()}>
+        Full Screen
+      </Button>
     </div>
   );
 };
