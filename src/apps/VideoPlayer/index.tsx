@@ -25,7 +25,7 @@ const VideoPlayer = () => {
   }
 
   return (
-    <div>
+    <div className='new-video-player'>
       <div className="w-full relative" ref={parentDivRef}>
         <iframe
           className="w-full h-full min-h-96"
