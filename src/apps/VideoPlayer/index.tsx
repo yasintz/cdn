@@ -33,6 +33,7 @@ const VideoPlayer = () => {
             season ? `&s=${season}&e=${episode}` : ''
           }`}
         />
+        <video className='hidden' />
         <div
           className="video-player-caption w-full text-center mt-2 absolute bottom-24 z-50 text-white text-3xl"
           dangerouslySetInnerHTML={{ __html: subtitle }}
