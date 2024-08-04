@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import srtParser2 from 'srt-parser-2';
-import './style.scss';
 import { Button } from '@/components/ui/button';
 import { downloadJsonFile } from '@/utils/file';
 import { Input } from '@/components/ui/input';
@@ -12,10 +11,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import './style.scss';
 
 const parser = new srtParser2();
 
-const OldVideoPlayer = () => {
+const LocalVideoPlayer = () => {
   const [videoFile, setVideoFile] = useState<File>();
   const [srt, setSrt] = useState<string>();
   const [activeSubtitle, setActiveSubtitle] = useState<string>();
@@ -107,7 +107,12 @@ const OldVideoPlayer = () => {
   return (
     <div className="p-4">
       <div className="video-player">
-        <video src={videoUrl} ref={videoRef} controls />
+        <video
+          src={videoUrl}
+          ref={videoRef}
+          controls
+          className="outline-none"
+        />
         {srt && (
           <pre
             className="video-player-caption"
@@ -165,4 +170,4 @@ const OldVideoPlayer = () => {
   );
 };
 
-export default OldVideoPlayer;
+export default LocalVideoPlayer;

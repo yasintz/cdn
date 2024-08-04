@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import OldVideoPlayer from './old';
+import LocalVideoPlayer from './local';
 import { FullscreenIcon } from 'lucide-react';
 import './style.scss';
 
@@ -21,7 +21,7 @@ const VideoPlayer = () => {
   }, []);
 
   if (!videoId) {
-    return <OldVideoPlayer />;
+    return <LocalVideoPlayer />;
   }
 
   return (
