@@ -105,7 +105,7 @@ const LocalVideoPlayer = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 overflow-y-auto">
       <div className="video-player">
         <video
           src={videoUrl}
@@ -122,48 +122,70 @@ const LocalVideoPlayer = () => {
       </div>
       <div className="flex gap-4 mt-2">
         <Button
-          onClick={() => videoRef.current?.parentElement?.requestFullscreen()}
+          onClick={() =>
+            document.querySelector('.video-player')?.requestFullscreen()
+          }
         >
           Full Screen
         </Button>
         {srt && (
-          <div className="flex flex-col gap-2">
-            <Label className="flex gap-2">
-              <span>Adjust</span>
-              <TooltipProvider>
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <InfoIcon size={16} />
-                  </TooltipTrigger>
-                  <TooltipContent className="mb-2">
-                    <pre>
-                      Increase: If you see captions before the voice
-                      <br />
-                      Decrease: If you see captions after the voice
-                    </pre>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Label>
-            <Input
-              placeholder="Adjust"
-              type="number"
-              value={adjust}
-              onChange={(e) => setAdjust(parseFloat(e.target.value))}
-            />
-            <Button
-              onClick={() =>
-                downloadJsonFile(subtitle, `${videoFile.name}-subtitle.json`)
-              }
-            >
-              Download Adjusted Subtitle
-            </Button>
+          <>
+            <div className="flex flex-col gap-2">
+              <Label className="flex gap-2">
+                <span>Adjust</span>
+                <TooltipProvider>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <InfoIcon size={16} />
+                    </TooltipTrigger>
+                    <TooltipContent className="mb-2">
+                      <pre>
+                        Increase: If you see captions before the voice
+                        <br />
+                        Decrease: If you see captions after the voice
+                      </pre>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Label>
+              <Input
+                placeholder="Adjust"
+                type="number"
+                value={adjust}
+                onChange={(e) => setAdjust(parseFloat(e.target.value))}
+              />
+              <Button
+                onClick={() =>
+                  downloadJsonFile(subtitle, `${videoFile.name}-subtitle.json`)
+                }
+              >
+                Download Adjusted Subtitle
+              </Button>
 
-            <label>
-              Change Subtitle:{' '}
-              <input type="file" onChange={onSubtitleUploaded} />
-            </label>
-          </div>
+              <label>
+                Change Subtitle:{' '}
+                <input type="file" onChange={onSubtitleUploaded} />
+              </label>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <Input id="remove-all-input" />
+                <Button
+                  onClick={() => {
+                    const input = document.getElementById(
+                      'remove-all-input'
+                    ) as HTMLInputElement;
+                    const value = input.value;
+                    setSrt(srt.replaceAll(value, ''));
+                  }}
+                >
+                  Remove All
+                </Button>
+              </div>
+
+              <pre className="max-h-96 overflow-y-scroll">{srt}</pre>
+            </div>
+          </>
         )}
       </div>
     </div>
