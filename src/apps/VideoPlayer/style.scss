@@ -6,20 +6,6 @@
     width: 100%;
     height: 100%;
   }
-
-  pre {
-    position: absolute;
-    bottom: 58px;
-    width: 100%;
-    text-align: center;
-    color: rgb(243, 243, 243);
-    z-index: 999;
-    font-size: 24px;
-  }
-
-  .ej-trans-sub {
-    display: none;
-  }
 }
 .video-player,
 .new-video-player {
@@ -32,4 +18,19 @@
       color: #1296ba !important;
     }
   }
+  .ej-trans-sub {
+    display: none;
+  }
+  pre {
+    position: absolute;
+    bottom: 58px;
+    width: 100%;
+    text-align: center;
+    color: rgb(243, 243, 243);
+    z-index: 999;
+    font-size: 24px;
+  }
+}
+nav {
+  display: none;
 }

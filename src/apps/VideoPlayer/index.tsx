@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import OldVideoPlayer from './old';
+import { FullscreenIcon } from 'lucide-react';
 import './style.scss';
-import { Button } from '@/components/ui/button';
 
 const VideoPlayer = () => {
   const [searchParams] = useSearchParams();
@@ -25,23 +25,22 @@ const VideoPlayer = () => {
   }
 
   return (
-    <div className='new-video-player'>
-      <div className="w-full relative" ref={parentDivRef}>
-        <iframe
-          className="w-full h-full min-h-96"
-          src={`https://multiembed.mov/directstream.php?video_id=${videoId}${
-            season ? `&s=${season}&e=${episode}` : ''
-          }`}
-        />
-        <video className='hidden' />
-        <div
-          className="video-player-caption w-full text-center mt-2 absolute bottom-24 z-50 text-white text-3xl"
-          dangerouslySetInnerHTML={{ __html: subtitle }}
+    <div className="new-video-player w-full relative h-full" ref={parentDivRef}>
+      <iframe
+        className="w-full h-full"
+        src={`https://multiembed.mov/directstream.php?video_id=${videoId}${
+          season ? `&s=${season}&e=${episode}` : ''
+        }`}
+      />
+      <pre
+        className="video-player-caption"
+        dangerouslySetInnerHTML={{ __html: subtitle }}
+      />
+      <div className="text-white absolute bottom-2 right-2 bg-black p-1 opacity-0 hover:opacity-100">
+        <FullscreenIcon
+          onClick={() => document.documentElement.requestFullscreen()}
         />
       </div>
-      <Button onClick={() => parentDivRef.current?.requestFullscreen()}>
-        Full Screen
-      </Button>
     </div>
   );
 };
