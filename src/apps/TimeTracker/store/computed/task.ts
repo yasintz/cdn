@@ -4,8 +4,8 @@ import _ from 'lodash';
 import { isTag } from '../../helpers';
 import ms from 'ms';
 
-export function getTaskTags(task: TaskType) {
-  return _.uniq(task.title.split(' ').filter(isTag));
+export function getTagsFromString(value: string) {
+  return _.uniq(value.split(' ').filter(isTag));
 }
 
 export function getTaskTotalPrice(task: TaskType, endTime?: number) {
@@ -21,7 +21,7 @@ export function getTaskComputed(task: TaskType) {
   return {
     ...task,
     duration: getTaskDuration(task),
-    tags: getTaskTags(task),
+    tags: getTagsFromString(task.title),
     totalPrice: getTaskTotalPrice(task),
   };
 }

@@ -5,14 +5,20 @@ import { PlayCircleIcon, StopCircleIcon, Trash2Icon } from 'lucide-react';
 import ms from 'ms';
 import { useState } from 'react';
 import Tag from '../TimelineTodo/Tag';
-import { parseTagsFromTitle } from './helpers';
-import { getTaskTotalPrice } from './store/computed/task';
+import { getTagsFromString, getTaskTotalPrice } from './store/computed/task';
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type StartTaskProps = {
   now: number;
@@ -22,14 +28,17 @@ type StartTaskProps = {
 
 const TaskInput = ({ id, now }: StartTaskProps) => {
   const [title, setTitle] = useState('');
-  const { createTask, stopTask, tasks, updateTask, removeInput } = useStore();
+  const { createTask, stopTask, tasks, updateTask, removeInput, projects } =
+    useStore();
   const currentTask = tasks.find((i) => i.id === id);
+  const [projectId, setProjectId] = useState(currentTask?.projectId || '');
 
   const diff = now - (currentTask?.startTime || 0);
   const currentTaskTotalPrice =
     currentTask && getTaskTotalPrice(currentTask, now);
 
-  const { tags } = parseTagsFromTitle(currentTask?.title || title);
+  const taskTitle = currentTask?.title || title;
+  const tags = getTagsFromString(taskTitle);
 
   const currentTaskDuration = dayjs.duration(currentTask ? diff : 0);
 
@@ -51,11 +60,18 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
     updateTask(currentTask.id, { startTime });
   };
 
-  const inputTitle = currentTask?.title || title;
-  const updateTaskTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateTaskTitle = (value: string) => {
     currentTask
-      ? updateTask(currentTask.id, { title: e.target.value })
-      : setTitle(e.target.value);
+      ? updateTask(currentTask.id, { title: value, projectId })
+      : setTitle(value);
+  };
+
+  const updateProjectId = (id: string) => {
+    if (currentTask) {
+      updateTask(currentTask.id, { projectId: id });
+    }
+
+    setProjectId(id);
   };
 
   const handleStartStop = () => {
@@ -65,6 +81,7 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
       createTask(id, {
         title,
         startTime: Date.now(),
+        projectId,
       });
       setTitle('');
     }
@@ -74,10 +91,22 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
     <>
       <div className="flex items-center gap-3 mb-3">
         <div className="flex flex-1 gap-2">
+          <Select onValueChange={updateProjectId} value={projectId}>
+            <SelectTrigger className="w-60">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {projects.map((project) => (
+                <SelectItem key={project.id} value={project.id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             style={{ flex: 20 }}
-            value={inputTitle}
-            onChange={updateTaskTitle}
+            value={taskTitle}
+            onChange={(e) => updateTaskTitle(e.target.value)}
             placeholder="Task Title"
             ringDisabled
           />

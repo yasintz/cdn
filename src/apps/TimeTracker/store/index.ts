@@ -5,7 +5,7 @@ import { immer } from 'zustand/middleware/immer';
 import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import { uid } from '@/utils/uid';
 import { parseTagsFromTitle } from '../helpers';
-import { getTaskTags } from './computed/task';
+import { getTagsFromString } from './computed/task';
 
 export type TaskType = {
   id: string;
@@ -14,15 +14,22 @@ export type TaskType = {
   startTime: number;
   endTime?: number;
   priceHr?: number;
+  projectId: string;
+};
+
+export type ProjectType = {
+  id: string;
+  name: string;
 };
 
 type StoreType = {
   tasks: TaskType[];
+  projects: ProjectType[];
   taskTags: Record<string, string[]>;
   inputs: string[];
   createTask: (
     inputId: string,
-    task: Pick<TaskType, 'title' | 'startTime' | 'priceHr'>
+    task: Pick<TaskType, 'title' | 'startTime' | 'priceHr' | 'projectId'>
   ) => void;
   stopTask: (id: string) => void;
   updateTask: (id: string, task: Partial<Omit<TaskType, 'id'>>) => void;
@@ -38,6 +45,7 @@ export const useStore = create<StoreType>()(
         (set, get) =>
           ({
             tasks: [],
+            projects: [],
             inputs: [],
             addInput: () =>
               set((prev) => {
@@ -84,7 +92,10 @@ export const useStore = create<StoreType>()(
 
             ...compute(get, (state) => ({
               taskTags: Object.fromEntries(
-                state.tasks.map((task) => [task.id, getTaskTags(task)])
+                state.tasks.map((task) => [
+                  task.id,
+                  getTagsFromString(task.title),
+                ])
               ),
             })),
           } as StoreType),

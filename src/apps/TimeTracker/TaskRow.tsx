@@ -26,11 +26,14 @@ const TaskRow = ({
   editingTaskId,
   setEditingTaskId,
 }: TaskRowProps) => {
-  const { createTask, updateTask, deleteTask } = useStore();
+  const { createTask, updateTask, deleteTask, projects } = useStore();
   const task = useTaskComputed(taskData);
   const isBiggerThanOneDay = task.duration > ms('24 hours');
+  const project = projects.find((p) => p.id === task.projectId);
+
   return (
     <TableRow key={task.id}>
+      <TableCell>{project?.name || '#'}</TableCell>
       <TableCell>
         {editingTaskId === task.id ? (
           <Input
@@ -102,6 +105,7 @@ const TaskRow = ({
                 title: task.title,
                 startTime: Date.now(),
                 priceHr: task.priceHr,
+                projectId: task.projectId,
               })
             }
           />
