@@ -1,5 +1,6 @@
 import familyRouter from '@/app/family-tree/router';
 import HomePage from '@/apps/HomePage';
+import PianoExercise from '@/apps/PianoExercise';
 import TimeTracker from '@/apps/TimeTracker';
 import timelineTodoRouter from '@/apps/TimelineTodo/router';
 import VideoPlayer from '@/apps/VideoPlayer';
@@ -31,9 +32,13 @@ const router = createBrowserRouter([
         path: 'time-tracker',
         element: <TimeTracker />,
       },
-{
+      {
         path: 'video-player',
         element: <VideoPlayer />,
+      },
+      {
+        path: 'piano-exercise',
+        element: <PianoExercise />,
       },
     ],
   },

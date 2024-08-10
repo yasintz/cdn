@@ -4,6 +4,7 @@ import { getTagColor } from './utils/tags';
 type TagProps = {
   tag: string;
   onClick?: () => void;
+  onDoubleClick?: () => void;
   className?: string;
   showBorder?: boolean;
   customBorderColor?: string;
@@ -15,6 +16,7 @@ const Tag = ({
   showBorder,
   customBorderColor,
   onClick,
+  onDoubleClick,
 }: TagProps) => {
   const { backgroundColor, color } = getTagColor(tag);
   return (
@@ -31,6 +33,7 @@ const Tag = ({
           : undefined,
       }}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
     >
       {tag}
     </div>

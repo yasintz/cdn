@@ -6,6 +6,7 @@ import CreateInput from './CreateInput';
 import { useState } from 'react';
 import _ from 'lodash';
 import Tag from '../TimelineTodo/Tag';
+import { toast } from 'sonner';
 
 const TimeTracker = () => {
   const now = useNow();
@@ -23,7 +24,12 @@ const TimeTracker = () => {
   return (
     <div className="time-tracker p-4">
       {inputs.map((inputId) => (
-        <TaskInput key={inputId} id={inputId} now={now} />
+        <TaskInput
+          key={inputId}
+          id={inputId}
+          now={now}
+          selectedTags={selectedTags}
+        />
       ))}
 
       <CreateInput onAdd={addInput} />
@@ -34,7 +40,11 @@ const TimeTracker = () => {
             <Tag
               key={tag}
               tag={tag}
-              onClick={() => onTagToggle(tag)}
+              onDoubleClick={() => onTagToggle(tag)}
+              onClick={async () => {
+                await navigator.clipboard.writeText(tag);
+                toast('Tag copied to clipboard');
+              }}
               showBorder
               customBorderColor={
                 selectedTags.includes(tag) ? undefined : 'transparent'

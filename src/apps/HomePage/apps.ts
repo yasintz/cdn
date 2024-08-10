@@ -19,4 +19,9 @@ export const apps = {
     image:
       'https://static.vecteezy.com/system/resources/previews/001/812/859/non_2x/video-player-play-button-simple-outline-color-icon-isolated-on-white-cartoon-hand-draw-illustration-vector.jpg',
   },
+  'piano-exercise': {
+    title: 'Piano Exercise',
+    image:
+      'https://cdn.pixabay.com/photo/2021/03/10/14/57/pianist-6084749_1280.png',
+  },
 };

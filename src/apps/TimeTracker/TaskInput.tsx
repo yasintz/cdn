@@ -17,6 +17,7 @@ import {
 type StartTaskProps = {
   now: number;
   id: string;
+  selectedTags: string[];
 };
 
 const TaskInput = ({ id, now }: StartTaskProps) => {
@@ -50,6 +51,13 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
     updateTask(currentTask.id, { startTime });
   };
 
+  const inputTitle = currentTask?.title || title;
+  const updateTaskTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    currentTask
+      ? updateTask(currentTask.id, { title: e.target.value })
+      : setTitle(e.target.value);
+  };
+
   const handleStartStop = () => {
     if (currentTask) {
       stopTask(id);
@@ -68,12 +76,8 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
         <div className="flex flex-1 gap-2">
           <Input
             style={{ flex: 20 }}
-            value={currentTask?.title || title}
-            onChange={(e) =>
-              currentTask
-                ? updateTask(currentTask.id, { title: e.target.value })
-                : setTitle(e.target.value)
-            }
+            value={inputTitle}
+            onChange={updateTaskTitle}
             placeholder="Task Title"
             ringDisabled
           />

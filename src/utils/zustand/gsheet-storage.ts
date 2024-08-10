@@ -6,6 +6,7 @@ import ms from 'ms';
 import _ from 'lodash';
 // @ts-expect-error type definition
 import { diffString } from 'json-diff';
+import { toast } from 'sonner';
 
 export function gSheetStorageDeprecated(sheetTabId: string): StateStorage {
   const db = googleSheetDbDeprecated(sheetTabId);
@@ -37,7 +38,7 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
     const latest = await db.get();
 
     if (!_.isEqual(syncedResponse, latest)) {
-      alert('Database is not in sync.');
+      toast.error('Database is not in sync');
       console.log(diffString(latest, syncedResponse));
       return;
     }
@@ -73,7 +74,7 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
         restartInterval();
       });
     } catch (error) {
-      alert('Database is not working');
+      toast.error('Database is not working');
     }
   }
 
