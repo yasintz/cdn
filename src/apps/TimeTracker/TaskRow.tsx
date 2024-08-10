@@ -98,7 +98,11 @@ const TaskRow = ({
           <PlayIcon
             className="cursor-pointer size-4"
             onClick={() =>
-              createTask(uid(), { title: task.title, startTime: Date.now() })
+              createTask(uid(), {
+                title: task.title,
+                startTime: Date.now(),
+                priceHr: task.priceHr,
+              })
             }
           />
         </div>

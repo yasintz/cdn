@@ -8,12 +8,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TaskType } from './store';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import TaskRow from './TaskRow';
 import ms from 'ms';
 import dayjs from '@/helpers/dayjs';
-import { getTaskDuration } from './store/computed/task';
+import { getTaskComputed } from './store/computed/task';
 
 type TaskTableComProps = {
   tasks: TaskType[];
@@ -25,7 +25,12 @@ const TableCom = ({
   tasks,
   setEditingTaskId,
 }: TaskTableComProps) => {
-  const total = tasks.reduce((acc, cur) => acc + getTaskDuration(cur), 0);
+  const allTasks = tasks.map((t) => getTaskComputed(t));
+  const total = allTasks.reduce((acc, cur) => acc + cur.duration, 0);
+  const totalPrice = allTasks.reduce(
+    (acc, cur) => acc + (cur.totalPrice || 0),
+    0
+  );
   const isBiggerThanOneDay = total >= ms('1 day');
   return (
     <Table>
@@ -63,7 +68,7 @@ const TableCom = ({
                 .format(isBiggerThanOneDay ? 'mm:ss' : 'HH:mm:ss')}
             </div>
           </TableCell>
-          <TableCell></TableCell>
+          <TableCell>${totalPrice.toFixed(2)}</TableCell>
           <TableCell></TableCell>
         </TableRow>
       </TableFooter>
@@ -76,9 +81,17 @@ type PropsType = {
 };
 const TaskTable = ({ tasks }: PropsType) => {
   const [editingTaskId, setEditingTaskId] = useState<string>();
+  const [height, setHeight] = useState<number>(0);
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setHeight(
+      (prev) => prev || divRef.current?.getBoundingClientRect().height || 0
+    );
+  }, []);
 
   return (
-    <>
+    <div ref={divRef} className="flex flex-col flex-1">
       <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative">
         <TableCom
           tasks={tasks}
@@ -87,16 +100,21 @@ const TaskTable = ({ tasks }: PropsType) => {
         />
       </div>
       <div
-        style={{ transform: 'translateY(-50px)', maxHeight: 'calc(100vh - 145px)' }}
-        className="relative overflow-y-scroll h-full rounded-md border"
+        style={{
+          transform: 'translateY(-50px)',
+          height: height,
+        }}
+        className="relative overflow-y-scroll rounded-md border"
       >
-        <TableCom
-          tasks={tasks}
-          editingTaskId={editingTaskId}
-          setEditingTaskId={setEditingTaskId}
-        />
+        {height > 0 && (
+          <TableCom
+            tasks={tasks}
+            editingTaskId={editingTaskId}
+            setEditingTaskId={setEditingTaskId}
+          />
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

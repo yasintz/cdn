@@ -22,7 +22,7 @@ type StoreType = {
   inputs: string[];
   createTask: (
     inputId: string,
-    task: Pick<TaskType, 'title' | 'startTime'>
+    task: Pick<TaskType, 'title' | 'startTime' | 'priceHr'>
   ) => void;
   stopTask: (id: string) => void;
   updateTask: (id: string, task: Partial<Omit<TaskType, 'id'>>) => void;

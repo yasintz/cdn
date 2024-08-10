@@ -21,7 +21,7 @@ const TimeTracker = () => {
   };
 
   return (
-    <div className="time-tracker p-4">
+    <div className="time-tracker p-4 flex flex-col h-full">
       {inputs.map((inputId) => (
         <TaskInput
           key={inputId}
