@@ -78,7 +78,7 @@ const TaskTable = ({ tasks }: PropsType) => {
   const [editingTaskId, setEditingTaskId] = useState<string>();
 
   return (
-    <div className='h-full'>
+    <>
       <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative">
         <TableCom
           tasks={tasks}
@@ -87,7 +87,7 @@ const TaskTable = ({ tasks }: PropsType) => {
         />
       </div>
       <div
-        style={{ transform: 'translateY(-50px)' ,maxHeight: 'calc(100% - 276px)'}}
+        style={{ transform: 'translateY(-50px)', maxHeight: 'calc(100vh - 145px)' }}
         className="relative overflow-y-scroll h-full rounded-md border"
       >
         <TableCom
@@ -96,7 +96,7 @@ const TaskTable = ({ tasks }: PropsType) => {
           setEditingTaskId={setEditingTaskId}
         />
       </div>
-    </div>
+    </>
   );
 };
 
