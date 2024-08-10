@@ -6,7 +6,6 @@ import CreateInput from './CreateInput';
 import { useState } from 'react';
 import _ from 'lodash';
 import Tag from '../TimelineTodo/Tag';
-import { toast } from 'sonner';
 
 const TimeTracker = () => {
   const now = useNow();
@@ -41,10 +40,7 @@ const TimeTracker = () => {
               key={tag}
               tag={tag}
               onDoubleClick={() => onTagToggle(tag)}
-              onClick={async () => {
-                await navigator.clipboard.writeText(tag);
-                toast('Tag copied to clipboard');
-              }}
+              onClick={() => navigator.clipboard.writeText(tag)}
               showBorder
               customBorderColor={
                 selectedTags.includes(tag) ? undefined : 'transparent'
