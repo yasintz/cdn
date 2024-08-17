@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import './style.scss';
+import Video from './Video';
 
 const parser = new srtParser2();
 
@@ -107,12 +108,7 @@ const LocalVideoPlayer = () => {
   return (
     <div className="p-4 overflow-y-auto">
       <div className="video-player">
-        <video
-          src={videoUrl}
-          ref={videoRef}
-          controls
-          className="outline-none"
-        />
+        <Video videoUrl={videoUrl!} videoRef={videoRef} />
         {srtJson.length > 0 && (
           <pre
             className="video-player-caption"
