@@ -11,6 +11,7 @@ import EditNoteDialog from './EditNoteDialog';
 import RightPanel from './RightPanel';
 import './style.scss';
 import { useExternalCalendars } from './utils/calendar';
+import SessionWeekView from './SessionWeekView';
 
 const TimelineTodo = () => {
   const { sessionId } = useParams();
@@ -48,12 +49,14 @@ const TimelineTodo = () => {
       {session && (
         <div className="flex gap-2 justify-between flex-1 min-h-0">
           <div className="py-4 px-6 overflow-y-scroll relative flex-1 pb-24">
-            <RightPanel
-              selectedEntry={selectedEntry}
-              session={session}
-              sessionEntries={sessionEntries}
-              className="flex md:hidden"
-            />
+            {session.view !== 'week-view' && (
+              <RightPanel
+                selectedEntry={selectedEntry}
+                session={session}
+                sessionEntries={sessionEntries}
+                className="flex md:hidden"
+              />
+            )}
             {(!session.view || session.view === 'day-view') && (
               <SessionDayView
                 sessionEntries={sessionEntries}
@@ -68,13 +71,21 @@ const TimelineTodo = () => {
                 startOfDayDiff={startOfDayDiff}
               />
             )}
+            {session.view === 'week-view' && (
+              <SessionWeekView
+                session={session}
+                startOfDayDiff={startOfDayDiff}
+              />
+            )}
           </div>
-          <RightPanel
-            selectedEntry={selectedEntry}
-            session={session}
-            sessionEntries={sessionEntries}
-            className="hidden md:flex"
-          />
+          {session.view !== 'week-view' && (
+            <RightPanel
+              selectedEntry={selectedEntry}
+              session={session}
+              sessionEntries={sessionEntries}
+              className="hidden md:flex"
+            />
+          )}
           <EditNoteDialog />
         </div>
       )}

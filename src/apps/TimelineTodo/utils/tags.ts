@@ -22,7 +22,7 @@ export const tagsGroup: Record<string, string[]> = {
 export const tagsColor: Record<string, string> = {
   bad: '#dd2a29',
   sleep: '#ca8a03',
-  ibadet: '#62c06b',
+  ibadet: '#6C4675',
   free: '#24b021',
   finance: '#d78b12',
   kajabi: '#1276f0',

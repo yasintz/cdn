@@ -1,7 +1,7 @@
 import type { EntryType, TodoStoreCreator, TodoType } from '..';
 import { uid } from '@/utils/uid';
 
-type ViewType = 'note' | 'day-view';
+type ViewType = 'note' | 'day-view' | 'week-view';
 
 export type SessionType = {
   id: string;

@@ -107,6 +107,7 @@ export const useStore = create<StoreType>()(
   )
 );
 
-gSheetStorage('1KvjSCdlFvJqE-SoJOLpfOiuGlwqM5aSqwZJy7uAM4zQ').handleStore(
-  useStore
-);
+gSheetStorage(
+  'Time Tracker',
+  '1KvjSCdlFvJqE-SoJOLpfOiuGlwqM5aSqwZJy7uAM4zQ'
+).handleStore(useStore);

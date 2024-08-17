@@ -27,8 +27,10 @@ const HourItem = ({ hourMs, hourSize, printNext, hidden }: HourItemProps) => {
         </span>
       </div>
       {printNext && (
-        <div className="absolute bottom-0 w-14 h-full translate-y-3 bg-white flex items-end">
-          {dayjs.duration(hourMs).add(1, 'hour').format('HH:mm')}
+        <div className="absolute bottom-0 w-14 h-full translate-y-3 bg-white flex items-end text-gray-500">
+          <span className={cn(hidden && 'opacity-0')}>
+            {dayjs.duration(hourMs).add(1, 'hour').format('HH:mm')}
+          </span>
         </div>
       )}
     </div>

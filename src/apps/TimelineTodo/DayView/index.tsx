@@ -5,15 +5,25 @@ import dayjs from '@/helpers/dayjs';
 import { DayViewContext } from './context';
 import { positiveNumber } from '@/utils';
 import ms from 'ms';
+import { cn } from '@/lib/utils';
 
 type DayViewProps = {
   startTime: number;
   endTime: number;
   children?: React.ReactNode;
   now?: number;
+  className?: string;
+  hideHours?: boolean;
 };
 
-const DayView = ({ startTime, endTime, now, children }: DayViewProps) => {
+const DayView = ({
+  startTime,
+  endTime,
+  now,
+  children,
+  className,
+  hideHours,
+}: DayViewProps) => {
   const { hours, startHourMs, endHourMs, totalSize } = getHours(
     Math.min(startTime, now || startTime),
     Math.max(endTime, now || endTime)
@@ -30,7 +40,7 @@ const DayView = ({ startTime, endTime, now, children }: DayViewProps) => {
         style={{
           height: totalSize,
         }}
-        className="border-y box-border relative"
+        className={cn('border-y box-border relative', className)}
       >
         {hours.map(({ hourMs }, index) => (
           <HourItem
@@ -39,8 +49,9 @@ const DayView = ({ startTime, endTime, now, children }: DayViewProps) => {
             hourSize={hourSize}
             printNext={index === hours.length - 1}
             hidden={
-              typeof now === 'number' &&
-              positiveNumber(hourMs - now) < ms('15 minutes')
+              hideHours ||
+              (typeof now === 'number' &&
+                positiveNumber(hourMs - now) < ms('15 minutes'))
             }
           />
         ))}
@@ -53,7 +64,11 @@ const DayView = ({ startTime, endTime, now, children }: DayViewProps) => {
               zIndex: 2,
             }}
           >
-            <div className="-translate-y-1/2 pr-1 bg-white text-black">
+            <div
+              className={cn('-translate-y-1/2 pr-1 bg-white text-black', {
+                'opacity-0': hideHours,
+              })}
+            >
               {dayjs.duration(now).format('HH:mm')}
             </div>
             <div

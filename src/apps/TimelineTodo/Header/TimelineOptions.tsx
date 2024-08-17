@@ -175,6 +175,13 @@ const TimelineOptions = ({ activeSession }: DropdownProps) => {
                     updateSession(activeSession.id, { view: 'day-view' })
                   }
                 />
+                <DropdownItem
+                  title="Week View"
+                  icon={CalendarIcon}
+                  onClick={() =>
+                    updateSession(activeSession.id, { view: 'week-view' })
+                  }
+                />
               </SubMenu>
             )}
             <SubMenu title="Move">

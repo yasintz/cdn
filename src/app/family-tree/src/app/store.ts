@@ -26,6 +26,7 @@ export const useStore = create(
   )
 );
 
-gSheetStorage('1BiqlwaBsUdyQIZU2wy0dMv7HkA7E0WpOZjyR3rWTr6E').handleStore(
-  useStore
-);
+gSheetStorage(
+  'Family Tree',
+  '1BiqlwaBsUdyQIZU2wy0dMv7HkA7E0WpOZjyR3rWTr6E'
+).handleStore(useStore);

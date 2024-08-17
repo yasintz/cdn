@@ -31,14 +31,14 @@ export function handleStoreLoadingState(store: any, loadingStateName: string) {
   });
 }
 
-export function gSheetStorage(sheetId: string, tabId?: string) {
+export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
   const db = googleSheetDB(sheetId, tabId);
   let syncedResponse: any;
   const debouncedSync = _debounce(async (value: string) => {
     const latest = await db.get();
 
     if (!_.isEqual(syncedResponse, latest)) {
-      toast.error('Database is not in sync');
+      toast.error(`${name} db is not in sync`);
       console.log(diffString(latest, syncedResponse));
       return;
     }
@@ -74,7 +74,7 @@ export function gSheetStorage(sheetId: string, tabId?: string) {
         restartInterval();
       });
     } catch (error) {
-      toast.error('Database is not working');
+      toast.error(`${name} db is not working`);
     }
   }
 

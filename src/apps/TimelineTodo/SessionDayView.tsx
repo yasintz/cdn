@@ -6,11 +6,15 @@ import ms from 'ms';
 type SessionDayViewProps = {
   sessionEntries: EntryWithRelation[];
   startOfDayDiff: number;
+  className?: string;
+  hideHours?: boolean;
 };
 
 const SessionDayView = ({
   sessionEntries,
   startOfDayDiff,
+  className,
+  hideHours,
 }: SessionDayViewProps) => {
   const startTime = sessionEntries.length ? sessionEntries[0].time : 0;
   const endTime = sessionEntries.length
@@ -18,13 +22,17 @@ const SessionDayView = ({
     : ms('24 hours');
 
   return (
-    <>
-      <DayView startTime={startTime} endTime={endTime} now={startOfDayDiff}>
-        {sessionEntries.map((entry) => (
-          <DayViewEntry key={entry.id} entry={entry} />
-        ))}
-      </DayView>
-    </>
+    <DayView
+      startTime={startTime}
+      endTime={endTime}
+      now={startOfDayDiff}
+      className={className}
+      hideHours={hideHours}
+    >
+      {sessionEntries.map((entry) => (
+        <DayViewEntry key={entry.id} entry={entry} />
+      ))}
+    </DayView>
   );
 };
 

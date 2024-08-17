@@ -7,6 +7,7 @@ type RequiredStore = Pick<StoreType, 'sessions' | 'entries' | 'todos'>;
 export type SessionWithRelation = SessionType & {
   entries: () => EntryWithRelation[];
   todos: () => TodoWithRelation[];
+  children: () => SessionWithRelation[];
 };
 
 export type EntryWithRelation = EntryType & {
@@ -41,10 +42,16 @@ export function createStoreRelations(store: RequiredStore): StoreRelations {
       );
 
     const todos = () => _.flatten(entries().map((i) => i.todos()));
+    const children = () =>
+      store.sessions
+        .filter((i) => i.parentId === session.id)
+        .map((i) => createSessionRelation(i));
+
     return {
       ...session,
       entries,
       todos,
+      children,
     };
   }
 

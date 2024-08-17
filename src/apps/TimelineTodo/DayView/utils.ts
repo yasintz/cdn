@@ -7,7 +7,7 @@ export const msSize = hourSize / ms('1 hour');
 
 export function getHours(startTime: number, endTime: number) {
   const startHour = Math.floor(startTime / ONE_HOUR);
-  const endHour = Math.ceil((endTime + 1) / ONE_HOUR) + 1;
+  const endHour = Math.ceil((endTime + 1) / ONE_HOUR) + 2;
 
   const hours = [];
   for (let hour = startHour; hour <= endHour; hour++) {
