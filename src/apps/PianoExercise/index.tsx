@@ -107,3 +107,5 @@ const PianoExercise = () => {
 };
 
 export default PianoExercise;
+
+export { PianoExercise as Component };

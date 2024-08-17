@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@loadable/component':
+        specifier: ^5.16.4
+        version: 5.16.4(react@18.2.0)
       '@radix-ui/react-checkbox':
         specifier: ^1.0.4
         version: 1.0.4(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -198,6 +201,9 @@ importers:
       '@types/inquirer':
         specifier: ^9.0.7
         version: 9.0.7
+      '@types/loadable__component':
+        specifier: ^5.13.9
+        version: 5.13.9
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.14.202
@@ -708,6 +714,12 @@ packages:
 
   '@kurkle/color@0.3.2':
     resolution: {integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==}
+
+  '@loadable/component@5.16.4':
+    resolution: {integrity: sha512-fJWxx9b5WHX90QKmizo9B+es2so8DnBthI1mbflwCoOyvzEwxiZ/SVDCTtXEnHG72/kGBdzr297SSIekYtzSOQ==}
+    engines: {node: '>=8'}
+    peerDependencies:
+      react: ^16.3.0 || ^17.0.0 || ^18.0.0
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1293,6 +1305,9 @@ packages:
 
   '@types/jsonfile@6.1.4':
     resolution: {integrity: sha512-D5qGUYwjvnNNextdU59/+fI+spnwtTFmyQP0h+PfIOSkNfpU6AOICUOkm4i0OnSk+NyjdPJrxCDro0sJsWlRpQ==}
+
+  '@types/loadable__component@5.13.9':
+    resolution: {integrity: sha512-QWOtIkwZqHNdQj3nixQ8oyihQiTMKZLk/DNuvNxMSbTfxf47w+kqcbnxlUeBgAxdOtW0Dh48dTAIp83iJKtnrQ==}
 
   '@types/lodash.memoize@4.1.9':
     resolution: {integrity: sha512-glY1nQuoqX4Ft8Uk+KfJudOD7DQbbEDF6k9XpGncaohW3RW4eSWBlx6AA0fZCrh40tZcQNH4jS/Oc59J6Eq+aw==}
@@ -3971,6 +3986,13 @@ snapshots:
 
   '@kurkle/color@0.3.2': {}
 
+  '@loadable/component@5.16.4(react@18.2.0)':
+    dependencies:
+      '@babel/runtime': 7.23.9
+      hoist-non-react-statics: 3.3.2
+      react: 18.2.0
+      react-is: 16.13.1
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -4595,6 +4617,10 @@ snapshots:
   '@types/jsonfile@6.1.4':
     dependencies:
       '@types/node': 18.11.18
+
+  '@types/loadable__component@5.13.9':
+    dependencies:
+      '@types/react': 18.2.48
 
   '@types/lodash.memoize@4.1.9':
     dependencies:

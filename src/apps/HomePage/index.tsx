@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { apps } from './apps';
 
-
 const HomePage = () => {
   return (
     <div className="flex gap-2 p-4 flex-wrap">
@@ -26,3 +25,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+export { HomePage as Component };

@@ -1,4 +1,4 @@
-import { Outlet, RouteObject } from 'react-router-dom';
+import { Outlet, Route, RouteObject, Routes } from 'react-router-dom';
 import Layout from './src/components/layout';
 import PersonLayout from './src/components/person-layout';
 import HomePage from './src/pages';
@@ -87,3 +87,28 @@ const router: RouteObject[] = [
 ];
 
 export default router;
+
+export const Router = () => {
+  return (
+    <Routes>
+      {router.map((route, index) => {
+        return (
+          <Route key={index} path={route.path} element={route.element}>
+            {route.children &&
+              route.children.map((child, index) => {
+                return (
+                  <Route
+                    key={index}
+                    path={child.path}
+                    element={child.element}
+                  />
+                );
+              })}
+          </Route>
+        );
+      })}
+    </Routes>
+  );
+};
+
+export { Router as Component };

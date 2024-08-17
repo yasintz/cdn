@@ -65,3 +65,5 @@ const TimeTracker = () => {
 };
 
 export default TimeTracker;
+
+export { TimeTracker as Component };

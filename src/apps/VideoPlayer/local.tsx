@@ -17,10 +17,12 @@ const parser = new srtParser2();
 
 const LocalVideoPlayer = () => {
   const [videoFile, setVideoFile] = useState<File>();
-  const [srt, setSrt] = useState<string>();
+  const [srtJson, setSrtJson] = useState<
+    ReturnType<(typeof parser)['fromSrt']>
+  >([]);
   const [activeSubtitle, setActiveSubtitle] = useState<string>();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [adjust, setAdjust] = useState(0);
+  const [adjustSecond, setAdjustSecond] = useState(0);
 
   const videoUrl = useMemo(() => {
     if (!videoFile) {
@@ -33,34 +35,32 @@ const LocalVideoPlayer = () => {
   }, [videoFile]);
 
   const subtitle = useMemo(() => {
-    if (!srt) {
-      return [];
-    }
-
-    let arr: ReturnType<(typeof parser)['fromSrt']> = [];
-
-    if (srt[0] === '[') {
-      arr = JSON.parse(srt) as any;
-    } else {
-      arr = parser.fromSrt(srt);
-    }
-
-    const adjustSeconds = adjust / 1000;
-    return arr.map((i) => ({
+    return srtJson.map((i) => ({
       ...i,
-      startSeconds: i.startSeconds + adjustSeconds,
-      endSeconds: i.endSeconds + adjustSeconds,
+      startSeconds: i.startSeconds + adjustSecond,
+      endSeconds: i.endSeconds + adjustSecond,
     }));
-  }, [adjust, srt]);
+  }, [adjustSecond, srtJson]);
 
   const onSubtitleUploaded = (e: React.ChangeEvent<HTMLInputElement>) => {
     const reader = new FileReader();
+    const file = e.target.files?.[0];
+    const isJsonFile = file?.name.endsWith('.json');
+
+    if (!file) {
+      return alert('No file selected');
+    }
 
     reader.addEventListener('load', (e) => {
-      setSrt(e.target?.result as string);
+      if (isJsonFile) {
+        setSrtJson(JSON.parse(e.target?.result as string));
+        return;
+      }
+
+      setSrtJson(parser.fromSrt(e.target?.result as string));
     });
 
-    reader.readAsText(e.target.files?.[0] as any);
+    reader.readAsText(file);
   };
 
   useEffect(() => {
@@ -113,7 +113,7 @@ const LocalVideoPlayer = () => {
           controls
           className="outline-none"
         />
-        {srt && (
+        {srtJson.length > 0 && (
           <pre
             className="video-player-caption"
             dangerouslySetInnerHTML={{ __html: activeSubtitle || '' }}
@@ -128,7 +128,7 @@ const LocalVideoPlayer = () => {
         >
           Full Screen
         </Button>
-        {srt && (
+        {srtJson.length > 0 && (
           <>
             <div className="flex flex-col gap-2">
               <Label className="flex gap-2">
@@ -151,8 +151,8 @@ const LocalVideoPlayer = () => {
               <Input
                 placeholder="Adjust"
                 type="number"
-                value={adjust}
-                onChange={(e) => setAdjust(parseFloat(e.target.value))}
+                value={adjustSecond}
+                onChange={(e) => setAdjustSecond(parseFloat(e.target.value))}
               />
               <Button
                 onClick={() =>
@@ -176,14 +176,18 @@ const LocalVideoPlayer = () => {
                       'remove-all-input'
                     ) as HTMLInputElement;
                     const value = input.value;
-                    setSrt(srt.replaceAll(value, ''));
+                    setSrtJson(
+                      JSON.parse(JSON.stringify(srtJson).replaceAll(value, ''))
+                    );
                   }}
                 >
                   Remove All
                 </Button>
               </div>
 
-              <pre className="max-h-96 overflow-y-scroll">{srt}</pre>
+              <pre className="max-h-96 overflow-y-scroll">
+                {JSON.stringify(subtitle, null, 2)}
+              </pre>
             </div>
           </>
         )}
