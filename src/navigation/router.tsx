@@ -34,6 +34,10 @@ const router = createBrowserRouter([
         path: 'piano-exercise',
         lazy: () => import('../apps/PianoExercise'),
       },
+      {
+        path: 'calendar',
+        lazy: () => import('../apps/Calendar'),
+      },
     ],
   },
 ]);

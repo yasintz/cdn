@@ -17,7 +17,7 @@ const List = ({
   active: number;
   onClick: (n: number) => void;
 }) => (
-  <div className="h-full overflow-y-auto flex flex-col gap-1 text-sm cursor-pointer border-r px-2 scrollbar-hidden py-2">
+  <div className="h-full overflow-y-auto flex flex-col gap-1 text-sm cursor-pointer first:border-r px-2 scrollbar-hidden py-2">
     {list.map((item) => (
       <div
         key={item}
