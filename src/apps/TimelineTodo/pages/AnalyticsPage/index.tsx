@@ -13,3 +13,4 @@ const AnalyticsPage = () => {
 };
 
 export default AnalyticsPage;
+export { AnalyticsPage as Component };

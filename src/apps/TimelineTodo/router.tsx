@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 import TimelineTodo from './TimelineTodo';
-import AnalyticsPage from './pages/AnalyticsPage';
 
 export default function TimelineTodoRouter() {
   return (
@@ -8,7 +7,7 @@ export default function TimelineTodoRouter() {
       <Route path=":sessionId?" element={<TimelineTodo />} />
       <Route
         path=":sessionId/analytics"
-        element={<AnalyticsPage />}
+        lazy={() => import('./pages/AnalyticsPage')}
       />
     </Routes>
   );

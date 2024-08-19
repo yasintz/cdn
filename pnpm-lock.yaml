@@ -273,6 +273,9 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.4.33
+      postcss-import:
+        specifier: ^16.1.0
+        version: 16.1.0(postcss@8.4.33)
       rollup-plugin-visualizer:
         specifier: ^5.12.0
         version: 5.12.0(rollup@4.9.1)
@@ -297,6 +300,9 @@ importers:
       vite:
         specifier: ^5.0.12
         version: 5.0.12(@types/node@18.11.18)(sass@1.70.0)(terser@5.27.0)
+      vite-bundle-visualizer:
+        specifier: ^1.2.1
+        version: 1.2.1(rollup@4.9.1)
       vite-plugin-html:
         specifier: ^3.2.2
         version: 3.2.2(vite@5.0.12(@types/node@18.11.18)(sass@1.70.0)(terser@5.27.0))
@@ -2338,10 +2344,17 @@ packages:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
 
+  import-from-esm@1.3.4:
+    resolution: {integrity: sha512-7EyUlPFC0HOlBDpUFGfYstsU7XHxZJKAAMzCT8wZ0hMW7b+hG51LIKTDcsgtz8Pu6YC0HqRVbX+rVUtsGMUKvg==}
+    engines: {node: '>=16.20'}
+
   import-local@3.1.0:
     resolution: {integrity: sha512-ASB07uLtnDs1o6EHjKpX34BKYDSqnFerfTOJL2HvMqF70LnxpjkzDB8J44oT9pu4AMPkQwf8jl6szgvNd2tRIg==}
     engines: {node: '>=8'}
     hasBin: true
+
+  import-meta-resolve@4.1.0:
+    resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
 
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
@@ -2775,6 +2788,12 @@ packages:
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
+    peerDependencies:
+      postcss: ^8.0.0
+
+  postcss-import@16.1.0:
+    resolution: {integrity: sha512-7hsAZ4xGXl4MW+OKEWCnF6T5jqBw80/EE9aXg1r2yyn1RsVEU8EtKXbijEODa+rg7iih4bKf7vlvTGYR4CnPNg==}
+    engines: {node: '>=18.0.0'}
     peerDependencies:
       postcss: ^8.0.0
 
@@ -3294,6 +3313,10 @@ packages:
     resolution: {integrity: sha512-q5nmENpTHgiPVd1cJDDc9cVoYN5x4vCvwT3FMilvKPKneCBZAxn2YWQjDF0UMcE9k0Cay1gBiDfTMU0g+mPMQA==}
     engines: {node: '>=14.0.0'}
 
+  tmp@0.2.3:
+    resolution: {integrity: sha512-nZD7m9iCPC5g0pYmcaxogYKggSfLsdxl8of3Q/oIbqCqLLIO9IAF0GWjX1z9NZRHPiXv8Wex4yDCaZsgEw0Y8w==}
+    engines: {node: '>=14.14'}
+
   to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
@@ -3445,6 +3468,11 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
+
+  vite-bundle-visualizer@1.2.1:
+    resolution: {integrity: sha512-cwz/Pg6+95YbgIDp+RPwEToc4TKxfsFWSG/tsl2DSZd9YZicUag1tQXjJ5xcL7ydvEoaC2FOZeaXOU60t9BRXw==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    hasBin: true
 
   vite-node@2.0.4:
     resolution: {integrity: sha512-ZpJVkxcakYtig5iakNeL7N3trufe3M6vGuzYAr4GsbCTwobDeyPJpE4cjDhhPluv8OvQCFzu2LWp6GkoKRITXA==}
@@ -5760,10 +5788,19 @@ snapshots:
       parent-module: 1.0.1
       resolve-from: 4.0.0
 
+  import-from-esm@1.3.4:
+    dependencies:
+      debug: 4.3.6
+      import-meta-resolve: 4.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   import-local@3.1.0:
     dependencies:
       pkg-dir: 4.2.0
       resolve-cwd: 3.0.0
+
+  import-meta-resolve@4.1.0: {}
 
   imurmurhash@0.1.4: {}
 
@@ -6141,6 +6178,13 @@ snapshots:
       find-up: 4.1.0
 
   postcss-import@15.1.0(postcss@8.4.33):
+    dependencies:
+      postcss: 8.4.33
+      postcss-value-parser: 4.2.0
+      read-cache: 1.0.0
+      resolve: 1.22.8
+
+  postcss-import@16.1.0(postcss@8.4.33):
     dependencies:
       postcss: 8.4.33
       postcss-value-parser: 4.2.0
@@ -6660,6 +6704,8 @@ snapshots:
 
   tinyspy@3.0.0: {}
 
+  tmp@0.2.3: {}
+
   to-fast-properties@2.0.0: {}
 
   to-regex-range@5.0.1:
@@ -6787,6 +6833,16 @@ snapshots:
   utility-types@3.11.0: {}
 
   v8-compile-cache-lib@3.0.1: {}
+
+  vite-bundle-visualizer@1.2.1(rollup@4.9.1):
+    dependencies:
+      cac: 6.7.14
+      import-from-esm: 1.3.4
+      rollup-plugin-visualizer: 5.12.0(rollup@4.9.1)
+      tmp: 0.2.3
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
 
   vite-node@2.0.4(@types/node@18.11.18)(sass@1.70.0)(terser@5.27.0):
     dependencies:
