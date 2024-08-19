@@ -59,7 +59,7 @@ function getEventConfig({
   const duration = end.toDate().getTime() - start.toDate().getTime();
   const startTime = dayjs(start).diff(dayjs(start).startOf('day'));
 
-  const height = (duration / ONE_DAY) * rect.height;
+  const height = ((duration / ONE_DAY) * rect.height) - 2;
   const top = (startTime / ONE_DAY) * rect.height;
 
   const isThereSameTimeFrameEvents = eventsInSameTimeFrame.length > 1;
