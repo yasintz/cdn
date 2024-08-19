@@ -4,7 +4,7 @@ import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
 import { EventType } from './store';
 import _ from 'lodash';
-import { toRGB } from '../TimelineTodo/helpers';
+import { toRGB } from '@/helpers/color';
 
 const ONE_DAY = ms('1 day');
 

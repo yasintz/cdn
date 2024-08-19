@@ -32,14 +32,14 @@ export const tagsColor: Record<string, string> = {
   finance: '#d78b12',
 };
 
-export const toRGB = (color: string, alpha = 1) => {
+export const toRGB = (color: string) => {
   const { style } = new Option();
   style.color = color;
   const rgb = style.color;
 
   const [r, g, b] = rgb.replace('rgb(', '').replace(')', '').split(',');
 
-  return `rgba(${r},${g},${b},${alpha})`;
+  return { r, g, b };
 };
 
 export function hashCode(t: string) {

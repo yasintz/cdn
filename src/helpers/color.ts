@@ -24,12 +24,12 @@ export function stringToColor(
   return color;
 }
 
-export const toRGB = (color: string) => {
+export const toRGB = (color: string, alpha = 1) => {
   const { style } = new Option();
   style.color = color;
   const rgb = style.color;
 
   const [r, g, b] = rgb.replace('rgb(', '').replace(')', '').split(',');
 
-  return { r, g, b };
+  return `rgba(${r},${g},${b},${alpha})`;
 };
