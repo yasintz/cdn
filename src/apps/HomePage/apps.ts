@@ -4,8 +4,8 @@ export const apps = {
     image:
       'https://cdn.dribbble.com/users/82373/screenshots/6785208/familytree.jpg?resize=400x0',
   },
-  'timeline-todo': {
-    title: 'Timeline Todo',
+  calendar: {
+    title: 'Calendar',
     image:
       'https://www.elegantthemes.com/blog/wp-content/uploads/2019/04/divi-transform-timeline-featured-image-3.jpg',
   },
