@@ -79,7 +79,10 @@ const CalendarPage = () => {
     <div className="h-full flex flex-col">
       <div className="flex justify-between px-4">
         <CreateModal />
-        <select onChange={(e) => setViewDays(Number(e.target.value))}>
+        <select
+          value={viewDays.toString()}
+          onChange={(e) => setViewDays(Number(e.target.value))}
+        >
           <option value="7">Week</option>
           <option value="1">Day</option>
           <option value="4">4 Days</option>
