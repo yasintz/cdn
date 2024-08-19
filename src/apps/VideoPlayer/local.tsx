@@ -108,7 +108,7 @@ const LocalVideoPlayer = () => {
   return (
     <div className="p-4 overflow-y-auto">
       <div className="video-player">
-        <Video videoUrl={videoUrl!} videoRef={videoRef} />
+        <Video videoUrl={videoUrl!} videoRef={videoRef as any} />
         {srtJson.length > 0 && (
           <pre
             className="video-player-caption"

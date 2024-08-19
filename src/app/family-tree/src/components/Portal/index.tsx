@@ -9,6 +9,8 @@ const wrapper = document.createElement('div');
 wrapper.classList.add('Portal');
 document.body.appendChild(wrapper);
 
-const Portal = ({ children }: PortalProps) => createPortal(children, wrapper);
+const Portal = ({ children }: PortalProps) => (
+  <>{createPortal(children as any, wrapper)}</>
+);
 
 export default Portal;
