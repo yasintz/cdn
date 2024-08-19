@@ -36,7 +36,9 @@ const Form = ({
     ...defaultValuesProp,
   };
 
-  const { register, handleSubmit, control } = useForm({ defaultValues });
+  const { register, handleSubmit, control, setValue, getValues } = useForm({
+    defaultValues,
+  });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -111,7 +113,16 @@ const Form = ({
             render={({ field }) => (
               <DateTimePicker
                 value={new Date(field.value)}
-                onChange={(d) => field.onChange(d.toISOString())}
+                onChange={(d) => {
+                  const diff = new Date(field.value).getTime() - d.getTime();
+                  setValue(
+                    'end',
+                    new Date(
+                      new Date(getValues().end).getTime() - diff
+                    ).toISOString()
+                  );
+                  field.onChange(d.toISOString());
+                }}
               />
             )}
           />
