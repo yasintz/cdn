@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
 import ms from 'ms';
+import Color from 'color';
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
 import { EventType } from './store';
 import _ from 'lodash';
-import { toRGB } from '@/helpers/color';
 import { showDiff } from '../TimelineTodo/Entry/utils';
 
 const ONE_DAY = ms('1 day');
@@ -59,7 +59,7 @@ function getEventConfig({
   const duration = end.toDate().getTime() - start.toDate().getTime();
   const startTime = dayjs(start).diff(dayjs(start).startOf('day'));
 
-  const height = ((duration / ONE_DAY) * rect.height) - 2;
+  const height = (duration / ONE_DAY) * rect.height - 2;
   const top = (startTime / ONE_DAY) * rect.height;
 
   const isThereSameTimeFrameEvents = eventsInSameTimeFrame.length > 1;
@@ -132,7 +132,9 @@ const CalendarDay = ({
           events: groupEvents,
           index,
         });
-        const backgroundColor = toRGB(event.color, 0.2);
+        const backgroundColor = Color(event.color)
+          .mix(Color('white'), 0.7)
+          .hex();
         return (
           <div
             key={event.id}
@@ -168,11 +170,14 @@ const CalendarDay = ({
           index,
         });
         const isNextDayDuplicate = !dayjs(event.start).isSame(day, 'day');
-        const backgroundColor = toRGB(event.color, 0.2);
+        const backgroundColor = Color(event.color)
+          .mix(Color('white'), 0.8)
+          .hex();
+
         return (
           <div
             key={event.id}
-            className="rounded-sm cursor-pointer flex overflow-hidden"
+            className="rounded-sm cursor-pointer flex overflow-hidden select-none"
             style={{
               ...style,
               backgroundColor,
