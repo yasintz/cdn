@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { EventType } from './store';
 import _ from 'lodash';
 import { toRGB } from '@/helpers/color';
+import { showDiff } from '../TimelineTodo/Entry/utils';
 
 const ONE_DAY = ms('1 day');
 
@@ -152,7 +153,8 @@ const CalendarDay = ({
                 }}
               >
                 {event.title} ({dayjs(event.start).format('HH:mm')} -{' '}
-                {dayjs(event.end).format('HH:mm')})
+                {dayjs(event.end).format('HH:mm')} -{' '}
+                {showDiff(dayjs(event.end).diff(dayjs(event.start)))} )
               </div>
             </div>
           </div>
@@ -195,7 +197,8 @@ const CalendarDay = ({
               {!isNextDayDuplicate && !event.isGroup && (
                 <div className="text-xs text-gray-600">
                   {dayjs(event.start).format('HH:mm')} -{' '}
-                  {dayjs(event.end).format('HH:mm')}
+                  {dayjs(event.end).format('HH:mm')} (
+                  {showDiff(dayjs(event.end).diff(dayjs(event.start)))})
                 </div>
               )}
             </div>
