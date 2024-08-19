@@ -174,6 +174,7 @@ const CalendarDay = ({
   const onMouseUp = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!eventCreatePoints) return;
+    if (eventCreatePoints.start === eventCreatePoints.end) return;
 
     onEventCreate?.(
       dayjs(day).startOf('day').add(eventCreatePoints.start).toDate(),
@@ -196,6 +197,18 @@ const CalendarDay = ({
       // ref.parentElement?.scrollTo()
     }
   }, [autoScroll, ref]);
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setEventCreatePoints(undefined);
+      }
+    };
+    window.addEventListener('keydown', listener);
+
+    return () => {
+      window.removeEventListener('keydown', listener);
+    };
+  }, []);
 
   return (
     <div

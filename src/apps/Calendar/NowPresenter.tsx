@@ -21,6 +21,7 @@ const NowPresenter = ({ itemSize }: NowPresenterProps) => {
         top: `${hour * itemSize}px`,
         left: 0,
         right: 0,
+        zIndex: 1,
       }}
     >
       <div className="-translate-y-1/2 bg-white px-2">
