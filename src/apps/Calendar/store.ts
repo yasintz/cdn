@@ -20,7 +20,7 @@ export type EventType = {
 type StoreType = {
   events: Array<EventType>;
 
-  createEvent: (event: Omit<EventType, 'id'>) => void;
+  createEvent: (event: Omit<EventType, 'id'>) => string;
   updateEvent: (id: string, event: Omit<EventType, 'id'>) => void;
   deleteEvent: (id: string) => void;
 };
@@ -32,14 +32,15 @@ export const useStore = create<StoreType>()(
         (set) => ({
           events: [],
           createEvent: (event) => {
+            const id = uid();
             set((prev) => {
               prev.events.push({
-                id: uid(),
+                id,
                 ...event,
               });
             });
+            return id;
           },
-
           updateEvent: (id, event) => {
             set((prev) => {
               const index = prev.events.findIndex((event) => event.id === id);

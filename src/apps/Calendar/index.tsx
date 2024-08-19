@@ -52,7 +52,7 @@ const UpdateModal = ({
 const CalendarPage = () => {
   const today = new Date();
   const [viewDays, setViewDays] = React.useState(4);
-  const { events } = useStore();
+  const { events, createEvent } = useStore();
   const { selectedEventId, updateModalClosed, setParams } = useUrlQ();
   const activeEvent = events.find((event) => event.id === selectedEventId);
   const [daysRef, setDaysRef] = React.useState<HTMLDivElement | null>(null);
@@ -139,6 +139,19 @@ const CalendarPage = () => {
                           dayjs(event.start).isSame(day, 'day') ||
                           dayjs(event.end).isSame(day, 'day')
                       )}
+                      onEventCreate={(start, end) => {
+                        const id = createEvent({
+                          title: 'New Event',
+                          start: start.toISOString(),
+                          end: end.toISOString(),
+                          color: '#8f8f8f',
+                        });
+
+                        setParams({
+                          selectedEventId: id,
+                          updateModalClosed: false,
+                        });
+                      }}
                     />
                   ))}
               </div>

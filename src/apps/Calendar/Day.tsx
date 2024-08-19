@@ -17,6 +17,20 @@ function getEventTimes(start: string, end: string, day: Date) {
     end: dayjs.min(dayjs(day).endOf('day'), dayjs(eventEnd))!,
   };
 }
+function pointToTime(point: number, div: HTMLDivElement) {
+  return (point / div.clientHeight) * ms('24 hours');
+}
+
+function timeToPoint(time: number, div: HTMLDivElement) {
+  return (time / ms('24 hours')) * div.clientHeight;
+}
+
+function getPoint(e: React.MouseEvent, ref: HTMLDivElement) {
+  return e.clientY - ref.getBoundingClientRect().top;
+}
+function roundTimeToNearest(time: number, s: number) {
+  return Math.round(time / s) * s;
+}
 
 function getEventConfig({
   ref,
@@ -91,6 +105,7 @@ type CalendarDayProps = {
   className?: string;
   width: number;
   autoScroll?: boolean;
+  onEventCreate?: (start: Date, end: Date) => void;
 };
 
 const CalendarDay = ({
@@ -100,8 +115,13 @@ const CalendarDay = ({
   onEventClick,
   width,
   autoScroll,
+  onEventCreate,
 }: CalendarDayProps) => {
   const [ref, setRef] = React.useState<HTMLDivElement | null>(null);
+  const [eventCreatePoints, setEventCreatePoints] = React.useState<{
+    start: number;
+    end: number;
+  }>();
 
   const groupEvents = events.filter((ev) => ev.isGroup);
   const nonGroupEvents = useMemo(
@@ -112,6 +132,64 @@ const CalendarDay = ({
       ),
     [events]
   );
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const isOrChildOfDayEvent = Boolean(
+      e.target instanceof HTMLDivElement &&
+        (e.target.classList.contains('day-event') ||
+          e.target.closest('.day-event'))
+    );
+
+    if (isOrChildOfDayEvent) return;
+
+    if (!ref) return;
+
+    const point = getPoint(e, ref);
+    const time = pointToTime(point, ref);
+
+    const nearestFifteen = roundTimeToNearest(time, ms('15 minutes'));
+
+    setEventCreatePoints({
+      start: nearestFifteen,
+      end: nearestFifteen,
+    });
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!eventCreatePoints || !ref) return;
+    const point = getPoint(e, ref);
+    const time = pointToTime(point, ref);
+    const nearestFifteen = roundTimeToNearest(time, ms('15 minutes'));
+
+    setEventCreatePoints({
+      start: eventCreatePoints.start,
+      end: nearestFifteen,
+    });
+  };
+
+  const onMouseUp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!eventCreatePoints) return;
+
+    onEventCreate?.(
+      dayjs(day).startOf('day').add(eventCreatePoints.start).toDate(),
+      dayjs(day).startOf('day').add(eventCreatePoints.end).toDate()
+    );
+
+    setEventCreatePoints(undefined);
+  };
+
+  const handleEventClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    event: EventType
+  ) => {
+    e.stopPropagation();
+    onEventClick?.(event);
+  };
 
   useEffect(() => {
     if (autoScroll && ref) {
@@ -124,7 +202,24 @@ const CalendarDay = ({
       ref={setRef}
       className={cn('relative flex-1', className)}
       style={{ minWidth: width }}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onMouseMove={onMouseMove}
     >
+      {eventCreatePoints && ref && (
+        <div
+          style={{
+            position: 'absolute',
+            top: timeToPoint(eventCreatePoints.start, ref),
+            height:
+              timeToPoint(eventCreatePoints.end, ref) -
+              timeToPoint(eventCreatePoints.start, ref),
+            left: 0,
+            width: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          }}
+        />
+      )}
       {groupEvents.map((event, index) => {
         const { style } = getEventConfig({
           day,
@@ -138,12 +233,12 @@ const CalendarDay = ({
         return (
           <div
             key={event.id}
-            className="border rounded-sm px-2 cursor-pointer"
+            className="day-event border rounded-sm px-2 cursor-pointer"
             style={{
               ...style,
               borderColor: event.color,
             }}
-            onClick={() => onEventClick?.(event)}
+            onClick={(e) => handleEventClick(e, event)}
           >
             <div className="flex">
               <div
@@ -177,12 +272,12 @@ const CalendarDay = ({
         return (
           <div
             key={event.id}
-            className="rounded-sm cursor-pointer flex overflow-hidden select-none"
+            className="day-event rounded-sm cursor-pointer flex overflow-hidden select-none"
             style={{
               ...style,
               backgroundColor,
             }}
-            onClick={() => onEventClick?.(event)}
+            onClick={(e) => handleEventClick(e, event)}
           >
             <div
               style={{

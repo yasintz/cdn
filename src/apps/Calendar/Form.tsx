@@ -13,6 +13,7 @@ import { EventType } from './store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
+import dayjs from '@/helpers/dayjs';
 
 export type FormInputs = Omit<EventType, 'id'>;
 type FormProps = {
@@ -104,13 +105,13 @@ const Form = ({
         )}
       />
 
-      <div className="flex gap-2">
-        <div className="flex flex-col flex-1 gap-2">
-          <Label>Start At</Label>
-          <Controller
-            control={control}
-            name="start"
-            render={({ field }) => (
+      <div className="flex gap-2 mt-2">
+        <Controller
+          control={control}
+          name="start"
+          render={({ field }) => (
+            <div className="flex flex-col flex-1 gap-2">
+              <Label>Start At ({dayjs(field.value).format('HH:mm')})</Label>
               <DateTimePicker
                 value={new Date(field.value)}
                 onChange={(d) => {
@@ -124,22 +125,22 @@ const Form = ({
                   field.onChange(d.toISOString());
                 }}
               />
-            )}
-          />
-        </div>
-        <div className="flex flex-col flex-1 gap-2">
-          <Label>End At</Label>
-          <Controller
-            control={control}
-            name="end"
-            render={({ field }) => (
+            </div>
+          )}
+        />
+        <Controller
+          control={control}
+          name="end"
+          render={({ field }) => (
+            <div className="flex flex-col flex-1 gap-2">
+              <Label>End At ({dayjs(field.value).format('HH:mm')})</Label>
               <DateTimePicker
                 value={new Date(field.value)}
                 onChange={(d) => field.onChange(d.toISOString())}
               />
-            )}
-          />
-        </div>
+            </div>
+          )}
+        />
       </div>
       <DialogFooter className="mt-4">
         {onDelete && (
