@@ -15,11 +15,11 @@ const router = createBrowserRouter([
         lazy: () => import('../apps/HomePage'),
       },
       {
-        path: 'family-tree*',
+        path: 'family-tree/*',
         lazy: () => import('../app/family-tree/router'),
       },
       {
-        path: 'timeline-todo*',
+        path: 'timeline-todo/*',
         lazy: () => import('../apps/TimelineTodo/router'),
       },
       {

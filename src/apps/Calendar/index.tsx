@@ -1,102 +1,155 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import React, { useEffect } from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import dayjs from '@/helpers/dayjs';
-import React from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import ListTimePicker from '@/components/ListTimePicker';
+import { EventType, useStore } from './store';
+import CalendarDay from './Day';
+import Form from './Form';
+import { useUrlQ } from './useUrlQ';
+import Hours from './Hours';
+import { cn } from '@/lib/utils';
 
 const CreateModal = () => {
+  const { createEvent } = useStore();
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <button>Create</button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-full md:max-w-[470px]">
-        <DialogHeader>
-          <DialogTitle>Create / Update</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Title
-            </Label>
-            <Input
-              //   value={value.name}
-              //   onChange={(e) => onChange({ ...value, name: e.target.value })}
-              className="col-span-3"
-            />
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <Calendar
-            mode="single"
-            // selected={date}
-            // onSelect={(d) => onChange({ ...value, date: d?.getTime() })}
-            className="rounded-md border"
-          />
-          <div className="rounded-md border h-80">
-            <ListTimePicker time={0} setTime={() => 0} />
-          </div>
-        </div>
+      <DialogContent className="max-w-5xl">
+        <Form onSubmit={createEvent} />
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-        <DialogFooter>
-          <Button>Create</Button>
-        </DialogFooter>
+const UpdateModal = ({
+  onClose,
+  event,
+  open,
+}: {
+  open: boolean;
+  onClose: () => void;
+  event: EventType;
+}) => {
+  const { updateEvent, deleteEvent } = useStore();
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-5xl">
+        <Form
+          key={event.id}
+          defaultValues={event}
+          onSubmit={(values) => updateEvent(event.id, values)}
+          onDelete={() => deleteEvent(event.id)}
+        />
       </DialogContent>
     </Dialog>
   );
 };
 
 const CalendarPage = () => {
-  const [viewStart, setViewStart] = React.useState(new Date());
-  const [viewDays, setViewDays] = React.useState(7);
+  const today = new Date();
+  const [viewDays, setViewDays] = React.useState(4);
+  const { events } = useStore();
+  const { selectedEventId, updateModalClosed, setParams } = useUrlQ();
+  const activeEvent = events.find((event) => event.id === selectedEventId);
+  const [daysRef, setDaysRef] = React.useState<HTMLDivElement | null>(null);
+  const [frameWidth, setFrameWidth] = React.useState(0);
+  const colWidth = frameWidth / viewDays;
+  const frameMaxWidth = daysRef ? frameWidth : undefined;
 
-  const days = Array.from({ length: viewDays }, (_, i) => {
-    const date = new Date(viewStart);
-    date.setDate(date.getDate() + i);
+  const onEventClick = (event: EventType) =>
+    setParams({ selectedEventId: event.id, updateModalClosed: false });
+
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(date.getDate() - 3 + i);
 
     return date;
   });
 
+  useEffect(() => {
+    // @ts-expect-error defined
+    window.syncscroll?.reset();
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1">
+    <div className="h-full flex flex-col">
       <div className="flex justify-between px-4">
-        <button
-          onClick={() =>
-            setViewStart(dayjs(viewStart).subtract(viewDays, 'day').toDate())
-          }
-        >
-          Prev
-        </button>
         <CreateModal />
-        <button
-          onClick={() =>
-            setViewStart(dayjs(viewStart).add(viewDays, 'day').toDate())
-          }
-        >
-          Next
-        </button>
+        <select onChange={(e) => setViewDays(Number(e.target.value))}>
+          <option value="7">Week</option>
+          <option value="1">Day</option>
+          <option value="4">4 Days</option>
+        </select>
       </div>
-      <div className="flex justify-between flex-1">
+      <div
+        className="syncscroll flex justify-between border-b overflow-x-scroll h-10 scrollbar-hidden ml-auto"
+        style={{ maxWidth: frameMaxWidth }}
+        scrollsync-name="scrollSyncPane"
+      >
         {days.map((day) => (
           <div
-            className="px-4 flex-1 bg-red-100 border-r"
+            className={cn(
+              'flex flex-1 justify-center',
+              dayjs(today).isSame(day, 'day') && 'text-red-500'
+            )}
             key={day.toISOString()}
+            style={{ minWidth: colWidth }}
           >
             {day.toDateString()}
           </div>
         ))}
       </div>
+      <div className="flex flex-col flex-auto min-h-0">
+        <div className="flex flex-col items-stretch min-h-0 flex-auto">
+          <div className="flex-initial min-h-0 overflow-x-hidden overflow-y-auto">
+            <div
+              className="flex justify-between flex-1 relative"
+              style={{
+                minHeight: 1000,
+              }}
+            >
+              <Hours />
+              <div
+                className="syncscroll flex flex-1 overflow-x-scroll"
+                style={{ maxWidth: frameMaxWidth }}
+                scrollsync-name="scrollSyncPane"
+                ref={(r) => {
+                  setFrameWidth(r?.clientWidth as number);
+                  setDaysRef(r);
+                }}
+              >
+                {daysRef &&
+                  days.map((day) => (
+                    <CalendarDay
+                      autoScroll={dayjs(today).isSame(day, 'day')}
+                      className="border-r"
+                      width={colWidth}
+                      key={day.toISOString()}
+                      day={day}
+                      onEventClick={onEventClick}
+                      events={events.filter(
+                        (event) =>
+                          dayjs(event.start).isSame(day, 'day') ||
+                          dayjs(event.end).isSame(day, 'day')
+                      )}
+                    />
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {activeEvent && (
+        <UpdateModal
+          open={!updateModalClosed}
+          onClose={() => setParams({ updateModalClosed: true })}
+          event={activeEvent}
+        />
+      )}
     </div>
   );
 };
