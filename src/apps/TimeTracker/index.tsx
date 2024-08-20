@@ -22,14 +22,16 @@ const TimeTracker = () => {
 
   return (
     <div className="time-tracker p-4 flex flex-col h-full">
-      {inputs.map((inputId) => (
-        <TaskInput
-          key={inputId}
-          id={inputId}
-          now={now}
-          selectedTags={selectedTags}
-        />
-      ))}
+      <div className="flex flex-col">
+        {inputs.map((inputId) => (
+          <TaskInput
+            key={inputId}
+            id={inputId}
+            now={now}
+            selectedTags={selectedTags}
+          />
+        ))}
+      </div>
 
       <CreateInput onAdd={addInput} />
 

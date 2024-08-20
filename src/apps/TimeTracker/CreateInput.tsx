@@ -6,7 +6,7 @@ type CreateInputProps = {
 
 const CreateInput = ({ onAdd }: CreateInputProps) => {
   return (
-    <div className="flex items-center gap-2 my-2">
+    <div className="flex items-center gap-2 mb-2">
       <div className="border-b border-gray-300 flex-1" />
       <PlusCircleIcon
         size={16}

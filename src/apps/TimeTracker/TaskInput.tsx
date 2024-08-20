@@ -88,118 +88,125 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
   };
 
   return (
-    <>
-      <div className="flex items-center gap-3 mb-3">
-        <div className="flex flex-1 gap-2">
-          <Select onValueChange={updateProjectId} value={projectId}>
-            <SelectTrigger className="w-60">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {projects.map((project) => (
-                <SelectItem key={project.id} value={project.id}>
-                  {project.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input
-            style={{ flex: 20 }}
-            value={taskTitle}
-            onChange={(e) => updateTaskTitle(e.target.value)}
-            placeholder="Task Title"
-            ringDisabled
-          />
-          <Input
-            style={{ flex: 1 }}
-            value={currentTask?.priceHr?.toString() || ''}
-            type="number"
-            onChange={(e) =>
-              currentTask &&
-              updateTask(currentTask.id, { priceHr: Number(e.target.value) })
-            }
-            placeholder="$/hr"
-            ringDisabled
-          />
-        </div>
-        <div className="flex gap-2 items-center cursor-pointer select-none">
-          {currentTask && (
-            <span
-              onClick={() =>
-                updateTask(currentTask.id, {
-                  startTime: currentTask.startTime + ms('10 minute'),
-                })
-              }
-            >
-              -
-            </span>
-          )}
-          <TooltipProvider>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild disabled={!currentTaskTotalPrice}>
-                <div className="flex">
-                  <input
-                    className="w-7 text-center focus:outline-none"
-                    value={currentTaskDuration.format('HH')}
-                    onChange={(e) => setStartTime(e.target.value, 'hour')}
-                  />
-                  :
-                  <input
-                    className="w-7 text-center focus:outline-none"
-                    value={currentTaskDuration.format('mm')}
-                    onChange={(e) => setStartTime(e.target.value, 'minute')}
-                  />
-                  :
-                  <input
-                    className="w-7 text-center focus:outline-none"
-                    value={currentTaskDuration.format('ss')}
-                    onChange={() => null}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                ${currentTaskTotalPrice?.toFixed(2)}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          {currentTask && (
-            <span
-              onClick={() =>
-                updateTask(currentTask.id, {
-                  startTime: currentTask.startTime - ms('1 minute'),
-                })
-              }
-            >
-              +
-            </span>
-          )}
-        </div>
+    <div className="flex flex-col mb-3 border-b pb-3 last:border-b-0 last:mb-0">
+      <div className="flex items-center gap-3">
+        <div className="flex flex-1 gap-2 flex-col lg:flex-row">
+          <div className="flex flex-1 gap-2 lg:flex-4">
+            <Select onValueChange={updateProjectId} value={projectId}>
+              <SelectTrigger className="w-auto lg:w-60 flex-8 lg:flex-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((project) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              className="flex-8"
+              value={taskTitle}
+              onChange={(e) => updateTaskTitle(e.target.value)}
+              placeholder="Task Title"
+              ringDisabled
+            />
+          </div>
 
-        {currentTask ? (
-          <StopCircleIcon
-            className="text-red-500 cursor-pointer"
-            onClick={handleStartStop}
-          />
-        ) : (
-          <PlayCircleIcon
-            className="text-primary cursor-pointer"
-            onClick={handleStartStop}
-          />
-        )}
-        {!currentTask && (
-          <Trash2Icon
-            className="text-primary cursor-pointer"
-            onClick={() => removeInput(id)}
-          />
-        )}
+          <div className="flex flex-1 gap-2 items-center">
+            <Input
+              style={{ flex: 1 }}
+              value={currentTask?.priceHr?.toString() || ''}
+              type="number"
+              onChange={(e) =>
+                currentTask &&
+                updateTask(currentTask.id, { priceHr: Number(e.target.value) })
+              }
+              placeholder="$/hr"
+              ringDisabled
+            />
+            <div className="flex gap-2 items-center cursor-pointer select-none">
+              {currentTask && (
+                <span
+                  onClick={() =>
+                    updateTask(currentTask.id, {
+                      startTime: currentTask.startTime + ms('10 minute'),
+                    })
+                  }
+                >
+                  -
+                </span>
+              )}
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild disabled={!currentTaskTotalPrice}>
+                    <div className="flex">
+                      <input
+                        className="w-7 text-center focus:outline-none"
+                        value={currentTaskDuration.format('HH')}
+                        onChange={(e) => setStartTime(e.target.value, 'hour')}
+                      />
+                      :
+                      <input
+                        className="w-7 text-center focus:outline-none"
+                        value={currentTaskDuration.format('mm')}
+                        onChange={(e) => setStartTime(e.target.value, 'minute')}
+                      />
+                      :
+                      <input
+                        className="w-7 text-center focus:outline-none"
+                        value={currentTaskDuration.format('ss')}
+                        onChange={() => null}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    ${currentTaskTotalPrice?.toFixed(2)}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              {currentTask && (
+                <span
+                  onClick={() =>
+                    updateTask(currentTask.id, {
+                      startTime: currentTask.startTime - ms('1 minute'),
+                    })
+                  }
+                >
+                  +
+                </span>
+              )}
+            </div>
+
+            {currentTask ? (
+              <StopCircleIcon
+                className="text-red-500 cursor-pointer"
+                onClick={handleStartStop}
+              />
+            ) : (
+              <PlayCircleIcon
+                className="text-primary cursor-pointer"
+                onClick={handleStartStop}
+              />
+            )}
+            {!currentTask && (
+              <Trash2Icon
+                className="text-primary cursor-pointer"
+                onClick={() => removeInput(id)}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="flex gap-2 my-2">
-        {tags.map((tag) => (
-          <Tag key={tag} tag={tag} />
-        ))}
-      </div>
-    </>
+      {tags.length > 0 && (
+        <div className="flex gap-2 my-2">
+          {tags.map((tag) => (
+            <Tag key={tag} tag={tag} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

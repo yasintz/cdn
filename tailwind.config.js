@@ -80,6 +80,10 @@ module.exports = {
         'border-4': '0 0 0 4px rgb(0 0 0 / 0.05)',
         'border-8': '0 0 0 8px rgb(0 0 0 / 0.05)',
       },
+      flex: Array.from({ length: 12 }, (_, i) => i).reduce((acc, i) => {
+        acc[i] = `${i} ${i} 0%`;
+        return acc;
+      }, {}),
     },
   },
   plugins: [require('tailwindcss-animate')],
