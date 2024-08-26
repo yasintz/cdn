@@ -146,9 +146,13 @@ const LocalVideoPlayer = () => {
               </Label>
               <Input
                 placeholder="Adjust"
-                type="number"
-                value={adjustSecond}
-                onChange={(e) => setAdjustSecond(parseFloat(e.target.value))}
+                onChange={(e) => {
+                  const n = parseFloat(e.target.value);
+                  if (isNaN(n)) {
+                    return;
+                  }
+                  setAdjustSecond(n);
+                }}
               />
               <Button
                 onClick={() =>
