@@ -19,11 +19,13 @@ type TaskTableComProps = {
   tasks: TaskType[];
   editingTaskId: string | undefined;
   setEditingTaskId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  className?: string;
 };
 const TableCom = ({
   editingTaskId,
   tasks,
   setEditingTaskId,
+  className,
 }: TaskTableComProps) => {
   const allTasks = tasks.map((t) => getTaskComputed(t));
   const total = allTasks.reduce((acc, cur) => acc + cur.duration, 0);
@@ -32,8 +34,9 @@ const TableCom = ({
     0
   );
   const isBiggerThanOneDay = total >= ms('1 day');
+
   return (
-    <Table>
+    <Table containerClassName={className}>
       <TableHeader>
         <TableRow>
           <TableHead className="w-28">Project</TableHead>
@@ -79,25 +82,37 @@ const TableCom = ({
 
 type PropsType = {
   tasks: TaskType[];
+  inputIds: string[];
 };
-const TaskTable = ({ tasks }: PropsType) => {
+const TaskTable = ({ tasks, inputIds }: PropsType) => {
   const [editingTaskId, setEditingTaskId] = useState<string>();
   const [height, setHeight] = useState<number>(0);
   const divRef = useRef<HTMLDivElement>(null);
+  const inputIdsRef = useRef<string>('');
+  const inputIdsStr = inputIds.join(',');
 
   useEffect(() => {
-    setHeight(
-      (prev) => prev || divRef.current?.getBoundingClientRect().height || 0
+    console.log({ inputIdsStr, inputIdsRef: inputIdsRef.current });
+    inputIdsRef.current = inputIdsStr;
+    setTimeout(
+      () => setHeight(divRef.current?.getBoundingClientRect().height || 0),
+      100
     );
+  }, [inputIdsStr]);
+
+  useEffect(() => {
+    // @ts-expect-error defined
+    window.syncscroll?.reset();
   }, []);
 
   return (
     <div ref={divRef} className="flex flex-col flex-1">
-      <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative">
+      <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative border-t-0">
         <TableCom
           tasks={tasks}
           editingTaskId={editingTaskId}
           setEditingTaskId={setEditingTaskId}
+          className="syncscroll syncscroll:scroll-table"
         />
       </div>
       <div
@@ -107,11 +122,12 @@ const TaskTable = ({ tasks }: PropsType) => {
         }}
         className="relative overflow-y-scroll rounded-md border"
       >
-        {height > 0 && (
+        {inputIdsStr === inputIdsRef.current && (
           <TableCom
             tasks={tasks}
             editingTaskId={editingTaskId}
             setEditingTaskId={setEditingTaskId}
+            className="syncscroll syncscroll:scroll-table"
           />
         )}
       </div>

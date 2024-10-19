@@ -53,6 +53,7 @@ const TimeTracker = () => {
       )}
 
       <TaskTable
+        inputIds={inputs}
         tasks={tasks
           .filter(
             (task) =>

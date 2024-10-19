@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import '../app/globals.css';
 import '../app/main.scss';
-import './lib/scrollsync.js';
+import './lib/scrollsync';
 
 import router from './navigation/router';
 

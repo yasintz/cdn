@@ -89,9 +89,8 @@ const CalendarPage = () => {
         </select>
       </div>
       <div
-        className="syncscroll flex justify-between border-b overflow-x-scroll h-10 scrollbar-hidden ml-auto"
+        className="syncscroll syncscroll:scroll-pane flex justify-between border-b overflow-x-scroll h-10 scrollbar-hidden ml-auto"
         style={{ maxWidth: frameMaxWidth }}
-        scrollsync-name="scrollSyncPane"
       >
         {days.map((day) => (
           <div
@@ -117,9 +116,8 @@ const CalendarPage = () => {
             >
               <Hours />
               <div
-                className="syncscroll flex flex-1 overflow-x-scroll"
+                className="syncscroll syncscroll:scroll-pane flex flex-1 overflow-x-scroll"
                 style={{ maxWidth: frameMaxWidth }}
-                scrollsync-name="scrollSyncPane"
                 ref={(r) => {
                   setFrameWidth(r?.clientWidth as number);
                   setDaysRef(r);
