@@ -3,7 +3,13 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { TaskType, useStore } from './store';
 import dayjs from '@/helpers/dayjs';
 import { Input } from '@/components/ui/input';
-import { PencilIcon, PlayIcon, Trash2Icon, XCircleIcon } from 'lucide-react';
+import {
+  CopyIcon,
+  PencilIcon,
+  StopCircleIcon,
+  Trash2Icon,
+  XCircleIcon,
+} from 'lucide-react';
 import Tag from '../TimelineTodo/Tag';
 import {
   Tooltip,
@@ -14,6 +20,8 @@ import {
 import ms from 'ms';
 import { useTaskComputed } from './store/computed/task';
 import { uid } from '@/utils/uid';
+import useNow from '@/hooks/useNow';
+import { useCurrencies } from '@/hooks/useCurrencies';
 
 type TaskRowProps = {
   task: TaskType;
@@ -26,10 +34,13 @@ const TaskRow = ({
   editingTaskId,
   setEditingTaskId,
 }: TaskRowProps) => {
-  const { createTask, updateTask, deleteTask, projects } = useStore();
-  const task = useTaskComputed(taskData);
+  const currencies = useCurrencies();
+  const now = useNow();
+  const { createTask, updateTask, deleteTask, projects, stopTask } = useStore();
+  const task = useTaskComputed(taskData, taskData.endTime ? 0 : now);
   const isBiggerThanOneDay = task.duration > ms('24 hours');
   const project = projects.find((p) => p.id === task.projectId);
+  const priceTry = (task.totalPrice || 0) * currencies.TRY;
 
   return (
     <TableRow key={task.id}>
@@ -80,13 +91,20 @@ const TaskRow = ({
           </Tooltip>
         </TooltipProvider>
       </TableCell>
-      <TableCell>${(task.totalPrice || 0).toFixed(2)}</TableCell>
+      <TableCell>
+        <TooltipProvider>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <p>${(task.totalPrice || 0).toFixed(2)}</p>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{(priceTry || 0).toFixed(2)}₺</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
       <TableCell>
         <div className="flex gap-2 items-center justify-center">
-          <Trash2Icon
-            className="cursor-pointer size-4"
-            onClick={() => confirm('Are you sure?') && deleteTask(task.id)}
-          />
           {editingTaskId === task.id ? (
             <XCircleIcon
               className="cursor-pointer size-4"
@@ -98,7 +116,7 @@ const TaskRow = ({
               onClick={() => setEditingTaskId(task.id)}
             />
           )}
-          <PlayIcon
+          <CopyIcon
             className="cursor-pointer size-4"
             onClick={() =>
               createTask(uid(), {
@@ -109,6 +127,17 @@ const TaskRow = ({
               })
             }
           />
+          {task.endTime ? (
+            <Trash2Icon
+              className="cursor-pointer size-4"
+              onClick={() => confirm('Are you sure?') && deleteTask(task.id)}
+            />
+          ) : (
+            <StopCircleIcon
+              className="text-red-500 cursor-pointer size-4"
+              onClick={() => stopTask(task.id)}
+            />
+          )}
         </div>
       </TableCell>
     </TableRow>

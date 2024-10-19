@@ -59,7 +59,6 @@ const TimeTracker = () => {
               selectedTags.length === 0 ||
               _.intersection(taskTags[task.id] || [], selectedTags).length > 0
           )
-          .filter((i) => i.endTime)
           .toReversed()}
       />
     </div>

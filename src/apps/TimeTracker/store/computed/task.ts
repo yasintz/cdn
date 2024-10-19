@@ -17,15 +17,15 @@ export function getTaskDuration(task: TaskType, endTime?: number) {
   return duration;
 }
 
-export function getTaskComputed(task: TaskType) {
+export function getTaskComputed(task: TaskType, now = Date.now()) {
   return {
     ...task,
-    duration: getTaskDuration(task),
+    duration: getTaskDuration(task, task.endTime || now),
     tags: getTagsFromString(task.title),
-    totalPrice: getTaskTotalPrice(task),
+    totalPrice: getTaskTotalPrice(task, now),
   };
 }
 
-export function useTaskComputed(task: TaskType) {
-  return useMemo(() => getTaskComputed(task), [task]);
+export function useTaskComputed(task: TaskType, now?: number) {
+  return useMemo(() => getTaskComputed(task, now), [task, now]);
 }

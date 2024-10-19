@@ -80,14 +80,10 @@ export const useStore = create<StoreType>()(
             createTask: (inputId, task) =>
               set((prev) => {
                 prev.tasks.push({
-                  id: inputId,
                   ...task,
                   ...parseTagsFromTitle(task.title),
+                  id: inputId,
                 });
-
-                if (!prev.inputs.includes(inputId)) {
-                  prev.inputs.push(inputId);
-                }
               }),
 
             ...compute(get, (state) => ({

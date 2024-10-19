@@ -72,6 +72,7 @@ const TableCom = ({
                 .format(isBiggerThanOneDay ? 'mm:ss' : 'HH:mm:ss')}
             </div>
           </TableCell>
+          <TableCell></TableCell>
           <TableCell>${totalPrice.toFixed(2)}</TableCell>
           <TableCell></TableCell>
         </TableRow>

@@ -1,4 +1,4 @@
-import { useStore } from './store';
+import { TaskType, useStore } from './store';
 import { Input } from '@/components/ui/input';
 import dayjs from '@/helpers/dayjs';
 import { PlayCircleIcon, StopCircleIcon, Trash2Icon } from 'lucide-react';
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { uid } from '@/utils/uid';
 
 type StartTaskProps = {
   now: number;
@@ -26,18 +27,26 @@ type StartTaskProps = {
   selectedTags: string[];
 };
 
+type TaskInputValues = Pick<TaskType, 'title' | 'priceHr' | 'projectId'>;
+
 const TaskInput = ({ id, now }: StartTaskProps) => {
-  const [title, setTitle] = useState('');
+  const [taskInput, setTaskInput] = useState<TaskInputValues>({
+    title: '',
+    priceHr: 0,
+    projectId: '',
+  });
   const { createTask, stopTask, tasks, updateTask, removeInput, projects } =
     useStore();
   const currentTask = tasks.find((i) => i.id === id);
-  const [projectId, setProjectId] = useState(currentTask?.projectId || '');
+  const projectId = currentTask?.projectId || taskInput.projectId;
+  const title = currentTask?.title || taskInput.title;
+  const priceHr = currentTask?.priceHr || taskInput.priceHr;
 
   const diff = now - (currentTask?.startTime || 0);
   const currentTaskTotalPrice =
     currentTask && getTaskTotalPrice(currentTask, now);
 
-  const taskTitle = currentTask?.title || title;
+  const taskTitle = currentTask?.title || taskInput.title;
   const tags = getTagsFromString(taskTitle);
 
   const currentTaskDuration = dayjs.duration(currentTask ? diff : 0);
@@ -63,27 +72,41 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
   const updateTaskTitle = (value: string) => {
     currentTask
       ? updateTask(currentTask.id, { title: value, projectId })
-      : setTitle(value);
+      : setTaskInput((prev) => ({ ...prev, title: value }));
   };
 
   const updateProjectId = (id: string) => {
     if (currentTask) {
       updateTask(currentTask.id, { projectId: id });
+    } else {
+      setTaskInput((prev) => ({ ...prev, projectId: id }));
     }
+  };
 
-    setProjectId(id);
+  const updatePriceHr = (value: number) => {
+    if (currentTask) {
+      updateTask(currentTask.id, { priceHr: value });
+    } else {
+      setTaskInput((prev) => ({ ...prev, priceHr: value }));
+    }
   };
 
   const handleStartStop = () => {
     if (currentTask) {
       stopTask(id);
     } else {
-      createTask(id, {
+      createTask(uid(), {
         title,
         startTime: Date.now(),
         projectId,
+        priceHr,
       });
-      setTitle('');
+      setTaskInput((prev) => ({
+        ...prev,
+        title: '',
+        projectId: '',
+        priceHr: 0,
+      }));
     }
   };
 
@@ -116,12 +139,9 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
           <div className="flex flex-1 gap-2 items-center">
             <Input
               style={{ flex: 1 }}
-              value={currentTask?.priceHr?.toString() || ''}
+              value={priceHr || ''}
               type="number"
-              onChange={(e) =>
-                currentTask &&
-                updateTask(currentTask.id, { priceHr: Number(e.target.value) })
-              }
+              onChange={(e) => updatePriceHr(Number(e.target.value))}
               placeholder="$/hr"
               ringDisabled
             />
