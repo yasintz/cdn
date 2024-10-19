@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { TaskType } from './store';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import TaskRow from './TaskRow';
 import ms from 'ms';
@@ -82,23 +82,10 @@ const TableCom = ({
 
 type PropsType = {
   tasks: TaskType[];
-  inputIds: string[];
 };
-const TaskTable = ({ tasks, inputIds }: PropsType) => {
-  const [editingTaskId, setEditingTaskId] = useState<string>();
-  const [height, setHeight] = useState<number>(0);
-  const divRef = useRef<HTMLDivElement>(null);
-  const inputIdsRef = useRef<string>('');
-  const inputIdsStr = inputIds.join(',');
 
-  useEffect(() => {
-    console.log({ inputIdsStr, inputIdsRef: inputIdsRef.current });
-    inputIdsRef.current = inputIdsStr;
-    setTimeout(
-      () => setHeight(divRef.current?.getBoundingClientRect().height || 0),
-      100
-    );
-  }, [inputIdsStr]);
+const TaskTable = ({ tasks }: PropsType) => {
+  const [editingTaskId, setEditingTaskId] = useState<string>();
 
   useEffect(() => {
     // @ts-expect-error defined
@@ -106,32 +93,26 @@ const TaskTable = ({ tasks, inputIds }: PropsType) => {
   }, []);
 
   return (
-    <div ref={divRef} className="flex flex-col flex-1">
-      <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative border-t-0">
-        <TableCom
-          tasks={tasks}
-          editingTaskId={editingTaskId}
-          setEditingTaskId={setEditingTaskId}
-          className="syncscroll syncscroll:scroll-table"
-        />
-      </div>
-      <div
-        style={{
-          transform: 'translateY(-50px)',
-          height: height,
-        }}
-        className="relative overflow-y-scroll rounded-md border"
-      >
-        {inputIdsStr === inputIdsRef.current && (
+    <>
+      <div className="flex flex-col flex-1 relative">
+        <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative">
           <TableCom
             tasks={tasks}
             editingTaskId={editingTaskId}
             setEditingTaskId={setEditingTaskId}
             className="syncscroll syncscroll:scroll-table"
           />
-        )}
+        </div>
+        <div className="overflow-y-scroll rounded-md border absolute top-0 left-0 right-0 bottom-0">
+          <TableCom
+            tasks={tasks}
+            editingTaskId={editingTaskId}
+            setEditingTaskId={setEditingTaskId}
+            className="syncscroll syncscroll:scroll-table"
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
