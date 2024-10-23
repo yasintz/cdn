@@ -24,4 +24,9 @@ export const apps = {
     image:
       'https://cdn.pixabay.com/photo/2021/03/10/14/57/pianist-6084749_1280.png',
   },
+  'code-snippets': {
+    title: 'Code Snippets',
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxSv7E4cJz1rLPR9yXv3K-IDlUmrl8clfgboMTYS_L4lToKVd-TPpCBZ05VIBYLnhKTbo&usqp=CAU',
+  },
 };

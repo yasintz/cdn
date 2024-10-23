@@ -38,6 +38,10 @@ const router = createBrowserRouter([
         path: 'calendar',
         lazy: () => import('../apps/Calendar'),
       },
+      {
+        path: 'code-snippets',
+        lazy: () => import('../apps/CodeSnippets'),
+      },
     ],
   },
 ]);
