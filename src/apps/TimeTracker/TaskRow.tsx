@@ -22,6 +22,7 @@ import { useTaskComputed } from './store/computed/task';
 import { uid } from '@/utils/uid';
 import useNow from '@/hooks/useNow';
 import { useCurrencies } from '@/hooks/useCurrencies';
+import { cn } from '@/lib/utils';
 
 type TaskRowProps = {
   task: TaskType;
@@ -43,7 +44,7 @@ const TaskRow = ({
   const priceTry = (task.totalPrice || 0) * currencies.TRY;
 
   return (
-    <TableRow key={task.id}>
+    <TableRow key={task.id} className={cn(!task.endTime && 'bg-yellow-100')}>
       <TableCell>{project?.name || '#'}</TableCell>
       <TableCell>
         {editingTaskId === task.id ? (
