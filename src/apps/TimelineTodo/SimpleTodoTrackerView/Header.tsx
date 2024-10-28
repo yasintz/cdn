@@ -1,11 +1,14 @@
 import { Button } from '@/components/ui/button';
-import React, { useLayoutEffect } from 'react';
-
-const getDaysInMonth = (date: Date) => {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  return new Date(year, month + 1, 0).getDate();
-};
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import dayjs from '@/helpers/dayjs';
+import { cn } from '@/lib/utils';
+import { CalendarIcon } from 'lucide-react';
+import { useMemo } from 'react';
 
 type HeaderProps = {
   selectedDate: string;
@@ -13,38 +16,33 @@ type HeaderProps = {
 };
 
 const Header = ({ selectedDate, setSelectedDate }: HeaderProps) => {
-  const today = new Date();
-  const daysInMonth = Array.from({ length: getDaysInMonth(today) });
-
-  useLayoutEffect(() => {
-    const selectedDay = document.querySelector('div[data-day-selected="true"]');
-
-    if (selectedDay) {
-      selectedDay.scrollIntoView({ behavior: 'instant', block: 'center' });
-    }
-  }, []);
-
+  const formatted = useMemo(
+    () => dayjs(selectedDate).format('MMMM D, YYYY'),
+    [selectedDate]
+  );
   return (
-    <div className="flex pt-4 pb-2 px-4 mb-2 overflow-x-scroll gap-3">
-      {daysInMonth.map((_, i) => {
-        const date = new Date(today.getFullYear(), today.getMonth(), i);
-        const dateString = date.toISOString().split('T')[0];
-        return (
-          <div
-            key={i}
-            className="w-10 h-10 p-0"
-            data-day-selected={dateString === selectedDate}
-          >
-            <Button
-              variant={dateString === selectedDate ? 'default' : 'outline'}
-              onClick={() => setSelectedDate(dateString)}
-            >
-              {i}
-            </Button>
-          </div>
-        );
-      })}
-    </div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            'w-[280px] justify-start text-left font-normal mb-4',
+            !selectedDate && 'text-muted-foreground'
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {selectedDate ? formatted : <span>Pick a date</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={new Date(selectedDate)}
+          onSelect={(s) => setSelectedDate(dayjs(s).format('YYYY-MM-DD'))}
+          className="rounded-md border"
+        />
+      </PopoverContent>
+    </Popover>
   );
 };
 
