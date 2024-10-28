@@ -46,7 +46,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
   const orderTodos = (newState: SimpleTodoType[]) => {
     setTodos(
       todos
-        .filter((i) => i.status !== status)
+        .filter((i) => !newState.map((j) => j.id).includes(i.id))
         .concat(newState.map((i) => todos.find((j) => j.id === i.id)!))
     );
   };
