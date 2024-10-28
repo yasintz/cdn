@@ -7,6 +7,8 @@ import { SessionSliceType, createSessionSlice } from './session/session-slice';
 import { EntrySliceType, createEntrySlice } from './entry-slice';
 import { TodoSliceType, createTodoSlice } from './todo-slice';
 import { StoreRelations, createStoreRelations } from './relations';
+import dayjs from '@/helpers/dayjs';
+import { SIMPLE_TODO_DATE_FORMAT } from './utils';
 export type { SessionType } from './session/session-slice';
 
 export type SimpleTodoType = {
@@ -60,7 +62,13 @@ export const useStore = create<StoreType>()(
               const setState = store[0];
               setState((prev) => {
                 prev.simpleTodoList = prev.simpleTodoList.map((t) =>
-                  t.id === id ? { ...t, status } : t
+                  t.id === id
+                    ? {
+                        ...t,
+                        status,
+                        date: dayjs().format(SIMPLE_TODO_DATE_FORMAT),
+                      }
+                    : t
                 );
               });
             },

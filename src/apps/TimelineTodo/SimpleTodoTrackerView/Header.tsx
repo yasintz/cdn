@@ -9,6 +9,7 @@ import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { useMemo } from 'react';
+import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 
 type HeaderProps = {
   selectedDate: string;
@@ -38,7 +39,9 @@ const Header = ({ selectedDate, setSelectedDate }: HeaderProps) => {
         <Calendar
           mode="single"
           selected={new Date(selectedDate)}
-          onSelect={(s) => setSelectedDate(dayjs(s).format('YYYY-MM-DD'))}
+          onSelect={(s) =>
+            setSelectedDate(dayjs(s).format(SIMPLE_TODO_DATE_FORMAT))
+          }
           className="rounded-md border"
         />
       </PopoverContent>

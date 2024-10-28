@@ -19,3 +19,5 @@ export function cloneEntry(entry: EntryWithRelation) {
     todos,
   };
 }
+
+export const SIMPLE_TODO_DATE_FORMAT = 'YYYY-MM-DD';

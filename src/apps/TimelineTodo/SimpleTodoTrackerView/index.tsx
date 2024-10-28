@@ -3,12 +3,13 @@ import Column from './Column';
 import Header from './Header';
 import { SimpleTodoType } from '../store';
 import dayjs from '@/helpers/dayjs';
+import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 
 const boardColumns: SimpleTodoType['status'][] = ['backlog', 'done'];
 
 export default function SimpleTodoTracker() {
   const [selectedDate, setSelectedDate] = useState(() =>
-    dayjs().format('YYYY-MM-DD')
+    dayjs().format(SIMPLE_TODO_DATE_FORMAT)
   );
 
   return (
