@@ -6,13 +6,13 @@ type HomePageAppType =
       title: string;
       image: string;
       cardPath?: string;
-      hiddenApp?: unknown;
+      hiddenApp?: boolean;
     }
   | {
       hiddenApp: true;
-      cardPath?: unknown;
-      title?: unknown;
-      image?: unknown;
+      cardPath?: string;
+      title?: string;
+      image?: string;
     };
 
 export const routes: Array<RouteObject & HomePageAppType> = [
