@@ -9,10 +9,19 @@ import { TodoSliceType, createTodoSlice } from './todo-slice';
 import { StoreRelations, createStoreRelations } from './relations';
 export type { SessionType } from './session/session-slice';
 
+export type SimpleTodoType = {
+  id: string;
+  text: string;
+  status: 'backlog' | 'inProgress' | 'done';
+  date: string;
+};
+
 export type StoreType = SessionSliceType &
   EntrySliceType &
   TodoSliceType & {
     getRelations: () => StoreRelations;
+    simpleTodoList: SimpleTodoType[];
+    updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
   };
 
 export type EntryType = StoreType['entries'][number];
@@ -35,6 +44,13 @@ export const useStore = create<StoreType>()(
             ...createEntrySlice(...store),
             ...createTodoSlice(...store),
             getRelations: () => createStoreRelations(store[1]()),
+            simpleTodoList: [],
+            updateSimpleTodoList: (todos) => {
+              const setState = store[0];
+              setState((prev) => {
+                prev.simpleTodoList = todos;
+              });
+            },
           } as StoreType),
         {
           name: 'timeline-todo',

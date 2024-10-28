@@ -6,12 +6,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { apps } from '@/apps/HomePage/apps';
+import { routes } from '@/navigation/router';
 
 const Breadcrumbs = () => {
   const [, matched] = useMatches();
   const pathname = matched?.pathname?.replace('/cdn/', '');
-  const app = apps[pathname as keyof typeof apps];
+  const app = routes.find((i) => i.path === pathname);
   if (!app) {
     return null;
   }
@@ -23,7 +23,7 @@ const Breadcrumbs = () => {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>{app.title}</BreadcrumbPage>
+          <BreadcrumbPage>{app.title as string}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

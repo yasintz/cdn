@@ -1,25 +1,30 @@
 import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { apps } from './apps';
+import { routes } from '@/navigation/router';
 
 const HomePage = () => {
   return (
     <div className="flex gap-2 p-4 flex-wrap">
-      {Object.entries(apps).map(([to, name]) => (
-        <Link to={to} key={to}>
-          <Card className="overflow-hidden">
-            <img
-              src={name.image}
-              className="w-64 aspect-video object-cover border-b"
-            />
-            <CardHeader>
-              <CardTitle className="text-lg text-center">
-                {name.title}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </Link>
-      ))}
+      {routes
+        .filter((i) => !i.hiddenApp)
+        .map((name) => (
+          <Link
+            to={name.cardPath || name.path!.replace('/*', '')}
+            key={name.path}
+          >
+            <Card className="overflow-hidden">
+              <img
+                src={name.image as string}
+                className="w-64 aspect-video object-cover border-b"
+              />
+              <CardHeader>
+                <CardTitle className="text-lg text-center">
+                  {name.title as string}
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </Link>
+        ))}
     </div>
   );
 };
