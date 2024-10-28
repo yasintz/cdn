@@ -1,6 +1,12 @@
 import React from 'react';
 import { SimpleTodoType, useStore } from '../store';
-import { ChevronLeftIcon, ChevronRightIcon, XCircleIcon } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+  XCircleIcon,
+} from 'lucide-react';
 
 const statusRight: Record<SimpleTodoType['status'], SimpleTodoType['status']> =
   {
@@ -30,14 +36,30 @@ const TodoItem = ({ todo }: TodoItemProps) => {
     >
       <span>{todo.text}</span>
       <div className="flex gap-3">
-        <ChevronLeftIcon
-          className="size-4 cursor-pointer"
-          onClick={() => updateStatus(todo.id, statusLeft[todo.status])}
-        />
-        <ChevronRightIcon
-          className="size-4 cursor-pointer"
-          onClick={() => updateStatus(todo.id, statusRight[todo.status])}
-        />
+        {todo.status !== 'backlog' && (
+          <>
+            <ChevronLeftIcon
+              className="size-4 cursor-pointer hidden md:block"
+              onClick={() => updateStatus(todo.id, statusLeft[todo.status])}
+            />
+            <ChevronUpIcon
+              className="size-4 cursor-pointer md:hidden"
+              onClick={() => updateStatus(todo.id, statusLeft[todo.status])}
+            />
+          </>
+        )}
+        {todo.status !== 'done' && (
+          <>
+            <ChevronDownIcon
+              className="size-4 cursor-pointer md:hidden"
+              onClick={() => updateStatus(todo.id, statusRight[todo.status])}
+            />
+            <ChevronRightIcon
+              className="size-4 cursor-pointer hidden md:block"
+              onClick={() => updateStatus(todo.id, statusRight[todo.status])}
+            />
+          </>
+        )}
         <XCircleIcon
           className="size-4 cursor-pointer"
           onClick={() => deleteTodo(todo.id)}
