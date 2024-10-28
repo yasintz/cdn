@@ -22,6 +22,11 @@ export type StoreType = SessionSliceType &
     getRelations: () => StoreRelations;
     simpleTodoList: SimpleTodoType[];
     updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
+    updateSimpleTodoStatus: (
+      id: string,
+      status: SimpleTodoType['status']
+    ) => void;
+    deleteSimpleTodo: (id: string) => void;
   };
 
 export type EntryType = StoreType['entries'][number];
@@ -49,6 +54,22 @@ export const useStore = create<StoreType>()(
               const setState = store[0];
               setState((prev) => {
                 prev.simpleTodoList = todos;
+              });
+            },
+            updateSimpleTodoStatus: (id, status) => {
+              const setState = store[0];
+              setState((prev) => {
+                prev.simpleTodoList = prev.simpleTodoList.map((t) =>
+                  t.id === id ? { ...t, status } : t
+                );
+              });
+            },
+            deleteSimpleTodo: (id) => {
+              const setState = store[0];
+              setState((prev) => {
+                prev.simpleTodoList = prev.simpleTodoList.filter(
+                  (t) => t.id !== id
+                );
               });
             },
           } as StoreType),
