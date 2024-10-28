@@ -34,11 +34,12 @@ export function handleStoreLoadingState(store: any, loadingStateName: string) {
 export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
   const db = googleSheetDB(sheetId, tabId);
   let syncedResponse: any;
-  const debouncedSync = _debounce(async (value: string) => {
+
+  const debouncedSet = _debounce(async (value: string) => {
     const latest = await db.get();
 
     if (!_.isEqual(syncedResponse, latest)) {
-      toast.error(`${name} db is not in sync`);
+      toast.error(`${name} db is updated somewhere else.`);
       console.log(diffString(latest, syncedResponse));
       return;
     }
@@ -53,7 +54,7 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
   ) {
     const sync = () => {
       return db.get().then((response) => {
-        syncedResponse = response;
+        syncedResponse = structuredClone(response);
         store.setState(response.state ? response.state : response);
       });
     };
@@ -70,7 +71,7 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
       restartInterval();
 
       store.subscribe((state) => {
-        debouncedSync(JSON.stringify(keepState ? { state } : state));
+        debouncedSet(JSON.stringify(keepState ? { state } : state));
         restartInterval();
       });
     } catch (error) {
