@@ -59,10 +59,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
         status === 'done' && 'opacity-70'
       )}
     >
-      <h2 className="text-lg font-semibold mb-4 capitalize">
-        {status === 'inProgress' ? 'In Progress' : status}
-      </h2>
-
+      <h2 className="text-lg font-semibold mb-4 capitalize">{status}</h2>
       <ReactSortable list={columnTodos} setList={orderTodos}>
         {columnTodos
           .map((id) => todos.find((i) => i.id === id.id)!)

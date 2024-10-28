@@ -12,7 +12,7 @@ export type { SessionType } from './session/session-slice';
 export type SimpleTodoType = {
   id: string;
   text: string;
-  status: 'backlog' | 'inProgress' | 'done';
+  status: 'backlog' | 'done';
   date: string;
 };
 

@@ -1,25 +1,5 @@
-import React from 'react';
 import { SimpleTodoType, useStore } from '../store';
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  XCircleIcon,
-} from 'lucide-react';
-
-const statusRight: Record<SimpleTodoType['status'], SimpleTodoType['status']> =
-  {
-    backlog: 'inProgress',
-    inProgress: 'done',
-    done: 'done',
-  };
-
-const statusLeft: Record<SimpleTodoType['status'], SimpleTodoType['status']> = {
-  backlog: 'backlog',
-  inProgress: 'backlog',
-  done: 'inProgress',
-};
+import { CheckCircleIcon, FolderIcon, XCircleIcon } from 'lucide-react';
 
 type TodoItemProps = {
   todo: SimpleTodoType;
@@ -36,29 +16,17 @@ const TodoItem = ({ todo }: TodoItemProps) => {
     >
       <span>{todo.text}</span>
       <div className="flex gap-3">
-        {todo.status !== 'backlog' && (
-          <>
-            <ChevronLeftIcon
-              className="size-4 cursor-pointer hidden md:block"
-              onClick={() => updateStatus(todo.id, statusLeft[todo.status])}
-            />
-            <ChevronUpIcon
-              className="size-4 cursor-pointer md:hidden"
-              onClick={() => updateStatus(todo.id, statusLeft[todo.status])}
-            />
-          </>
+        {todo.status === 'backlog' && (
+          <CheckCircleIcon
+            className="size-4 cursor-pointer"
+            onClick={() => updateStatus(todo.id, 'done')}
+          />
         )}
-        {todo.status !== 'done' && (
-          <>
-            <ChevronDownIcon
-              className="size-4 cursor-pointer md:hidden"
-              onClick={() => updateStatus(todo.id, statusRight[todo.status])}
-            />
-            <ChevronRightIcon
-              className="size-4 cursor-pointer hidden md:block"
-              onClick={() => updateStatus(todo.id, statusRight[todo.status])}
-            />
-          </>
+        {todo.status === 'done' && (
+          <FolderIcon
+            className="size-4 cursor-pointer"
+            onClick={() => updateStatus(todo.id, 'backlog')}
+          />
         )}
         <XCircleIcon
           className="size-4 cursor-pointer"
