@@ -1,7 +1,5 @@
-'use client';
-
 import * as React from 'react';
-import { ChevronUp, ChevronDown, CheckIcon, XCircle } from 'lucide-react';
+import { CheckIcon, XCircle, ChevronsUpDownIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -19,8 +17,14 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
+type OptionType = {
+  value: string;
+  label: string;
+};
+
 type PrimitivePropsType = {
-  options: Array<{ value: string; label: string }>;
+  options: Array<OptionType>;
+  renderOption?: (option: OptionType) => React.ReactNode;
   values: string[];
   onClick: (val: string) => void;
   onClear: () => void;
@@ -28,6 +32,8 @@ type PrimitivePropsType = {
   showClearIcon?: boolean;
   open: boolean;
   setOpen: (bool: boolean) => void;
+  className?: string;
+  onSearchChange?: (val: string) => void;
 };
 
 function ComboboxPrimitive({
@@ -39,6 +45,9 @@ function ComboboxPrimitive({
   showClearIcon,
   open,
   setOpen,
+  className,
+  onSearchChange,
+  renderOption,
 }: PrimitivePropsType) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,7 +56,7 @@ function ComboboxPrimitive({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn('justify-between outline-none', className)}
         >
           <span>
             {values
@@ -61,24 +70,24 @@ function ComboboxPrimitive({
           <div className="flex gap-3">
             {showClearIcon && (
               <XCircle
-                className="size-4"
+                className="size-4 opacity-50"
                 onClick={(e) => {
                   e.stopPropagation();
                   onClear();
                 }}
               />
             )}
-            {open ? (
-              <ChevronUp className="size-4" />
-            ) : (
-              <ChevronDown className="size-4" />
-            )}
+            <ChevronsUpDownIcon className="size-4 shrink-0 opacity-50" />
           </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder={placeholder} className="h-9" />
+          <CommandInput
+            placeholder={placeholder}
+            className="h-9"
+            onValueChange={onSearchChange}
+          />
           <CommandEmpty>Not Found</CommandEmpty>
           <CommandList>
             <CommandGroup>
@@ -88,16 +97,21 @@ function ComboboxPrimitive({
                   value={framework.value}
                   onSelect={onClick}
                 >
-                  {framework.label}
-
-                  <CheckIcon
-                    className={cn(
-                      'ml-auto h-4 w-4',
-                      values.includes(framework.value)
-                        ? 'opacity-100'
-                        : 'opacity-0'
-                    )}
-                  />
+                  {renderOption ? (
+                    renderOption(framework)
+                  ) : (
+                    <>
+                      {framework.label}
+                      <CheckIcon
+                        className={cn(
+                          'ml-auto h-4 w-4',
+                          values.includes(framework.value)
+                            ? 'opacity-100'
+                            : 'opacity-0'
+                        )}
+                      />
+                    </>
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -108,20 +122,20 @@ function ComboboxPrimitive({
   );
 }
 
-type SingleSelectPropsType = {
-  options: Array<{ value: string; label: string }>;
+type SingleSelectPropsType = Pick<
+  PrimitivePropsType,
+  'onSearchChange' | 'options' | 'className' | 'placeholder' | 'renderOption'
+> & {
   value: string;
   setValue: (value: string) => void;
-  placeholder?: string;
   required?: boolean;
 };
 
 export const Combobox = ({
   value,
-  options,
   setValue,
-  placeholder,
   required,
+  ...rest
 }: SingleSelectPropsType) => {
   const values = React.useMemo(() => [value], [value]);
   const [open, setOpen] = React.useState(false);
@@ -136,8 +150,7 @@ export const Combobox = ({
         setOpen(false);
       }}
       setOpen={setOpen}
-      options={options}
-      placeholder={placeholder}
+      {...rest}
     />
   );
 };

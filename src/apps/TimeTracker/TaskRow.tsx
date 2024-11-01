@@ -23,6 +23,7 @@ import { uid } from '@/utils/uid';
 import useNow from '@/hooks/useNow';
 import { useCurrencies } from '@/hooks/useCurrencies';
 import { cn } from '@/lib/utils';
+import SelectProject from './SelectProject';
 
 type TaskRowProps = {
   task: TaskType;
@@ -45,7 +46,20 @@ const TaskRow = ({
 
   return (
     <TableRow key={task.id} className={cn(!task.endTime && 'bg-yellow-100')}>
-      <TableCell>{project?.name || '#'}</TableCell>
+      <TableCell>
+        {editingTaskId === task.id ? (
+          <SelectProject
+            projectId={task.projectId}
+            onChange={(projectId) => updateTask(task.id, { projectId })}
+          />
+        ) : project?.name ? (
+          <div className='flex'>
+            <Tag key={project.id} tag={project.name} />
+          </div>
+        ) : (
+          '#'
+        )}
+      </TableCell>
       <TableCell>
         {editingTaskId === task.id ? (
           <Input

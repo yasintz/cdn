@@ -12,19 +12,12 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { uid } from '@/utils/uid';
+import SelectProject from './SelectProject';
 
 type StartTaskProps = {
   now: number;
   id: string;
-  selectedTags: string[];
 };
 
 type TaskInputValues = Pick<TaskType, 'title' | 'priceHr' | 'projectId'>;
@@ -35,8 +28,7 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
     priceHr: 0,
     projectId: '',
   });
-  const { createTask, stopTask, tasks, updateTask, removeInput, projects } =
-    useStore();
+  const { createTask, stopTask, tasks, updateTask, removeInput } = useStore();
   const currentTask = tasks.find((i) => i.id === id);
   const projectId = currentTask?.projectId || taskInput.projectId;
   const title = currentTask?.title || taskInput.title;
@@ -75,11 +67,11 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
       : setTaskInput((prev) => ({ ...prev, title: value }));
   };
 
-  const updateProjectId = (id: string) => {
+  const updateProjectId = (id?: string) => {
     if (currentTask) {
       updateTask(currentTask.id, { projectId: id });
     } else {
-      setTaskInput((prev) => ({ ...prev, projectId: id }));
+      setTaskInput((prev) => ({ ...prev, projectId: id! }));
     }
   };
 
@@ -115,18 +107,8 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
       <div className="flex items-center gap-3">
         <div className="flex flex-1 gap-2 flex-col lg:flex-row">
           <div className="flex flex-1 gap-2 lg:flex-4">
-            <Select onValueChange={updateProjectId} value={projectId}>
-              <SelectTrigger className="w-auto lg:w-60 flex-8 lg:flex-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map((project) => (
-                  <SelectItem key={project.id} value={project.id}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SelectProject onChange={updateProjectId} projectId={projectId} />
+
             <Input
               className="flex-8"
               value={taskTitle}

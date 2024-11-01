@@ -36,6 +36,8 @@ type StoreType = {
   deleteTask: (id: string) => void;
   addInput: () => void;
   removeInput: (id: string) => void;
+  createProject: (project: ProjectType) => void;
+  deleteProject: (id: string) => void;
 };
 
 export const useStore = create<StoreType>()(
@@ -85,7 +87,16 @@ export const useStore = create<StoreType>()(
                   id: inputId,
                 });
               }),
-
+            createProject: (project) => {
+              set((prev) => {
+                prev.projects.push(project);
+              });
+            },
+            deleteProject: (id) => {
+              set((prev) => {
+                prev.projects = prev.projects.filter((p) => p.id !== id);
+              });
+            },
             ...compute(get, (state) => ({
               taskTags: Object.fromEntries(
                 state.tasks.map((task) => [

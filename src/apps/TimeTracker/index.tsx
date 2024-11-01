@@ -1,4 +1,5 @@
 import TaskTable from './TaskTable';
+import { DateRange } from 'react-day-picker';
 import { useStore } from './store';
 import useNow from '@/hooks/useNow';
 import TaskInput from './TaskInput';
@@ -6,58 +7,63 @@ import CreateInput from './CreateInput';
 import { useState } from 'react';
 import _ from 'lodash';
 import Tag from '../TimelineTodo/Tag';
+import { XIcon } from 'lucide-react';
+import { DateRangeFilter } from './CalendarFilter';
 
 const TimeTracker = () => {
   const now = useNow();
-  const { tasks, inputs, addInput, taskTags } = useStore();
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
-  const allTags = _.uniq(_.flatten(Object.values(taskTags))).sort();
-
-  const onTagToggle = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((i) => i !== tag) : [...prev, tag]
-    );
-  };
+  const { tasks, inputs, addInput, projects, deleteProject } = useStore();
+  const [projectFilters, setProjectFilters] = useState<string[]>([]);
+  const [range, setRange] = useState<DateRange>();
 
   return (
     <div className="time-tracker p-4 flex flex-col h-full">
       <div className="flex flex-col">
         {inputs.map((inputId) => (
-          <TaskInput
-            key={inputId}
-            id={inputId}
-            now={now}
-            selectedTags={selectedTags}
-          />
+          <TaskInput key={inputId} id={inputId} now={now} />
         ))}
       </div>
 
       <CreateInput onAdd={addInput} />
 
-      {allTags.length > 0 && (
-        <div className="flex gap-2 mb-2">
-          {allTags.map((tag) => (
-            <Tag
-              key={tag}
-              tag={tag}
-              onDoubleClick={() => onTagToggle(tag)}
-              onClick={() => navigator.clipboard.writeText(tag)}
-              showBorder
-              customBorderColor={
-                selectedTags.includes(tag) ? undefined : 'transparent'
-              }
-            />
-          ))}
-        </div>
-      )}
+      <div className="flex gap-2 mb-2 items-center">
+        <DateRangeFilter range={range} onChange={setRange} />
+        {projects.map((project) => (
+          <Tag
+            key={project.id}
+            tag={project.name}
+            className="flex items-center justify-between gap-2"
+            onClick={() =>
+              setProjectFilters((prev) => _.xor(prev, [project.id]))
+            }
+            showBorder
+            customBorderColor={
+              projectFilters.includes(project.id) ? undefined : 'transparent'
+            }
+            actions={
+              <XIcon
+                className="size-3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteProject(project.id);
+                }}
+              />
+            }
+          />
+        ))}
+      </div>
 
       <TaskTable
         tasks={tasks
           .filter(
             (task) =>
-              selectedTags.length === 0 ||
-              _.intersection(taskTags[task.id] || [], selectedTags).length > 0
+              projectFilters.length === 0 ||
+              projectFilters.includes(task.projectId)
+          )
+          .filter(
+            (task) =>
+              (range?.from ? task.startTime >= range.from.getTime() : true) &&
+              (range?.to ? task.startTime <= range.to.getTime() : true)
           )
           .toReversed()}
       />

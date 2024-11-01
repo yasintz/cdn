@@ -29,6 +29,10 @@ export const tagsColor: Record<string, string> = {
   'c:Kajabi': '#1276f0',
   spor: '#4876a3',
   'c:Main': '#985df6',
+  Kajabi: '#1276f0',
+  Nexizon: '#f87816',
+  Osapiens: '#56ac9d',
+  Cdn: '#EA899A',
 };
 
 export const tagsChildGroupMap: Record<string, string> = Object.entries(

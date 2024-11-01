@@ -8,6 +8,7 @@ type TagProps = {
   className?: string;
   showBorder?: boolean;
   customBorderColor?: string;
+  actions?: React.ReactNode;
 };
 
 const Tag = ({
@@ -17,13 +18,15 @@ const Tag = ({
   customBorderColor,
   onClick,
   onDoubleClick,
+  actions,
 }: TagProps) => {
   const { backgroundColor, color } = getTagColor(tag);
   return (
     <div
       className={cn(
-        'text-xs px-2 py-0.5 rounded-full cursor-pointer select-none',
-        className
+        'text-xs px-2 py-0.5 rounded-full select-none',
+        className,
+        (onClick || onDoubleClick) && 'hover:bg-opacity-70 cursor-pointer'
       )}
       style={{
         backgroundColor,
@@ -36,6 +39,7 @@ const Tag = ({
       onDoubleClick={onDoubleClick}
     >
       {tag}
+      {actions}
     </div>
   );
 };
