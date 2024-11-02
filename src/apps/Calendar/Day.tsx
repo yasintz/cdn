@@ -221,19 +221,17 @@ const CalendarDay = ({
     >
       {eventCreatePoints && ref && (
         <div
+          className="absolute left-0 w-full rounded-sm"
           style={{
-            position: 'absolute',
             top: timeToPoint(eventCreatePoints.start, ref),
             height:
               timeToPoint(eventCreatePoints.end, ref) -
               timeToPoint(eventCreatePoints.start, ref),
-            left: 0,
-            width: '100%',
             backgroundColor: 'rgba(0, 0, 0, 0.1)',
           }}
         >
           {eventCreatePoints.start !== eventCreatePoints.end && (
-            <div className="px-1 py-0.5">
+            <div className="px-1 py-0.5 text-sm">
               {dayjs.duration(eventCreatePoints.start).format('HH:mm')} -{' '}
               {dayjs.duration(eventCreatePoints.end).format('HH:mm')} - (
               {showDiff(eventCreatePoints.end - eventCreatePoints.start)})
