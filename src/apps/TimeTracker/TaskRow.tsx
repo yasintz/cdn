@@ -24,6 +24,12 @@ import useNow from '@/hooks/useNow';
 import { useCurrencies } from '@/hooks/useCurrencies';
 import { cn } from '@/lib/utils';
 import SelectProject from './SelectProject';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 
 type TaskRowProps = {
   task: TaskType;
@@ -43,17 +49,18 @@ const TaskRow = ({
   const isBiggerThanOneDay = task.duration > ms('24 hours');
   const project = projects.find((p) => p.id === task.projectId);
   const priceTry = (task.totalPrice || 0) * currencies.TRY;
+  const isEditing = editingTaskId === task.id;
 
   return (
     <TableRow key={task.id} className={cn(!task.endTime && 'bg-yellow-100')}>
       <TableCell>
-        {editingTaskId === task.id ? (
+        {isEditing ? (
           <SelectProject
             projectId={task.projectId}
             onChange={(projectId) => updateTask(task.id, { projectId })}
           />
         ) : project?.name ? (
-          <div className='flex'>
+          <div className="flex">
             <Tag key={project.id} tag={project.name} />
           </div>
         ) : (
@@ -61,7 +68,7 @@ const TaskRow = ({
         )}
       </TableCell>
       <TableCell>
-        {editingTaskId === task.id ? (
+        {isEditing ? (
           <Input
             value={task.title}
             ringDisabled
@@ -82,7 +89,38 @@ const TaskRow = ({
           </div>
         )}
       </TableCell>
-      <TableCell>{dayjs(task.startTime).format('MM/DD/YYYY')}</TableCell>
+      <TableCell>
+        {isEditing ? (
+          <Popover>
+            <PopoverTrigger asChild>
+              <div>
+                {dayjs(task.startTime).format('MM/DD/YYYY HH:mm')} -{' '}
+                {dayjs(task.endTime).format('MM/DD/YYYY HH:mm')}
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto md:w-500 mr-4 h-[350px] md:h-auto overflow-y-scroll">
+              <div className="flex gap-4 flex-col md:flex-row">
+                <DateTimePicker
+                  value={new Date(task.startTime)}
+                  onChange={(d) =>
+                    updateTask(task.id, { startTime: d.getTime() })
+                  }
+                />
+                {task.endTime && (
+                  <DateTimePicker
+                    value={new Date(task.endTime)}
+                    onChange={(d) =>
+                      updateTask(task.id, { endTime: d.getTime() })
+                    }
+                  />
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          dayjs(task.startTime).format('MM/DD/YYYY')
+        )}
+      </TableCell>
       <TableCell>
         <TooltipProvider>
           <Tooltip delayDuration={0}>

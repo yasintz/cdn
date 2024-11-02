@@ -41,7 +41,7 @@ const TableCom = ({
         <TableRow>
           <TableHead className="w-28">Project</TableHead>
           <TableHead className="w-72 md:w-auto">Title</TableHead>
-          <TableHead className="w-28">Date</TableHead>
+          <TableHead className="w-50">Date</TableHead>
           <TableHead className="w-28">Duration</TableHead>
           <TableHead className="w-28">Price</TableHead>
           <TableHead className="w-20" />

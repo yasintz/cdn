@@ -26,13 +26,13 @@ const TimeTracker = () => {
 
       <CreateInput onAdd={addInput} />
 
-      <div className="flex gap-2 mb-2 items-center">
+      <div className="w-full overflow-x-scroll flex gap-2 mb-2 items-center py-2 scrollbar-hidden">
         <DateRangeFilter range={range} onChange={setRange} />
         {projects.map((project) => (
           <Tag
             key={project.id}
             tag={project.name}
-            className="flex items-center justify-between gap-2"
+            className="flex items-center justify-between gap-2 group"
             onClick={() =>
               setProjectFilters((prev) => _.xor(prev, [project.id]))
             }
@@ -42,10 +42,14 @@ const TimeTracker = () => {
             }
             actions={
               <XIcon
-                className="size-3"
+                className="size-3 hidden group-hover:block"
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteProject(project.id);
+                  if (
+                    confirm('Are you sure you want to delete this project?')
+                  ) {
+                    deleteProject(project.id);
+                  }
                 }}
               />
             }
