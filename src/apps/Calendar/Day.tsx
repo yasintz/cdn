@@ -231,7 +231,15 @@ const CalendarDay = ({
             width: '100%',
             backgroundColor: 'rgba(0, 0, 0, 0.1)',
           }}
-        />
+        >
+          {eventCreatePoints.start !== eventCreatePoints.end && (
+            <div className="px-1 py-0.5">
+              {dayjs.duration(eventCreatePoints.start).format('HH:mm')} -{' '}
+              {dayjs.duration(eventCreatePoints.end).format('HH:mm')} - (
+              {showDiff(eventCreatePoints.end - eventCreatePoints.start)})
+            </div>
+          )}
+        </div>
       )}
       {groupEvents.map((event, index) => {
         const { style } = getEventConfig({

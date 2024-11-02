@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import dayjs from '@/helpers/dayjs';
+import { showDiff } from '../TimelineTodo/Entry/utils';
 
 export type FormInputs = Omit<EventType, 'id'>;
 type FormProps = {
@@ -133,7 +134,10 @@ const Form = ({
           name="end"
           render={({ field }) => (
             <div className="flex flex-col flex-1 gap-2">
-              <Label>End At ({dayjs(field.value).format('HH:mm')})</Label>
+              <Label>
+                End At ({dayjs(field.value).format('HH:mm')}) -{' '}
+                {showDiff(dayjs(field.value).diff(dayjs(getValues().start)))}
+              </Label>
               <DateTimePicker
                 value={new Date(field.value)}
                 onChange={(d) => field.onChange(d.toISOString())}
