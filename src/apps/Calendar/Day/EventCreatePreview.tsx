@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import dayjs from '@/helpers/dayjs';
 import { showDiff } from '@/apps/TimelineTodo/Entry/utils';
 import {
@@ -10,11 +10,21 @@ import {
 import ms from 'ms';
 
 type EventCreatePointsType = {
+  y1: number;
+  y2: number;
+};
+
+type EventTimesType = {
   start: number;
   end: number;
-  // y1: number;
-  // y2: number;
 };
+
+function getNearestFifteenPoint(e: React.MouseEvent, ref: HTMLDivElement) {
+  const point = getPoint(e, ref);
+  const time = pointToTime(point, ref);
+  const nearestFifteen = roundTimeToNearest(time, ms('15 minutes'));
+  return timeToPoint(nearestFifteen, ref);
+}
 
 export function useEventCreatePreview(
   ref: HTMLDivElement | null,
@@ -23,6 +33,23 @@ export function useEventCreatePreview(
 ) {
   const [eventCreatePoints, setEventCreatePoints] =
     React.useState<EventCreatePointsType>();
+
+  const eventTimes = useMemo<EventTimesType | undefined>(() => {
+    if (
+      !eventCreatePoints ||
+      !ref ||
+      eventCreatePoints.y1 === eventCreatePoints.y2
+    ) {
+      return;
+    }
+
+    const startPoint = Math.min(eventCreatePoints.y1, eventCreatePoints.y2);
+    const endPoint = Math.max(eventCreatePoints.y1, eventCreatePoints.y2);
+
+    const start = pointToTime(startPoint, ref);
+    const end = pointToTime(endPoint, ref);
+    return { start, end };
+  }, [eventCreatePoints, ref]);
 
   const onMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -38,38 +65,33 @@ export function useEventCreatePreview(
 
     if (!ref) return;
 
-    const point = getPoint(e, ref);
-    const time = pointToTime(point, ref);
-
-    const nearestFifteen = roundTimeToNearest(time, ms('15 minutes'));
+    const point = getNearestFifteenPoint(e, ref);
 
     setEventCreatePoints({
-      start: nearestFifteen,
-      end: nearestFifteen,
+      y1: point,
+      y2: point,
     });
   };
 
   const onMouseMove = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!eventCreatePoints || !ref) return;
-    const point = getPoint(e, ref);
-    const time = pointToTime(point, ref);
-    const nearestFifteen = roundTimeToNearest(time, ms('15 minutes'));
+    const point = getNearestFifteenPoint(e, ref);
 
     setEventCreatePoints({
-      start: eventCreatePoints.start,
-      end: nearestFifteen,
+      y1: eventCreatePoints.y1,
+      y2: point,
     });
   };
 
   const onMouseUp = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!eventCreatePoints) return;
-    if (eventCreatePoints.start === eventCreatePoints.end) return;
+
+    if (!eventTimes) return;
 
     onEventCreate?.(
-      dayjs(day).startOf('day').add(eventCreatePoints.start).toDate(),
-      dayjs(day).startOf('day').add(eventCreatePoints.end).toDate()
+      dayjs(day).startOf('day').add(eventTimes.start).toDate(),
+      dayjs(day).startOf('day').add(eventTimes.end).toDate()
     );
 
     setEventCreatePoints(undefined);
@@ -90,6 +112,7 @@ export function useEventCreatePreview(
 
   return {
     eventCreatePoints,
+    eventTimes,
     onMouseDown,
     onMouseMove,
     onMouseUp,
@@ -98,29 +121,29 @@ export function useEventCreatePreview(
 
 type EventCreatePreviewProps = {
   eventCreatePoints: EventCreatePointsType;
-  divRef: HTMLDivElement;
+  eventTimes?: EventTimesType;
 };
 
 const EventCreatePreview = ({
-  divRef: ref,
   eventCreatePoints,
+  eventTimes,
 }: EventCreatePreviewProps) => {
+  const top = Math.min(eventCreatePoints.y1, eventCreatePoints.y2);
+  const height = Math.abs(eventCreatePoints.y2 - eventCreatePoints.y1);
   return (
     <div
       className="absolute left-0 w-full rounded-sm"
       style={{
-        top: timeToPoint(eventCreatePoints.start, ref),
-        height:
-          timeToPoint(eventCreatePoints.end, ref) -
-          timeToPoint(eventCreatePoints.start, ref),
+        top,
+        height,
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
       }}
     >
-      {eventCreatePoints.start !== eventCreatePoints.end && (
+      {eventTimes && (
         <div className="px-1 py-0.5 text-sm">
-          {dayjs.duration(eventCreatePoints.start).format('HH:mm')} -{' '}
-          {dayjs.duration(eventCreatePoints.end).format('HH:mm')} - (
-          {showDiff(eventCreatePoints.end - eventCreatePoints.start)})
+          {dayjs.duration(eventTimes.start).format('HH:mm')} -{' '}
+          {dayjs.duration(eventTimes.end).format('HH:mm')} - (
+          {showDiff(eventTimes.end - eventTimes.start)})
         </div>
       )}
     </div>

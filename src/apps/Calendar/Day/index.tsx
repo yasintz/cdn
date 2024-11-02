@@ -29,7 +29,7 @@ const CalendarDay = ({
 }: CalendarDayProps) => {
   const [ref, setRef] = React.useState<HTMLDivElement | null>(null);
 
-  const { eventCreatePoints, onMouseDown, onMouseMove, onMouseUp } =
+  const { eventCreatePoints, onMouseDown, onMouseMove, onMouseUp, eventTimes } =
     useEventCreatePreview(ref, day, onEventCreate);
 
   const groupEvents = events.filter((ev) => ev.isGroup);
@@ -70,7 +70,7 @@ const CalendarDay = ({
       {eventCreatePoints && ref && (
         <EventCreatePreview
           eventCreatePoints={eventCreatePoints}
-          divRef={ref}
+          eventTimes={eventTimes}
         />
       )}
       {groupEvents.map((event, index) => (
