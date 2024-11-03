@@ -91,11 +91,15 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       todo.text.toLowerCase().includes(i.name.toLowerCase())
     );
 
+    const title = project
+      ? todo.text.replace(`${project.name}:`, '').trim()
+      : todo.text;
+
     const timeTrackerTaskId = uid();
     createTimeTrackerTask(timeTrackerTaskId, {
       projectId: project?.id || '',
       startTime: Date.now(),
-      title: todo.text,
+      title,
     });
 
     updateTask(todo.id, {
