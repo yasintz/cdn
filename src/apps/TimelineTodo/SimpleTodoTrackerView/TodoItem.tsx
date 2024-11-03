@@ -62,8 +62,8 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       date: selectedDate,
     });
 
-    if (todo.timeTrackerId) {
-      stopTimeTrackerTask(todo.timeTrackerId);
+    if (timeTrackerTask && !timeTrackerTask.endTime) {
+      stopTimeTrackerTask(timeTrackerTask.id);
     }
   };
 
