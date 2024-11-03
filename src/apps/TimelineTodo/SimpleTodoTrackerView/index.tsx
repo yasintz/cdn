@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import Column from './Column';
 import Header from './Header';
-import { SimpleTodoType } from '../store';
 import dayjs from '@/helpers/dayjs';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 
-const boardColumns: SimpleTodoType['status'][] = ['backlog', 'done'];
+const boardColumns = ['backlog', 'done'];
 
 export default function SimpleTodoTracker() {
   const [selectedDate, setSelectedDate] = useState(() =>
@@ -17,7 +16,12 @@ export default function SimpleTodoTracker() {
       <Header selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {boardColumns.map((status) => (
-          <Column key={status} status={status} selectedDate={selectedDate} />
+          <Column
+            key={status}
+            status={status}
+            selectedDate={selectedDate}
+            updateSelectedDate={setSelectedDate}
+          />
         ))}
       </div>
     </div>

@@ -7,28 +7,14 @@ import { SessionSliceType, createSessionSlice } from './session/session-slice';
 import { EntrySliceType, createEntrySlice } from './entry-slice';
 import { TodoSliceType, createTodoSlice } from './todo-slice';
 import { StoreRelations, createStoreRelations } from './relations';
-import dayjs from '@/helpers/dayjs';
-import { SIMPLE_TODO_DATE_FORMAT } from './utils';
+import { createSimpleTodoSlice, SimpleTodoSlice } from './simple-todo-slice';
 export type { SessionType } from './session/session-slice';
-
-export type SimpleTodoType = {
-  id: string;
-  text: string;
-  status: 'backlog' | 'done';
-  date: string;
-};
 
 export type StoreType = SessionSliceType &
   EntrySliceType &
-  TodoSliceType & {
+  TodoSliceType &
+  SimpleTodoSlice & {
     getRelations: () => StoreRelations;
-    simpleTodoList: SimpleTodoType[];
-    updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
-    updateSimpleTodoStatus: (
-      id: string,
-      status: SimpleTodoType['status']
-    ) => void;
-    deleteSimpleTodo: (id: string) => void;
   };
 
 export type EntryType = StoreType['entries'][number];
@@ -50,36 +36,8 @@ export const useStore = create<StoreType>()(
             ...createSessionSlice(...store),
             ...createEntrySlice(...store),
             ...createTodoSlice(...store),
+            ...createSimpleTodoSlice(...store),
             getRelations: () => createStoreRelations(store[1]()),
-            simpleTodoList: [],
-            updateSimpleTodoList: (todos) => {
-              const setState = store[0];
-              setState((prev) => {
-                prev.simpleTodoList = todos;
-              });
-            },
-            updateSimpleTodoStatus: (id, status) => {
-              const setState = store[0];
-              setState((prev) => {
-                prev.simpleTodoList = prev.simpleTodoList.map((t) =>
-                  t.id === id
-                    ? {
-                        ...t,
-                        status,
-                        date: dayjs().format(SIMPLE_TODO_DATE_FORMAT),
-                      }
-                    : t
-                );
-              });
-            },
-            deleteSimpleTodo: (id) => {
-              const setState = store[0];
-              setState((prev) => {
-                prev.simpleTodoList = prev.simpleTodoList.filter(
-                  (t) => t.id !== id
-                );
-              });
-            },
           } as StoreType),
         {
           name: 'timeline-todo',

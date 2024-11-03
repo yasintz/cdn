@@ -1,28 +1,27 @@
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import React, { useMemo, useState } from 'react';
-import { SimpleTodoType, useStore } from '../store';
+import { useStore } from '../store';
 import TodoItem from './TodoItem';
 import { ReactSortable } from 'react-sortablejs';
-import './style.scss';
 import dayjs from '@/helpers/dayjs';
 import _ from 'lodash';
+import { ChevronsUpDownIcon } from 'lucide-react';
+import { SimpleTodoType } from '../store/simple-todo-slice';
+import './style.scss';
 
 type ColumnProps = {
-  status: SimpleTodoType['status'];
+  status: string;
   selectedDate: string;
+  updateSelectedDate: (date: string) => void;
 };
 
-const Column = ({ status, selectedDate }: ColumnProps) => {
-  const [todos, setTodos] = useStore((s) => [
-    s.simpleTodoList,
-    s.updateSimpleTodoList,
-  ]);
+const Column = ({ status, selectedDate, updateSelectedDate }: ColumnProps) => {
+  const { simpleTodoList: todos, updateSimpleTodoList: setTodos } = useStore();
   const [newTodo, setNewTodo] = useState('');
 
   const allPreviousBacklogItems = todos.filter(
-    (todo) =>
-      todo.status === 'backlog' && dayjs(todo.date).isBefore(selectedDate)
+    (todo) => !todo.completed && dayjs(todo.date).isBefore(selectedDate)
   );
   const previousBacklogItems = _.groupBy(allPreviousBacklogItems, 'date');
 
@@ -30,7 +29,9 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
     () =>
       structuredClone(
         todos.filter(
-          (todo) => todo.status === status && todo.date === selectedDate
+          (todo) =>
+            (status === 'done' ? todo.completed : !todo.completed) &&
+            todo.date === selectedDate
         )
       ),
     [selectedDate, status, todos]
@@ -43,8 +44,8 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
         {
           id: Date.now().toString(),
           text: newTodo,
-          status: 'backlog',
           date: selectedDate,
+          completed: false,
         },
       ]);
       setNewTodo('');
@@ -71,12 +72,22 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
       {allPreviousBacklogItems.length > 0 && status === 'backlog' && (
         <div className="border p-4 mb-2 rounded-md">
           {Object.keys(previousBacklogItems).map((date) => (
-            <div>
-              <h2 className="text-lg font-semibold mb-4 capitalize">{dayjs(date).format('D MMMM')}</h2>
+            <div className="group">
+              <h2 className="text-lg font-semibold mb-4 capitalize flex gap-2 items-center">
+                {dayjs(date).format('D MMMM')}
+                <ChevronsUpDownIcon
+                  className="size-3 cursor-pointer hidden group-hover:block rotate-45"
+                  onClick={() => updateSelectedDate(date)}
+                />
+              </h2>
               {previousBacklogItems[date]
                 .map((id) => todos.find((i) => i.id === id.id)!)
                 .map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} />
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    selectedDate={selectedDate}
+                  />
                 ))}
             </div>
           ))}
@@ -86,7 +97,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
         {columnTodos
           .map((id) => todos.find((i) => i.id === id.id)!)
           .map((todo) => (
-            <TodoItem key={todo.id} todo={todo} />
+            <TodoItem key={todo.id} todo={todo} selectedDate={selectedDate} />
           ))}
       </ReactSortable>
       {status === 'backlog' && (
