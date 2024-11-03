@@ -72,7 +72,7 @@ const Column = ({ status, selectedDate, updateSelectedDate }: ColumnProps) => {
       {allPreviousBacklogItems.length > 0 && status === 'backlog' && (
         <div className="border p-4 mb-2 rounded-md">
           {Object.keys(previousBacklogItems).map((date) => (
-            <div className="group">
+            <div className="group" key={date}>
               <h2 className="text-lg font-semibold mb-4 capitalize flex gap-2 items-center">
                 {dayjs(date).format('D MMMM')}
                 <ChevronsUpDownIcon

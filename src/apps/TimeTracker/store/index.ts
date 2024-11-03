@@ -20,6 +20,7 @@ export type TaskType = {
 export type ProjectType = {
   id: string;
   name: string;
+  priceHr?: number;
 };
 
 type StoreType = {

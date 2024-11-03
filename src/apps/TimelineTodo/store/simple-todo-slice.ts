@@ -7,12 +7,14 @@ export type SimpleTodoType = {
   text: string;
   date: string;
   subtasks?: SimpleTodoType[];
+  timeTrackerId?: string;
   completed: boolean;
 };
 
 export type SimpleTodoSlice = {
   simpleTodoList: SimpleTodoType[];
   updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
+  updateTask: (id: string, task: Partial<SimpleTodoType>) => void;
   toggleTask: (id: string, selectedDate: string) => void;
   deleteSimpleTodo: (id: string) => void;
   addSubtask: (id: string, subtask: SimpleTodoType) => void;
@@ -27,6 +29,18 @@ export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
   updateSimpleTodoList: (todos) => {
     set((prev) => {
       prev.simpleTodoList = todos;
+    });
+  },
+  updateTask: (id, task) => {
+    set((prev) => {
+      prev.simpleTodoList = prev.simpleTodoList.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              ...task,
+            }
+          : t
+      );
     });
   },
   toggleTask: (id, selectedDate) => {
