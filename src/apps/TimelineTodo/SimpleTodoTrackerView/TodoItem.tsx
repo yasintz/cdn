@@ -143,7 +143,7 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
         </div>
       </div>
       {subtasks.length > 0 && (
-        <div className="mt-2 ml-4 text-sm text-gray-700">
+        <div className="flex flex-col gap-1 mt-2 ml-4 text-sm text-gray-700">
           {subtasks.map((subtask) => (
             <div
               key={subtask.id}
