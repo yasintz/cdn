@@ -127,16 +127,37 @@ const FileExplorer: React.FC<{
   );
 };
 
+const FileRenderer = ({ file }: { file: FileSystemItem }) => {
+  const { updateItem: updateFile } = useStore();
+
+  if (file.name.endsWith('exc')) {
+    return (
+      <iframe
+        className="w-full h-full border rounded font-mono text-sm"
+        src={`https://excalidraw.com/?file_id=${file.id}${file.content}`}
+      />
+    );
+  }
+
+  return (
+    <textarea
+      value={file.content}
+      onChange={(e) => updateFile(file.id, { content: e.target.value })}
+      className="w-full h-full border rounded p-2 font-mono text-sm"
+      placeholder="Select a file to view its content"
+    />
+  );
+};
+
 export default function SimpleCodeEditor({
   initialFileSystem,
 }: {
   initialFileSystem: FileSystemItemWithChildren[];
 }) {
   const [selectedItemId, setSelectedItemId] = useState('');
-  const { items: files, updateItem: updateFile } = useStore();
+  const { items: files } = useStore();
 
   const selectedFile = files.find((file) => file.id === selectedItemId);
-  const selectedFileContent = selectedFile?.content || '';
 
   return (
     <div className="flex h-screen bg-white">
@@ -147,16 +168,11 @@ export default function SimpleCodeEditor({
           selectedFileId={selectedItemId}
         />
       </div>
-      <div className="flex-1 p-4">
-        <textarea
-          value={selectedFileContent}
-          onChange={(e) =>
-            updateFile(selectedItemId, { content: e.target.value })
-          }
-          className="w-full h-full border rounded p-2 font-mono text-sm"
-          placeholder="Select a file to view its content"
-        />
-      </div>
+      {selectedFile && (
+        <div className="flex-1 p-4">
+          <FileRenderer file={selectedFile} />
+        </div>
+      )}
     </div>
   );
 }
