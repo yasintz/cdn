@@ -24,6 +24,7 @@ import {
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import './style.scss';
+import { PanelTopCloseIcon } from 'lucide-react';
 
 const defaultSnippetContent = `
 export default function App() {
@@ -51,8 +52,46 @@ const reactSandpackConfig: SandpackConfig = {
     },
   ],
 };
-const allPlugins = (diffMarkdown: string) => [
-  toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+
+const ToolbarContent = ({
+  show,
+  setShow,
+}: {
+  show: boolean;
+  setShow: (show: boolean) => void;
+}) => {
+  if (show) {
+    return (
+      <div className="flex gap-2 items-center">
+        <KitchenSinkToolbar />
+        <PanelTopCloseIcon
+          className="size-4 text-gray-600"
+          onClick={() => setShow(false)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-1.5 bg-gray-100" onClick={() => setShow(true)} />
+  );
+};
+
+const allPlugins = ({
+  diffMarkdown,
+  showToolbar,
+  setShowToolbar,
+}: {
+  diffMarkdown: string;
+  showToolbar: boolean;
+  setShowToolbar: (show: boolean) => void;
+}) => [
+  toolbarPlugin({
+    toolbarClassName: cn({ 'hidden-toolbar': !showToolbar }),
+    toolbarContents: () => (
+      <ToolbarContent show={showToolbar} setShow={setShowToolbar} />
+    ),
+  }),
   listsPlugin(),
   quotePlugin(),
   headingsPlugin(),
@@ -82,15 +121,23 @@ type MarkdownInputProps = {
   onChange: (value: string) => void;
   value: string;
   className?: string;
+  showToolbar?: boolean;
 };
 
-const MarkdownInput = ({ onChange, value, className }: MarkdownInputProps) => {
+const MarkdownInput = ({
+  onChange,
+  value,
+  className,
+  showToolbar: showToolbarProp = false,
+}: MarkdownInputProps) => {
+  const [showToolbar, setShowToolbar] = React.useState(showToolbarProp);
+
   return (
     <MDXEditor
       markdown={value}
       className={cn(className, 'mt-2 full-demo-mdxeditor border rounded-sm')}
       contentEditableClassName="prose max-w-full font-sans"
-      plugins={allPlugins(value)}
+      plugins={allPlugins({ diffMarkdown: value, showToolbar, setShowToolbar })}
       onChange={onChange}
     />
   );

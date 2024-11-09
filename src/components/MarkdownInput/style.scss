@@ -1,11 +1,18 @@
 @import '../../styles/shared.scss';
 
 .full-demo-mdxeditor {
+  overflow: hidden;
+
   .mdxeditor-toolbar {
     @apply rounded-none p-1;
+
+    &.hidden-toolbar {
+      padding: 0;
+    }
+
     @include scrollbar-hidden;
 
-    svg {
+    span svg {
       @apply size-5;
     }
   }
