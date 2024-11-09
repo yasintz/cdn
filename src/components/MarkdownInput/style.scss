@@ -1,0 +1,40 @@
+@import '../../styles/shared.scss';
+
+.full-demo-mdxeditor {
+  .mdxeditor-toolbar {
+    @apply rounded-none p-1;
+    @include scrollbar-hidden;
+
+    svg {
+      @apply size-5;
+    }
+  }
+
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
+  a {
+    @apply text-blue-600 underline;
+  }
+
+  ul li[role='checkbox'] {
+    margin-left: 0px;
+    &::before {
+      margin-top: 2px;
+    }
+  }
+
+  ul {
+    @apply list-inside list-disc;
+  }
+
+  ol {
+    @apply list-inside list-decimal;
+  }
+}

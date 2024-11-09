@@ -2,25 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '../src/styles//shared.scss';
+
 html,
 body,
 #root {
   height: 100%;
-}
-
-.scrollbar-hidden {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-
-  &::-webkit-scrollbar {
-    width: 1px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: transparent;
-  }
 }

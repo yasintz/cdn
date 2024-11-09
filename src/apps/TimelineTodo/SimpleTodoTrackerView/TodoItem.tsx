@@ -36,9 +36,7 @@ type TodoItemProps = {
 };
 
 const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
-  const [noteMode, setNoteMode] = useState<'view' | 'edit' | 'hidden'>(
-    'hidden'
-  );
+  const [showNote, setShowNote] = useState(false);
   const {
     projects: timeTrackerProjects,
     tasks: timeTrackerTasks,
@@ -110,12 +108,13 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       <div className="flex justify-between items-center">
         <span>{todo.text}</span>
         <div className="flex gap-3 items-center">
-          {todo.note && (
+          {(todo.note || showNote) && (
             <NotepadTextIcon
               className="size-3 cursor-pointer"
-              onClick={() => setNoteMode('view')}
+              onClick={() => setShowNote(!showNote)}
             />
           )}
+
           {timeTrackerTask && (
             <span className="text-xs text-gray-500">
               {formatDuration(diff, todo.completed)}
@@ -151,7 +150,7 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
               <DropdownItem
                 title="Add Note"
                 icon={NotepadTextIcon}
-                onClick={() => setNoteMode('edit')}
+                onClick={() => setShowNote(true)}
                 hidden={Boolean(todo.note)}
               />
               <DropdownItem
@@ -164,15 +163,10 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
           </DropdownMenu>
         </div>
       </div>
-      {noteMode !== 'hidden' && (
+      {showNote && (
         <MarkdownInput
           onChange={(value) => updateTask(todo.id, { note: value })}
           value={todo.note || ''}
-          onInputClose={() => setNoteMode('hidden')}
-          onEditableChange={(editable) =>
-            setNoteMode(editable ? 'edit' : 'view')
-          }
-          editable={noteMode === 'edit'}
           className="mt-2 border rounded text-sm"
         />
       )}
