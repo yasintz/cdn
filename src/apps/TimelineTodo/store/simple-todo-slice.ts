@@ -9,6 +9,7 @@ export type SimpleTodoType = {
   subtasks?: SimpleTodoType[];
   timeTrackerId?: string;
   completed: boolean;
+  note?: string;
 };
 
 export type SimpleTodoSlice = {

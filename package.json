@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "@loadable/component": "^5.16.4",
+    "@mdxeditor/editor": "^3.17.1",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -110,6 +111,7 @@
     "react-dom": "19.0.0-rc-1eaccd82-20240816",
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.52.2",
+    "react-markdown": "^9.0.1",
     "react-router-dom": "^6.21.3",
     "react-scroll-sync": "^0.11.2",
     "react-sortablejs": "^6.1.4",

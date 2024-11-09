@@ -3,18 +3,26 @@ import { useStore } from '../store';
 import {
   CheckCircleIcon,
   FolderIcon,
+  MoreHorizontalIcon,
+  NotepadTextIcon,
   PlayIcon,
-  PlusIcon,
   TrashIcon,
-  XCircleIcon,
 } from 'lucide-react';
 import { SimpleTodoType } from '../store/simple-todo-slice';
-import Tooltip from '@/components/Tooltip';
 import { useStore as useTimeTrackerStore } from '@/apps/TimeTracker/store';
 import { uid } from '@/utils/uid';
 import useNow from '@/hooks/useNow';
 import dayjs from 'dayjs';
 import ms from 'ms';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import DropdownItem from '../DropdownItem';
+import { useState } from 'react';
+import MarkdownInput from '@/components/MarkdownInput';
 
 const formatDuration = (diff: number, completed: boolean) => {
   const format = diff > ms('1 hour') || completed ? 'HH:mm:ss' : 'mm:ss';
@@ -28,6 +36,9 @@ type TodoItemProps = {
 };
 
 const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
+  const [noteMode, setNoteMode] = useState<'view' | 'edit' | 'hidden'>(
+    'hidden'
+  );
   const {
     projects: timeTrackerProjects,
     tasks: timeTrackerTasks,
@@ -49,7 +60,6 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
 
   const {
     deleteSimpleTodo: deleteTodo,
-    addSubtask,
     toggleTask,
     toggleSubtask,
     deleteSubtask,
@@ -64,18 +74,6 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
 
     if (timeTrackerTask && !timeTrackerTask.endTime) {
       stopTimeTrackerTask(timeTrackerTask.id);
-    }
-  };
-
-  const handleAddSubtask = () => {
-    const title = prompt('Enter subtask title');
-    if (title) {
-      addSubtask(todo.id, {
-        id: Date.now().toString(),
-        text: title,
-        completed: false,
-        date: todo.date,
-      });
     }
   };
 
@@ -112,22 +110,16 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       <div className="flex justify-between items-center">
         <span>{todo.text}</span>
         <div className="flex gap-3 items-center">
-          <Tooltip tooltip="Add Subtask">
-            <PlusIcon
+          {todo.note && (
+            <NotepadTextIcon
               className="size-3 cursor-pointer"
-              onClick={handleAddSubtask}
+              onClick={() => setNoteMode('view')}
             />
-          </Tooltip>
-
-          {timeTrackerTask ? (
+          )}
+          {timeTrackerTask && (
             <span className="text-xs text-gray-500">
               {formatDuration(diff, todo.completed)}
             </span>
-          ) : (
-            <PlayIcon
-              className="size-3 cursor-pointer"
-              onClick={handleStartTask}
-            />
           )}
           {todo.completed ? (
             <FolderIcon
@@ -140,12 +132,50 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
               onClick={completeTask}
             />
           )}
-          <XCircleIcon
-            className="size-3 cursor-pointer"
-            onClick={() => deleteTodo(todo.id)}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex h-6 w-6 p-0 data-[state=open]:bg-muted outline-none ring-0"
+              >
+                <MoreHorizontalIcon className="size-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownItem
+                title="Start Timer"
+                icon={PlayIcon}
+                onClick={handleStartTask}
+                hidden={Boolean(timeTrackerTask)}
+              />
+              <DropdownItem
+                title="Add Note"
+                icon={NotepadTextIcon}
+                onClick={() => setNoteMode('edit')}
+                hidden={Boolean(todo.note)}
+              />
+              <DropdownItem
+                className="text-red-500"
+                icon={TrashIcon}
+                title="Delete"
+                onClick={() => deleteTodo(todo.id)}
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
+      {noteMode !== 'hidden' && (
+        <MarkdownInput
+          onChange={(value) => updateTask(todo.id, { note: value })}
+          value={todo.note || ''}
+          onInputClose={() => setNoteMode('hidden')}
+          onEditableChange={(editable) =>
+            setNoteMode(editable ? 'edit' : 'view')
+          }
+          editable={noteMode === 'edit'}
+          className="mt-2 border rounded text-sm"
+        />
+      )}
       {subtasks.length > 0 && (
         <div className="flex flex-col gap-1 mt-2 ml-4 text-sm text-gray-700">
           {subtasks.map((subtask) => (
