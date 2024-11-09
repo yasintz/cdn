@@ -27,3 +27,5 @@ export default function SimpleTodoTracker() {
     </div>
   );
 }
+
+export { SimpleTodoTracker as Component };

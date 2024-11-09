@@ -6,7 +6,7 @@
   "homepage": "http://yasintz.github.io/cdn",
   "scripts": {
     "dev": "vite",
-    "analyze": "vite-bundle-visualizer -t sunburst",
+    "analyze": "vite build -- --analyze",
     "build:projects": "mkdir dist/projects && cp -r projects/* dist/projects",
     "build:vite": "vite build && cp dist/index.html dist/404.html",
     "build": "tsc && pnpm build:vite && pnpm build:projects",

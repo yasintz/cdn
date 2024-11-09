@@ -30,7 +30,15 @@ export const routes: Array<RouteObject & HomePageAppType> = [
   },
   {
     path: 'timeline-todo/*',
-    lazy: () => import('../apps/TimelineTodo/router'),
+    lazy: () => import('../apps/TimelineTodo'),
+    title: 'Timeline Todo',
+    cardPath: 'timeline-todo/simple-todo-tracker',
+    image:
+      'https://thumbs.dreamstime.com/b/satisfaction-crossing-off-everything-todo-list-vector-illustration-317472455.jpg?w=992',
+  },
+  {
+    path: 'timeline-todo/simple-todo-tracker/*',
+    lazy: () => import('../apps/TimelineTodo/SimpleTodoTrackerView'),
     title: 'Timeline Todo',
     cardPath: 'timeline-todo/simple-todo-tracker',
     image:

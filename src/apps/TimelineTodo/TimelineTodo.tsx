@@ -93,4 +93,4 @@ const TimelineTodo = () => {
   );
 };
 
-export default TimelineTodo;
+export { TimelineTodo as Component };
