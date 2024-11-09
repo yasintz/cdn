@@ -4,41 +4,36 @@ import React, { useMemo, useState } from 'react';
 import { useStore } from '../store';
 import TodoItem from './TodoItem';
 import { ReactSortable } from 'react-sortablejs';
-import dayjs from '@/helpers/dayjs';
-import _ from 'lodash';
-import { ChevronsUpDownIcon } from 'lucide-react';
 import { SimpleTodoType } from '../store/simple-todo-slice';
 import './style.scss';
+// import { useSharedStore } from './store';
 
 type ColumnProps = {
   status: string;
   selectedDate: string;
-  updateSelectedDate: (date: string) => void;
 };
 
-const Column = ({ status, selectedDate, updateSelectedDate }: ColumnProps) => {
+const Column = ({ status, selectedDate }: ColumnProps) => {
+  // const { selectedDate } = useSharedStore();
   const { simpleTodoList: todos, updateSimpleTodoList: setTodos } = useStore();
   const [newTodo, setNewTodo] = useState('');
 
-  const allPreviousBacklogItems = todos.filter(
-    (todo) => !todo.completed && dayjs(todo.date).isBefore(selectedDate)
-  );
-  const previousBacklogItems = _.groupBy(allPreviousBacklogItems, 'date');
-
   const columnTodos = useMemo(
     () =>
-      structuredClone(
-        todos.filter(
-          (todo) =>
-            !todo.blocked &&
-            (status === 'done' ? todo.completed : !todo.completed) &&
-            todo.date === selectedDate
-        )
+      todos.filter(
+        (todo) =>
+          (status === 'done' ? todo.completed : !todo.completed) &&
+          todo.date === selectedDate
       ),
     [selectedDate, status, todos]
   );
 
-  const blockedTodos = todos.filter((i) => i.blocked);
+  const nonBlockedTodos = useMemo(
+    () => structuredClone(columnTodos.filter((todo) => !todo.blocked)),
+    [columnTodos]
+  );
+
+  const blockedTodos = columnTodos.filter((i) => i.blocked);
 
   const addTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newTodo.trim() !== '') {
@@ -72,32 +67,8 @@ const Column = ({ status, selectedDate, updateSelectedDate }: ColumnProps) => {
       )}
     >
       <h2 className="text-lg font-semibold mb-4 capitalize">{status}</h2>
-      {allPreviousBacklogItems.length > 0 && status === 'backlog' && (
-        <div className="border p-4 mb-2 rounded-md">
-          {Object.keys(previousBacklogItems).map((date) => (
-            <div className="group" key={date}>
-              <h2 className="text-lg font-semibold mb-4 capitalize flex gap-2 items-center">
-                {dayjs(date).format('D MMMM')}
-                <ChevronsUpDownIcon
-                  className="size-3 cursor-pointer hidden group-hover:block rotate-45"
-                  onClick={() => updateSelectedDate(date)}
-                />
-              </h2>
-              {previousBacklogItems[date]
-                .map((id) => todos.find((i) => i.id === id.id)!)
-                .map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    selectedDate={selectedDate}
-                  />
-                ))}
-            </div>
-          ))}
-        </div>
-      )}
-      <ReactSortable list={columnTodos} setList={orderTodos}>
-        {columnTodos
+      <ReactSortable list={nonBlockedTodos} setList={orderTodos}>
+        {nonBlockedTodos
           .map((id) => todos.find((i) => i.id === id.id)!)
           .map((todo) => (
             <TodoItem key={todo.id} todo={todo} selectedDate={selectedDate} />

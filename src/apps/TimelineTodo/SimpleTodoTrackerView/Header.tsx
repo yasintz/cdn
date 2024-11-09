@@ -10,42 +10,62 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
+import { useSharedStore } from './store';
+import { Checkbox } from '@/components/ui/checkbox';
 
-type HeaderProps = {
-  selectedDate: string;
-  setSelectedDate: (date: string) => void;
-};
+const Header = () => {
+  const { selectedDate, showAllTodos, setSharedState } = useSharedStore();
+  const { formatted, date } = useMemo(() => {
+    return {
+      formatted: dayjs(selectedDate).format('MMMM D, YYYY'),
+      date: new Date(selectedDate),
+    };
+  }, [selectedDate]);
 
-const Header = ({ selectedDate, setSelectedDate }: HeaderProps) => {
-  const formatted = useMemo(
-    () => dayjs(selectedDate).format('MMMM D, YYYY'),
-    [selectedDate]
-  );
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className={cn(
-            'w-[280px] justify-start text-left font-normal mb-4',
-            !selectedDate && 'text-muted-foreground'
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {selectedDate ? formatted : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={new Date(selectedDate)}
-          onSelect={(s) =>
-            setSelectedDate(dayjs(s).format(SIMPLE_TODO_DATE_FORMAT))
+    <div className="flex items-center gap-2 mb-4">
+      <Popover>
+        <PopoverTrigger asChild disabled={showAllTodos}>
+          <Button
+            variant="outline"
+            className={cn(
+              'w-[280px] justify-start text-left font-normal',
+              !selectedDate && 'text-muted-foreground'
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedDate ? formatted : <span>Pick a date</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(s) =>
+              setSharedState({
+                selectedDate: dayjs(s).format(SIMPLE_TODO_DATE_FORMAT),
+              })
+            }
+            className="rounded-md border"
+          />
+        </PopoverContent>
+      </Popover>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="show-all-todos"
+          checked={showAllTodos}
+          onCheckedChange={(checked) =>
+            setSharedState({ showAllTodos: !!checked })
           }
-          className="rounded-md border"
         />
-      </PopoverContent>
-    </Popover>
+        <label
+          htmlFor="show-all-todos"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Show All Todos
+        </label>
+      </div>
+    </div>
   );
 };
 
