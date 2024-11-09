@@ -1,11 +1,13 @@
 import { cn } from '@/lib/utils';
 import { useStore } from '../store';
 import {
+  BanIcon,
   CheckCircleIcon,
   FolderIcon,
   MoreHorizontalIcon,
   NotepadTextIcon,
   PlayIcon,
+  SquareArrowOutUpRightIcon,
   TrashIcon,
 } from 'lucide-react';
 import { SimpleTodoType } from '../store/simple-todo-slice';
@@ -102,11 +104,31 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       timeTrackerId: timeTrackerTaskId,
     });
   };
+  const onBookmarkAdd = () => {
+    const link = prompt('Add Link');
+    if (link) {
+      updateTask(todo.id, {
+        reference: link,
+      });
+    }
+  };
 
   return (
     <div className="bg-white p-2 mb-2 rounded shadow cursor-pointer">
       <div className="flex justify-between items-center">
-        <span>{todo.text}</span>
+        <div className="flex gap-2">
+          {todo.reference && (
+            <Button
+              variant="ghost"
+              className="flex h-6 w-6 p-0 data-[state=open]:bg-muted outline-none ring-0"
+              onClick={() => window.open(todo.reference, '_blank')}
+            >
+              <SquareArrowOutUpRightIcon className="size-3" />
+            </Button>
+          )}
+
+          <span>{todo.text}</span>
+        </div>
         <div className="flex gap-3 items-center">
           {(todo.note || showNote) && (
             <NotepadTextIcon
@@ -152,6 +174,16 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
                 icon={NotepadTextIcon}
                 onClick={() => setShowNote(true)}
                 hidden={Boolean(todo.note)}
+              />
+              <DropdownItem
+                title={todo.blocked ? 'Unblocked' : 'Blocked'}
+                icon={BanIcon}
+                onClick={() => updateTask(todo.id, { blocked: !todo.blocked })}
+              />
+              <DropdownItem
+                title="Add Reference"
+                icon={SquareArrowOutUpRightIcon}
+                onClick={onBookmarkAdd}
               />
               <DropdownItem
                 className="text-red-500"

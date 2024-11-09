@@ -29,18 +29,10 @@ export const routes: Array<RouteObject & HomePageAppType> = [
       'https://cdn.dribbble.com/users/82373/screenshots/6785208/familytree.jpg?resize=400x0',
   },
   {
-    path: 'timeline-todo/*',
-    lazy: () => import('../apps/TimelineTodo'),
-    title: 'Timeline Todo',
-    cardPath: 'timeline-todo/simple-todo-tracker',
-    image:
-      'https://thumbs.dreamstime.com/b/satisfaction-crossing-off-everything-todo-list-vector-illustration-317472455.jpg?w=992',
-  },
-  {
-    path: 'timeline-todo/simple-todo-tracker/*',
+    path: 'simple-todo-tracker/*',
     lazy: () => import('../apps/TimelineTodo/SimpleTodoTrackerView'),
     title: 'Timeline Todo',
-    cardPath: 'timeline-todo/simple-todo-tracker',
+    cardPath: 'simple-todo-tracker',
     image:
       'https://thumbs.dreamstime.com/b/satisfaction-crossing-off-everything-todo-list-vector-illustration-317472455.jpg?w=992',
   },

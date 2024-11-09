@@ -10,6 +10,8 @@ export type SimpleTodoType = {
   timeTrackerId?: string;
   completed: boolean;
   note?: string;
+  blocked?: boolean;
+  reference?: string;
 };
 
 export type SimpleTodoSlice = {

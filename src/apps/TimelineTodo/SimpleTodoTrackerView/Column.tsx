@@ -30,12 +30,15 @@ const Column = ({ status, selectedDate, updateSelectedDate }: ColumnProps) => {
       structuredClone(
         todos.filter(
           (todo) =>
+            !todo.blocked &&
             (status === 'done' ? todo.completed : !todo.completed) &&
             todo.date === selectedDate
         )
       ),
     [selectedDate, status, todos]
   );
+
+  const blockedTodos = todos.filter((i) => i.blocked);
 
   const addTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newTodo.trim() !== '') {
@@ -100,6 +103,16 @@ const Column = ({ status, selectedDate, updateSelectedDate }: ColumnProps) => {
             <TodoItem key={todo.id} todo={todo} selectedDate={selectedDate} />
           ))}
       </ReactSortable>
+
+      {blockedTodos.length > 0 && (
+        <div className="mt-2 opacity-70">
+          <h3 className="mb-2">Blocked Todos</h3>
+          {blockedTodos.map((todo) => (
+            <TodoItem key={todo.id} todo={todo} selectedDate={selectedDate} />
+          ))}
+        </div>
+      )}
+
       {status === 'backlog' && (
         <Input
           type="text"
