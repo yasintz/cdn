@@ -2,10 +2,12 @@ import { cn } from '@/lib/utils';
 import { useStore } from '../store';
 import {
   BanIcon,
+  CalendarIcon,
   CheckCircleIcon,
   FolderIcon,
   MoreHorizontalIcon,
   NotepadTextIcon,
+  PencilIcon,
   PlayIcon,
   SquareArrowOutUpRightIcon,
   TrashIcon,
@@ -26,6 +28,13 @@ import DropdownItem from '../DropdownItem';
 import { useState } from 'react';
 import MarkdownInput from '@/components/MarkdownInput';
 import { getTagColor } from '../utils/tags';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 
 const formatDuration = (diff: number, completed: boolean) => {
   const format = diff > ms('1 hour') || completed ? 'HH:mm:ss' : 'mm:ss';
@@ -40,6 +49,7 @@ type TodoItemProps = {
 
 const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
   const [showNote, setShowNote] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const {
     projects: timeTrackerProjects,
     tasks: timeTrackerTasks,
@@ -129,7 +139,7 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
             </Button>
           )}
 
-          <div className='flex items-center'>
+          <div className="flex items-center">
             {project && (
               <span
                 style={getTagColor(project.name)}
@@ -148,6 +158,29 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
               onClick={() => setShowNote(!showNote)}
             />
           )}
+          <Popover open={showCalendar}>
+            <PopoverTrigger asChild>
+              <CalendarIcon
+                className={cn(
+                  'size-3 cursor-pointer',
+                  showCalendar ? 'text-blue-500' : 'hidden'
+                )}
+              />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={new Date(todo.date)}
+                onSelect={(s) => {
+                  updateTask(todo.id, {
+                    date: dayjs(s).format(SIMPLE_TODO_DATE_FORMAT),
+                  });
+                  setShowCalendar(false);
+                }}
+                className="rounded-md border"
+              />
+            </PopoverContent>
+          </Popover>
 
           {timeTrackerTask && (
             <span className="text-xs text-gray-500">
@@ -180,6 +213,21 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
                 icon={PlayIcon}
                 onClick={handleStartTask}
                 hidden={Boolean(timeTrackerTask)}
+              />
+              <DropdownItem
+                title="Change Date"
+                icon={CalendarIcon}
+                onClick={() => setShowCalendar(true)}
+              />
+              <DropdownItem
+                title="Edit"
+                icon={PencilIcon}
+                onClick={() => {
+                  const text = prompt('Edit Task', todo.text);
+                  if (text) {
+                    updateTask(todo.id, { text });
+                  }
+                }}
               />
               <DropdownItem
                 title="Add Note"

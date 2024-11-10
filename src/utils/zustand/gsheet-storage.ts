@@ -34,8 +34,11 @@ export function handleStoreLoadingState(store: any, loadingStateName: string) {
 export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
   const db = googleSheetDB(sheetId, tabId);
   let syncedResponse: any;
+  let promise: Promise<any> | undefined = undefined;
 
   const debouncedSet = _debounce(async (value: string) => {
+    await promise;
+    promise = undefined;
     const latest = await db.get();
 
     if (!_.isEqual(syncedResponse, latest)) {
@@ -44,9 +47,9 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
       return;
     }
 
-    await db.set(value);
     syncedResponse = JSON.parse(value);
-  }, 500);
+    await db.set(value);
+  }, 1000);
 
   async function handleStore<S extends ReturnType<typeof create>>(
     store: S,
@@ -78,7 +81,7 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
       restartInterval();
 
       store.subscribe((state) => {
-        debouncedSet(JSON.stringify(keepState ? { state } : state));
+        promise = debouncedSet(JSON.stringify(keepState ? { state } : state));
         restartInterval();
       });
     } catch (error) {
