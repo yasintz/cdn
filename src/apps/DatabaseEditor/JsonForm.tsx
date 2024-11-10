@@ -16,6 +16,23 @@ const PrimitiveForm = ({
   value: any;
   onChange: (value: any) => void;
 }) => {
+  const isDate =
+    (typeof value === 'string' &&
+      new Date(value).toString() !== 'Invalid Date') ||
+    (typeof value === 'number' &&
+      value.toString().length === 13 &&
+      new Date(value).toString() !== 'Invalid Date');
+
+  if (isDate) {
+    return (
+      <input
+        type="datetime-local"
+        value={new Date(value).toISOString().slice(0, 16)}
+        onChange={(e) => onChange(new Date(e.target.value).getTime())}
+      />
+    );
+  }
+
   if (typeof value === 'boolean') {
     return (
       <select
@@ -48,13 +65,37 @@ const ListContainer = ({ children }: { children: React.ReactNode }) => {
     <table>
       <thead>
         <tr>
-          <th>Index/Key</th>
+          <th>Key</th>
           <th>Value</th>
+          <th>Type</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>{children}</tbody>
     </table>
+  );
+};
+
+const Cell = ({
+  value,
+  onClick,
+  onValueChange,
+}: {
+  value: any;
+  onClick?: () => void;
+  onValueChange: (value: any) => void;
+}) => {
+  const isPrimitive = typeof value !== 'object' || value === null;
+  return isPrimitive ? (
+    <PrimitiveForm value={value} onChange={onValueChange} />
+  ) : (
+    <button
+      className="border rounded-sm px-1 flex gap-2 items-center"
+      onClick={onClick}
+    >
+      Open ({Array.isArray(value) ? 'array' : typeof value})
+      <ExpandIcon className="size-3" />
+    </button>
   );
 };
 
@@ -71,22 +112,20 @@ const Row = ({
   onValueChange: (value: any) => void;
   onRemove?: () => void;
 }) => {
-  const isPrimitive = typeof value !== 'object' || value === null;
   return (
     <tr>
       <td>{name}</td>
       <td>
-        {isPrimitive ? (
-          <PrimitiveForm value={value} onChange={onValueChange} />
-        ) : (
-          <button
-            className="border rounded-sm px-1 flex gap-2 items-center"
-            onClick={onClick}
-          >
-            Open
-            <ExpandIcon className="size-3" />
-          </button>
-        )}
+        <Cell value={value} onClick={onClick} onValueChange={onValueChange} />
+      </td>
+      <td>
+        <select value={Array.isArray(value) ? 'array' : typeof value}>
+          <option>string</option>
+          <option>number</option>
+          <option>boolean</option>
+          <option>object</option>
+          <option>array</option>
+        </select>
       </td>
       <td>
         <div className="flex gap-2 items-center">
@@ -125,21 +164,88 @@ const JsonForm = ({ value, onChange, setPath, path }: JsonFormProps) => {
   };
 
   if (Array.isArray(value)) {
-    return (
-      <ListContainer>
-        {value.map((item, index) => (
-          <Row
-            value={item}
-            name={index}
-            key={index}
-            onClick={() => openClick(index)}
-            onValueChange={(newValue) => onValueChange(index, newValue)}
-            onRemove={() => onValueRemove(index)}
-          />
-        ))}
+    const allKeys = _.uniq(
+      _.flatten(
+        value.map((item) =>
+          typeof item === 'object' && item !== null ? Object.keys(item) : []
+        )
+      )
+    );
 
+    if (allKeys.length === 0) {
+      return (
+        <table>
+          <tbody>
+            {value.map((item, index) => (
+              <tr key={index}>
+                <td>
+                  <Cell
+                    value={item}
+                    onValueChange={(newValue: any) =>
+                      onValueChange(index, newValue)
+                    }
+                    onClick={() => openClick(index)}
+                  />
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <td>
+                <button
+                  className="w-full"
+                  onClick={() => {
+                    const newValue = [...value, null];
+                    onChange(newValue);
+                  }}
+                >
+                  Add
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      );
+    }
+
+    return (
+      <table>
         <tr>
-          <td colSpan={3}>
+          {allKeys.map((key) => (
+            <th key={key}>
+              {key}(
+              <select
+                value={
+                  Array.isArray(value[0]?.[key]) ? 'array' : typeof value[0]
+                }
+              >
+                <option>string</option>
+                <option>number</option>
+                <option>boolean</option>
+                <option>object</option>
+                <option>array</option>
+              </select>
+              )
+            </th>
+          ))}
+        </tr>
+
+        {value.map((item, index) => (
+          <tr key={index}>
+            {allKeys.map((key) => (
+              <td key={key}>
+                <Cell
+                  value={item?.[key] || ''}
+                  onValueChange={(newValue: any) =>
+                    onValueChange(index, { ...(item || {}), [key]: newValue })
+                  }
+                  onClick={() => openClick(`${index}.${key}`)}
+                />
+              </td>
+            ))}
+          </tr>
+        ))}
+        <tr>
+          <td colSpan={allKeys.length}>
             <button
               className="w-full"
               onClick={() => {
@@ -151,7 +257,7 @@ const JsonForm = ({ value, onChange, setPath, path }: JsonFormProps) => {
             </button>
           </td>
         </tr>
-      </ListContainer>
+      </table>
     );
   }
 

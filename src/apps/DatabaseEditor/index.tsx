@@ -60,7 +60,22 @@ const DatabaseEditor = () => {
           setValue={setSelectedDatabaseId}
           className="min-w-56"
         />
-        <Button size="sm">Save</Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            const db = databases.find((db) => db.id === selectedDatabaseId);
+
+            if (!db) {
+              return;
+            }
+
+            const gSheetDb = googleSheetDB(db.sheetId, db.tabId);
+
+            gSheetDb.set(JSON.stringify(value));
+          }}
+        >
+          Save
+        </Button>
       </div>
       {value && (
         <div className="json-form mt-2">
