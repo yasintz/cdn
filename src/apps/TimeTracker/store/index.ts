@@ -23,7 +23,7 @@ export type ProjectType = {
   priceHr?: number;
 };
 
-type StoreType = {
+export type StoreType = {
   tasks: TaskType[];
   projects: ProjectType[];
   taskTags: Record<string, string[]>;
@@ -40,6 +40,8 @@ type StoreType = {
   createProject: (project: ProjectType) => void;
   deleteProject: (id: string) => void;
 };
+
+export type TimeTrackerStoreType = StoreType;
 
 export const useStore = create<StoreType>()(
   computed(

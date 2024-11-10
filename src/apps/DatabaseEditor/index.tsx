@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import * as timeTrackerModule from '@/apps/TimeTracker/store';
-import * as codeSnippetsModule from '@/apps/CodeSnippets/store';
+import * as timelineTodoModule from '@/apps/TimelineTodo/store';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { googleSheetDB } from '@/utils/googleSheetDb';
-import JsonForm from './JsonForm';
 import './style.scss';
-import _ from 'lodash';
 
 type DatabaseItem = {
   id: string;
@@ -14,17 +12,11 @@ type DatabaseItem = {
   sheetId: string;
   tabId?: string;
 };
-type DatabaseModule = {
-  useStore: {
-    __dbModule: DatabaseItem;
-  };
-};
 
-const databases: Array<DatabaseItem> = [
-  timeTrackerModule as any,
-  codeSnippetsModule as any,
-]
-  .map((db) => (db as DatabaseModule).useStore.__dbModule || db)
+const modules = [timeTrackerModule, timelineTodoModule];
+
+const databases: Array<DatabaseItem> = modules
+  .map((db) => (db as any).useStore.__dbModule || db)
   .map((db) => ({
     ...db,
     id: `${db.sheetId}/${db.tabId || '0'}`,
@@ -33,7 +25,7 @@ const databases: Array<DatabaseItem> = [
 const DatabaseEditor = () => {
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>();
   const [value, setValue] = useState<any>(undefined);
-  const [path, setPath] = useState<string>();
+  const selectedDatabase = databases.find((db) => db.id === selectedDatabaseId);
 
   useEffect(() => {
     const db = databases.find((db) => db.id === selectedDatabaseId);
@@ -77,31 +69,12 @@ const DatabaseEditor = () => {
           Save
         </Button>
       </div>
-      {value && (
+      {value && selectedDatabase && (
         <div className="json-form mt-2">
-          {path && (
-            <div className="border rounded-sm p-1 flex mb-2">
-              <button onClick={() => setPath(undefined)}>#.</button>
-              {path.split('.').map((p, i, arr) => (
-                <button
-                  key={i}
-                  onClick={() => setPath(arr.slice(0, i + 1).join('.'))}
-                >
-                  {p}
-                  {i === arr.length - 1 ? '' : '.'}
-                </button>
-              ))}
-            </div>
-          )}
-          <JsonForm
-            value={path ? _.get(value, path) : value}
-            path={path}
-            setPath={setPath}
-            onChange={(val) => {
-              setValue((prev: any) =>
-                path ? _.set(_.cloneDeep(prev), path, val) : val
-              );
-            }}
+          <textarea
+            className="w-full h-96"
+            value={JSON.stringify(value, null, 2)}
+            onChange={(e) => setValue(JSON.parse(e.target.value))}
           />
         </div>
       )}
