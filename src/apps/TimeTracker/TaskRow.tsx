@@ -58,6 +58,7 @@ const TaskRow = ({
           <SelectProject
             projectId={task.projectId}
             onChange={(projectId) => updateTask(task.id, { projectId })}
+            className="flex-8"
           />
         ) : project?.name ? (
           <div className="flex">

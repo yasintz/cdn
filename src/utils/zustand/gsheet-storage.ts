@@ -52,6 +52,13 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
     store: S,
     keepState?: boolean
   ) {
+    // @ts-expect-error keep database info in store
+    store.__dbModule = {
+      name,
+      sheetId,
+      tabId,
+    };
+
     const sync = () => {
       return db.get().then((response) => {
         syncedResponse = structuredClone(response);

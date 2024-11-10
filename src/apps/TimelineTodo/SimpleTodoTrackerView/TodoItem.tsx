@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import DropdownItem from '../DropdownItem';
 import { useState } from 'react';
 import MarkdownInput from '@/components/MarkdownInput';
+import { getTagColor } from '../utils/tags';
 
 const formatDuration = (diff: number, completed: boolean) => {
   const format = diff > ms('1 hour') || completed ? 'HH:mm:ss' : 'mm:ss';
@@ -45,6 +46,7 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
     createTask: createTimeTrackerTask,
     stopTask: stopTimeTrackerTask,
   } = useTimeTrackerStore();
+  const project = timeTrackerProjects.find((i) => i.id === todo.projectId);
 
   const subtasks = todo.subtasks || [];
   const timeTrackerTask = timeTrackerTasks.find(
@@ -127,7 +129,17 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
             </Button>
           )}
 
-          <span>{todo.text}</span>
+          <div className='flex items-center'>
+            {project && (
+              <span
+                style={getTagColor(project.name)}
+                className="px-1 py-0.5 rounded-sm mr-1 opacity-85"
+              >
+                {project.name}:
+              </span>
+            )}
+            {todo.text}
+          </div>
         </div>
         <div className="flex gap-3 items-center">
           {(todo.note || showNote) && (

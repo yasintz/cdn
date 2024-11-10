@@ -7,9 +7,14 @@ import { cn } from '@/lib/utils';
 type SelectProjectProps = {
   projectId?: string;
   onChange: (projectId?: string) => void;
+  className?: string;
 };
 
-const SelectProject = ({ projectId, onChange }: SelectProjectProps) => {
+const SelectProject = ({
+  projectId,
+  onChange,
+  className,
+}: SelectProjectProps) => {
   const { projects, createProject } = useStore();
   const [newProject, setNewProject] = useState<ProjectType>();
   const projectsWithNew = useMemo(
@@ -55,7 +60,7 @@ const SelectProject = ({ projectId, onChange }: SelectProjectProps) => {
       }))}
       value={projectId || ''}
       setValue={updateProjectId}
-      className="w-auto lg:w-60 flex-8 lg:flex-2"
+      className={cn('w-auto lg:w-60 lg:flex-2', className)}
       onSearchChange={onProjectSearchChange}
       renderOption={(option) => (
         <>

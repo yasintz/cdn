@@ -107,7 +107,7 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
       <div className="flex items-center gap-3">
         <div className="flex flex-1 gap-2 flex-col lg:flex-row">
           <div className="flex flex-1 gap-2 lg:flex-4">
-            <SelectProject onChange={updateProjectId} projectId={projectId} />
+            <SelectProject onChange={updateProjectId} projectId={projectId} className='flex-8' />
 
             <Input
               className="flex-8"

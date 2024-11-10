@@ -22,6 +22,13 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     hiddenApp: true,
   },
   {
+    path: 'database-editor',
+    lazy: () => import('../apps/DatabaseEditor'),
+    title: 'Database Editor',
+    image:
+      'https://cdn.dribbble.com/users/1962791/screenshots/5534733/database-4.jpg',
+  },
+  {
     path: 'family-tree/*',
     lazy: () => import('../app/family-tree/router'),
     title: 'Family Tree',

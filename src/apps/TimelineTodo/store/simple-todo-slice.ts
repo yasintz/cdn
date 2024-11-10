@@ -4,6 +4,7 @@ import { SIMPLE_TODO_DATE_FORMAT } from './utils';
 
 export type SimpleTodoType = {
   id: string;
+  projectId?: string;
   text: string;
   date: string;
   subtasks?: SimpleTodoType[];

@@ -1,0 +1,14 @@
+.json-form {
+  table {
+    @apply border;
+  }
+
+  tr {
+    @apply border-b;
+  }
+
+  td,
+  th {
+    @apply border-r p-1;
+  }
+}

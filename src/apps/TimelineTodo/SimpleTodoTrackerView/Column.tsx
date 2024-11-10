@@ -6,6 +6,7 @@ import TodoItem from './TodoItem';
 import { ReactSortable } from 'react-sortablejs';
 import { SimpleTodoType } from '../store/simple-todo-slice';
 import './style.scss';
+import SelectProject from '@/apps/TimeTracker/SelectProject';
 // import { useSharedStore } from './store';
 
 type ColumnProps = {
@@ -17,6 +18,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
   // const { selectedDate } = useSharedStore();
   const { simpleTodoList: todos, updateSimpleTodoList: setTodos } = useStore();
   const [newTodo, setNewTodo] = useState('');
+  const [projectId, setProjectId] = useState<string | undefined>();
 
   const columnTodos = useMemo(
     () =>
@@ -44,6 +46,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
           text: newTodo,
           date: selectedDate,
           completed: false,
+          projectId,
         },
       ]);
       setNewTodo('');
@@ -85,14 +88,21 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
       )}
 
       {status === 'backlog' && (
-        <Input
-          type="text"
-          placeholder="Add your todo..."
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          onKeyPress={addTodo}
-          className="mt-2"
-        />
+        <div className="flex gap-2 items-center mt-2">
+          <SelectProject
+            className="flex-1"
+            projectId={projectId}
+            onChange={setProjectId}
+          />
+          <Input
+            type="text"
+            placeholder="Add your todo..."
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+            onKeyPress={addTodo}
+            className="flex-8"
+          />
+        </div>
       )}
     </div>
   );
