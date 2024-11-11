@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as timeTrackerModule from '@/apps/TimeTracker/store';
 import * as timelineTodoModule from '@/apps/TimelineTodo/store';
+import * as taskModule from '@/apps/Tasks/store';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { googleSheetDB } from '@/utils/googleSheetDb';
@@ -13,7 +14,7 @@ type DatabaseItem = {
   tabId?: string;
 };
 
-const modules = [timeTrackerModule, timelineTodoModule];
+const modules = [timeTrackerModule, timelineTodoModule, taskModule];
 
 const databases: Array<DatabaseItem> = modules
   .map((db) => (db as any).useStore.__dbModule || db)
@@ -24,20 +25,21 @@ const databases: Array<DatabaseItem> = modules
 
 const DatabaseEditor = () => {
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>();
-  const [value, setValue] = useState<any>(undefined);
+  // const [value, setValue] = useState<any>(undefined);
+  const [valueString, setValueString] = useState<string | undefined>(undefined);
   const selectedDatabase = databases.find((db) => db.id === selectedDatabaseId);
 
   useEffect(() => {
     const db = databases.find((db) => db.id === selectedDatabaseId);
 
     if (!db) {
-      setValue(undefined);
+      setValueString(undefined);
       return;
     }
 
     const gSheetDb = googleSheetDB(db.sheetId, db.tabId);
 
-    gSheetDb.get().then(setValue);
+    gSheetDb.get().then((v) => setValueString(JSON.stringify(v, null, 2)));
   }, [selectedDatabaseId]);
 
   return (
@@ -57,24 +59,30 @@ const DatabaseEditor = () => {
           onClick={() => {
             const db = databases.find((db) => db.id === selectedDatabaseId);
 
-            if (!db) {
+            if (!db || !valueString) {
               return;
+            }
+
+            try {
+              JSON.parse(valueString);
+            } catch (error) {
+              alert('Invalid JSON');
             }
 
             const gSheetDb = googleSheetDB(db.sheetId, db.tabId);
 
-            gSheetDb.set(JSON.stringify(value));
+            gSheetDb.set(valueString);
           }}
         >
           Save
         </Button>
       </div>
-      {value && selectedDatabase && (
+      {selectedDatabase && (
         <div className="json-form mt-2">
           <textarea
             className="w-full h-96"
-            value={JSON.stringify(value, null, 2)}
-            onChange={(e) => setValue(JSON.parse(e.target.value))}
+            value={valueString}
+            onChange={(e) => setValueString(e.target.value)}
           />
         </div>
       )}

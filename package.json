@@ -11,7 +11,8 @@
     "build:vite": "vite build && cp dist/index.html dist/404.html",
     "build": "tsc && pnpm build:vite && pnpm build:projects",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "test": "vitest"
+    "test": "vitest",
+    "find-deadcode": "ts-prune"
   },
   "engines": {
     "node": "18.18.2"
@@ -51,6 +52,7 @@
     "ts-json-schema-generator": "^2.3.0",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
+    "ts-prune": "^0.10.3",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",

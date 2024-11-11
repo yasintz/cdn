@@ -22,18 +22,4 @@ const Popup = ({ children, open, onClose }: PopupProps) => {
   );
 };
 
-export function popupHoc<T>(
-  Component: React.FC<T>,
-  getProps: (props: T) => {
-    open: boolean;
-    onClose: () => void;
-  }
-) {
-  const Comp = Component as any;
-  return (props: T) => (
-    <Popup {...getProps(props)}>
-      <Comp {...props} />
-    </Popup>
-  );
-}
 export default Popup;
