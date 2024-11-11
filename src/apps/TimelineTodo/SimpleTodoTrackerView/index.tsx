@@ -5,6 +5,7 @@ import Header from './Header';
 import { useSharedStore } from './store';
 import dayjs from '@/helpers/dayjs';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
+import SelectedTodoView from './SelectedTodoView';
 
 const boardColumns = ['backlog', 'done'];
 
@@ -54,6 +55,7 @@ export default function SimpleTodoTracker() {
           <Column key={status} status={status} selectedDate={selectedDate} />
         ))}
       </div>
+      <SelectedTodoView />
     </div>
   );
 }

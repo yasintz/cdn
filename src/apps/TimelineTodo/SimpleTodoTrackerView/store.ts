@@ -6,6 +6,7 @@ type SharedStore = {
   selectedDate: string;
   showAllTodos: boolean;
   setSharedState: (state: Partial<SharedStore>) => void;
+  selectedTodoId?: string;
 };
 
 export const useSharedStore = create<SharedStore>((set) => ({

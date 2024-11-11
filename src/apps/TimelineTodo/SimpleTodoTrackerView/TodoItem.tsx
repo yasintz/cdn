@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
+import { useSharedStore } from './store';
 
 const formatDuration = (diff: number, completed: boolean) => {
   const format = diff > ms('1 hour') || completed ? 'HH:mm:ss' : 'mm:ss';
@@ -48,6 +49,7 @@ type TodoItemProps = {
 };
 
 const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
+  const { setSharedState } = useSharedStore();
   const [showNote, setShowNote] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const {
@@ -152,12 +154,10 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
           </div>
         </div>
         <div className="flex gap-3 items-center">
-          {(todo.note || showNote) && (
-            <NotepadTextIcon
-              className="size-3 cursor-pointer"
-              onClick={() => setShowNote(!showNote)}
-            />
-          )}
+          <NotepadTextIcon
+            className="size-3 cursor-pointer"
+            onClick={() => setSharedState({ selectedTodoId: todo.id })}
+          />
           <Popover open={showCalendar}>
             <PopoverTrigger asChild>
               <CalendarIcon
