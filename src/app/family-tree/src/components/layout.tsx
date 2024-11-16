@@ -18,7 +18,7 @@ const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
   const data = useData();
 
-  const [treeView, setTreeView] = useState<TreeView>(TreeView.Default);
+  const [treeView, setTreeView] = useState<TreeView>(TreeView.DTree);
   const [treeDepth, setTreeDepth] = useState<number>(3);
   const [personSelector, setPersonSelector] = useState<{
     cb?: (v: PersonType) => void;
