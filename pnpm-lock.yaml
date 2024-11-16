@@ -291,6 +291,9 @@ importers:
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
+      husky:
+        specifier: ^9.1.6
+        version: 9.1.6
       postcss:
         specifier: ^8.4.33
         version: 8.4.33
@@ -2966,6 +2969,11 @@ packages:
   human-signals@5.0.0:
     resolution: {integrity: sha512-AXcZb6vzzrFAUE61HnN4mpLqd/cSIwNQjtNWR0euPm6y0iqx3G4gOXaIDdtdDwZmhwe82LA6+zinmW4UBWVePQ==}
     engines: {node: '>=16.17.0'}
+
+  husky@9.1.6:
+    resolution: {integrity: sha512-sqbjZKK7kf44hfdE94EoX8MZNk0n7HeW37O4YrVGCF4wzgQjp+akPAkfUK5LZ6KuR/6sqeAVuXHji+RzQgOn5A==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   ical2json@4.0.1:
     resolution: {integrity: sha512-TIJXQVtMKEf3G3Va5AL2imld8KZaI2DpQz/GiUmO4aIbWYQ123PPxHQLlInfdq6jY0BKdRaAxMWQ7l2kSSGyyg==}
@@ -7881,6 +7889,8 @@ snapshots:
   html-url-attributes@3.0.1: {}
 
   human-signals@5.0.0: {}
+
+  husky@9.1.6: {}
 
   ical2json@4.0.1:
     dependencies:
