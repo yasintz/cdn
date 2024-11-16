@@ -11,7 +11,6 @@ type RelationFinderProps = {
   mainPerson?: PersonType;
   onSelect?: (person: PersonType) => void;
   renderAllPerson: boolean;
-  isOldRelation?: boolean;
 };
 
 const RenderPersonList: React.FC<{
@@ -48,7 +47,7 @@ const PersonRelation = ({
   isOldRelation?: boolean;
 }) => {
   const [search, setSearch] = useState('');
-  const { store, person: personList, showCreatePersonModal } = useAppContext();
+  const { store, person: personList } = useAppContext();
   const builded = useMemo(
     () => (person ? new PersonBuilder(person, store) : null),
     [person, store]
@@ -58,11 +57,6 @@ const PersonRelation = ({
     <div className={style.listContainer}>
       {renderAllPerson && (
         <div className={style.allPerson}>
-          <div>
-            <button onClick={() => showCreatePersonModal()}>
-              Create Person
-            </button>
-          </div>
           <div>
             <input value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
@@ -112,8 +106,9 @@ const RelationFinder: React.FC<RelationFinderProps> = ({
   mainPerson,
   onSelect,
   renderAllPerson,
-  isOldRelation,
 }) => {
+  const [relationView, setRelationView] = useState('new');
+  const isOldRelation = relationView === 'old';
   const [stack, setStack] = useState<PersonType[]>([]);
   const stackRef = useRef<HTMLDivElement>(null);
   const lastPerson = stack[stack.length - 1];
@@ -138,6 +133,13 @@ const RelationFinder: React.FC<RelationFinderProps> = ({
   return (
     <div className={cx(style.relationFinder)}>
       <div className={style.stackList} ref={stackRef as any}>
+        <select
+          value={relationView}
+          onChange={(e) => setRelationView(e.target.value)}
+        >
+          <option value="new">New Relation</option>
+          <option value="old">Old Relation</option>
+        </select>
         {mainPerson && <span>{mainPerson.name}</span>}
 
         {stack.map((p, index) => (

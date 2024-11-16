@@ -26,7 +26,7 @@ type PersonRelationProps = {
 };
 
 const PersonRelation: React.FC<PersonRelationProps> = ({ person, onClick }) => {
-  const { store, isDTree, treeDepth } = useAppContext();
+  const { store, treeDepth } = useAppContext();
 
   const buildedPerson = useMemo(
     () => new PersonBuilder(person, store),
@@ -96,13 +96,7 @@ const PersonRelation: React.FC<PersonRelationProps> = ({ person, onClick }) => {
   );
 
   return (
-    <Tree
-      depth={treeDepth}
-      person={tree}
-      onClick={onClick}
-      store={store}
-      isDTree={isDTree}
-    />
+    <Tree depth={treeDepth} person={tree} onClick={onClick} store={store} />
   );
 };
 

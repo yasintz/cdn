@@ -3,7 +3,7 @@ import { PersonTreeType, PersonType, StoreType } from '../../types';
 import Person from './Person';
 import Portal from '../Portal';
 import TreeSizeCalc from './TreeSizeCalc';
-import DTree from '../DTree';
+import { useZoomAndPan } from '@/hooks/useZoomAndPan';
 
 type PersonTreeProps = {
   person: PersonTreeType;
@@ -74,26 +74,35 @@ type TreeMainProps = {
 };
 
 const TreeMain: React.FC<TreeMainProps> = ({ person, onClick, parentTree }) => {
+  const { ref, transform: zoomAndPanTransform, cursor } = useZoomAndPan(1, 10);
   const [size, setSize] = useState({
     width: 0,
     height: 0,
   });
-
   const el = (
     <PersonTree person={person} onClick={onClick} parentTree={parentTree} />
   );
 
+  const transform = [
+    zoomAndPanTransform,
+    parentTree ? 'rotate(180deg)' : '',
+  ].join(' ');
+
   return (
     <>
-      <div
-        className="tree"
-        style={{
-          minWidth: size.width,
-          minHeight: size.height,
-          transform: parentTree ? 'rotate(180deg)' : '',
-        }}
-      >
-        {el}
+      <div ref={ref}>
+        <div
+          className="tree"
+          style={{
+            minWidth: size.width,
+            minHeight: size.height,
+            transform,
+            cursor,
+            transformOrigin: '0 0',
+          }}
+        >
+          {el}
+        </div>
       </div>
       <Portal>
         <TreeSizeCalc deps={[person]} setSize={setSize}>
@@ -108,22 +117,10 @@ type TreeProps = {
   person: PersonTreeType;
   onClick?: (person: PersonType) => void;
   parentTree?: boolean;
-  isDTree: boolean;
   store: StoreType;
   depth: number;
 };
-const Tree: React.FC<TreeProps> = ({
-  person,
-  onClick,
-  parentTree,
-  isDTree,
-  store,
-  depth,
-}) => {
-  if (isDTree) {
-    return <DTree depth={depth} onClick={onClick} person={person} store={store} />;
-  }
-
+const Tree: React.FC<TreeProps> = ({ person, onClick, parentTree }) => {
   return <TreeMain person={person} onClick={onClick} parentTree={parentTree} />;
 };
 

@@ -1,6 +1,18 @@
 @import './tree.scss';
 @import './autocomplate.scss';
 
+button {
+  @apply border rounded-sm px-1 py-0.5;
+}
+
+select {
+  @apply border rounded-sm px-1 py-0.5;
+}
+
+input {
+  @apply border rounded-sm px-1 py-0.5;
+}
+
 html,
 body {
   margin: 0;

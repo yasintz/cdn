@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppContext, TreeView } from '../app/ctx';
+import { AppContext } from '../app/ctx';
 import useData from '../app/data';
 import { PersonType } from '../types';
 import Sidebar from './Sidebar';
@@ -8,7 +8,6 @@ import style from '../app/app.module.scss';
 import Popup from './Popup';
 import RelationFinder from '../app/RelationDetail';
 import { Sync } from './sync';
-import Loading from '@/components/ui/loading';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -18,13 +17,13 @@ const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
   const data = useData();
 
-  const [treeView, setTreeView] = useState<TreeView>(TreeView.DTree);
   const [treeDepth, setTreeDepth] = useState<number>(3);
   const [personSelector, setPersonSelector] = useState<{
     cb?: (v: PersonType) => void;
     person?: PersonType;
   }>();
-  const setPerson = (p: PersonType) => navigate(`/cdn/family-tree/person/${p.id}/tree`);
+  const setPerson = (p: PersonType) =>
+    navigate(`/cdn/family-tree/person/${p.id}/tree`);
 
   return (
     <AppContext.Provider
@@ -33,9 +32,6 @@ const Layout = ({ children }: LayoutProps) => {
         showCreatePersonModal: () => navigate('create-person'),
         showPersonSelector: setPersonSelector,
         treeDepth,
-        isDTree: treeView === TreeView.DTree,
-        treeView,
-        setTreeView,
         setTreeDepth,
       }}
     >
@@ -60,7 +56,6 @@ const Layout = ({ children }: LayoutProps) => {
             mainPerson={personSelector?.person}
             onSelect={personSelector?.cb}
             renderAllPerson
-            isOldRelation={treeView === TreeView.List}
           />
         </div>
       </Popup>
