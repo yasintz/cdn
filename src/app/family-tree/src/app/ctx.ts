@@ -10,6 +10,8 @@ type ContextType = ReturnType<typeof useData> & {
   }) => void;
   treeDepth: number;
   setTreeDepth: React.Dispatch<React.SetStateAction<number>>;
+  showMobileSidebar: boolean;
+  setShowMobileSidebar: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const AppContext = React.createContext<ContextType>(

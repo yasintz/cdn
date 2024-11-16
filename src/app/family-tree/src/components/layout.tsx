@@ -8,6 +8,8 @@ import style from '../app/app.module.scss';
 import Popup from './Popup';
 import RelationFinder from '../app/RelationDetail';
 import { Sync } from './sync';
+import { cn } from '@/lib/utils';
+import { MenuIcon } from 'lucide-react';
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -17,6 +19,7 @@ const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
   const data = useData();
 
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [treeDepth, setTreeDepth] = useState<number>(3);
   const [personSelector, setPersonSelector] = useState<{
     cb?: (v: PersonType) => void;
@@ -29,6 +32,8 @@ const Layout = ({ children }: LayoutProps) => {
     <AppContext.Provider
       value={{
         ...data,
+        showMobileSidebar,
+        setShowMobileSidebar,
         showCreatePersonModal: () => navigate('create-person'),
         showPersonSelector: setPersonSelector,
         treeDepth,
@@ -36,7 +41,17 @@ const Layout = ({ children }: LayoutProps) => {
       }}
     >
       <div className={style.container}>
-        <div className={style.sidebar}>
+        <div
+          className={cn(
+            style.sidebar,
+            'md:block',
+            showMobileSidebar ? 'block' : 'hidden'
+          )}
+        >
+          <MenuIcon
+            className="size-8 border rounded-md p-1 cursor-pointer md:hidden ml-2 select-none"
+            onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+          />
           <Sidebar
             person={data.person}
             onClick={setPerson}
@@ -44,6 +59,13 @@ const Layout = ({ children }: LayoutProps) => {
             onSettingsClick={() => navigate('settings')}
           />
         </div>
+        <MenuIcon
+          className={cn(
+            'fixed size-8 border rounded-md p-1 cursor-pointer md:hidden left-2 z-10 select-none',
+            showMobileSidebar ? 'hidden' : 'block'
+          )}
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+        />
         {children}
       </div>
 

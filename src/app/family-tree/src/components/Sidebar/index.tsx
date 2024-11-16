@@ -2,12 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { PersonType } from '../../types';
 import style from './Sidebar.module.scss';
 import SideItem from './SideItem';
+import { cn } from '@/lib/utils';
 
 type SidebarProps = {
   person: PersonType[];
   onClick: (person: PersonType) => void;
   onCreatePersonClick: () => void;
   onSettingsClick?: () => void;
+  className?: string;
 };
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -15,6 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onClick,
   onCreatePersonClick,
   onSettingsClick,
+  className,
 }) => {
   const [search, setSearch] = useState('');
   const persons = useMemo(() => {
@@ -28,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, [person, search]);
 
   return (
-    <div className={style.container}>
+    <div className={cn(style.container, className)}>
       <span style={{ fontSize: 12, marginTop: 16 }}>
         {persons.length} Person
       </span>

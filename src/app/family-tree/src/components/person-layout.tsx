@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import style from '../app/app.module.scss';
 import { useAppContext } from '../app/ctx';
 import SettingsPage from '../pages/settings';
+import { cn } from '@/lib/utils';
 
 // #region Style
 const StyledActionButton = styled(NavLink)`
@@ -30,7 +31,7 @@ type PersonLayoutProps = {
 };
 
 const PersonLayout = ({ children }: PersonLayoutProps) => {
-  const { person: personList } = useAppContext();
+  const { person: personList, showMobileSidebar } = useAppContext();
   const { personId } = useParams<{ personId: string }>();
   const person = personList.find((p) => p.id === personId);
 
@@ -75,7 +76,13 @@ const PersonLayout = ({ children }: PersonLayoutProps) => {
 
   return (
     <>
-      <div className={style.actionSidebar}>
+      <div
+        className={cn(
+          style.actionSidebar,
+          'md:block',
+          showMobileSidebar ? 'block' : 'hidden'
+        )}
+      >
         {person && (
           <>
             <StyledPersonName>{person.name}</StyledPersonName>

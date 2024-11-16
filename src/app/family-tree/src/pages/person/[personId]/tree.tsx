@@ -9,7 +9,6 @@ import { PersonType } from '../../../types';
 
 // #region Style
 const StyledContainer = styled.div`
-  width: calc(100vw - 250px);
   height: 100%;
   overflow: scroll;
 `;
