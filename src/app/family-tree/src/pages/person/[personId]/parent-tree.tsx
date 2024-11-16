@@ -23,7 +23,7 @@ const PersonParentTreePage = () => {
   const { treeDepth, store, treeView } = useAppContext();
   const person = usePerson();
 
-  const setPerson = (p: PersonType) => navigate(`/person/${p.id}`);
+  const setPerson = (p: PersonType) => navigate(`/cdn/family-tree/person/${p.id}/tree`);
 
   const personTree = useMemo(() => {
     if (!person) {

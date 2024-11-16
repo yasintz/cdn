@@ -18,13 +18,13 @@ const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
   const data = useData();
 
-  const [treeView, setTreeView] = useState<TreeView>(TreeView.DTree);
+  const [treeView, setTreeView] = useState<TreeView>(TreeView.Default);
   const [treeDepth, setTreeDepth] = useState<number>(3);
   const [personSelector, setPersonSelector] = useState<{
     cb?: (v: PersonType) => void;
     person?: PersonType;
   }>();
-  const setPerson = (p: PersonType) => navigate(`person/${p.id}`);
+  const setPerson = (p: PersonType) => navigate(`/cdn/family-tree/person/${p.id}/tree`);
 
   return (
     <AppContext.Provider

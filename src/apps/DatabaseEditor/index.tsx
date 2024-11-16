@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as timeTrackerModule from '@/apps/TimeTracker/store';
 import * as timelineTodoModule from '@/apps/TimelineTodo/store';
-import * as taskModule from '@/apps/Tasks/store';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { googleSheetDB } from '@/utils/googleSheetDb';
@@ -14,7 +13,7 @@ type DatabaseItem = {
   tabId?: string;
 };
 
-const modules = [timeTrackerModule, timelineTodoModule, taskModule];
+const modules = [timeTrackerModule, timelineTodoModule];
 
 const databases: Array<DatabaseItem> = modules
   .map((db) => (db as any).useStore.__dbModule || db)

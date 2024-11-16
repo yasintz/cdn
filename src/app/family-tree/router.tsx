@@ -44,7 +44,8 @@ const router: RouteObject[] = [
         ),
         children: [
           {
-            index: true,
+            // index: true,
+            path: '',
             element: <PersonHomePage />,
           },
           {
@@ -97,11 +98,18 @@ export const Router = () => {
             {route.children &&
               route.children.map((child, index) => {
                 return (
-                  <Route
-                    key={index}
-                    path={child.path}
-                    element={child.element}
-                  />
+                  <Route key={index} path={child.path} element={child.element}>
+                    {child.children &&
+                      child.children.map((child, index) => {
+                        return (
+                          <Route
+                            key={index}
+                            path={child.path}
+                            element={child.element}
+                          />
+                        );
+                      })}
+                  </Route>
                 );
               })}
           </Route>
