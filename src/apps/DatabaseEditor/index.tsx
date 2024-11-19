@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { JsonEditor } from 'json-edit-react';
 import * as timeTrackerModule from '@/apps/TimeTracker/store';
 import * as timelineTodoModule from '@/apps/TimelineTodo/store';
 import { Combobox } from '@/components/ui/combobox';
@@ -23,6 +24,7 @@ const databases: Array<DatabaseItem> = modules
   }));
 
 const DatabaseEditor = () => {
+  const [mode, setMode] = useState<'json' | 'textarea'>('json');
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>();
   // const [value, setValue] = useState<any>(undefined);
   const [valueString, setValueString] = useState<string | undefined>(undefined);
@@ -42,17 +44,29 @@ const DatabaseEditor = () => {
   }, [selectedDatabaseId]);
 
   return (
-    <div className="container">
+    <div className="container h-full flex flex-col">
       <div className="flex justify-between items-center gap-2">
-        <Combobox
-          options={databases.map((p) => ({
-            label: p.name,
-            value: p.id,
-          }))}
-          value={selectedDatabaseId || ''}
-          setValue={setSelectedDatabaseId}
-          className="min-w-56"
-        />
+        <div className="flex gap-2">
+          <Combobox
+            options={databases.map((p) => ({
+              label: p.name,
+              value: p.id,
+            }))}
+            value={selectedDatabaseId || ''}
+            setValue={setSelectedDatabaseId}
+            className="min-w-56"
+          />
+
+          <Combobox
+            options={['json', 'textarea'].map((p) => ({
+              label: p,
+              value: p,
+            }))}
+            value={mode}
+            setValue={setMode as any}
+            className="min-w-56"
+          />
+        </div>
         <Button
           size="sm"
           onClick={() => {
@@ -77,12 +91,20 @@ const DatabaseEditor = () => {
         </Button>
       </div>
       {selectedDatabase && (
-        <div className="json-form mt-2">
-          <textarea
-            className="w-full h-96"
-            value={valueString}
-            onChange={(e) => setValueString(e.target.value)}
-          />
+        <div className="json-form mt-2 flex-1">
+          {mode === 'textarea' ? (
+            <textarea
+              className="flex-1 w-full"
+              value={valueString}
+              onChange={(e) => setValueString(e.target.value)}
+            />
+          ) : (
+            <JsonEditor
+              className="flex-1 w-full"
+              data={JSON.parse(valueString || '{}')}
+              setData={(v) => setValueString(JSON.stringify(v, null, 2))}
+            />
+          )}
         </div>
       )}
     </div>
