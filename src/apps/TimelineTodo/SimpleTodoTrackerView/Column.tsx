@@ -7,6 +7,8 @@ import { ReactSortable } from 'react-sortablejs';
 import { SimpleTodoType } from '../store/simple-todo-slice';
 import './style.scss';
 import SelectProject from '@/apps/TimeTracker/SelectProject';
+import ms from 'ms';
+import dayjs from '@/helpers/dayjs';
 // import { useSharedStore } from './store';
 
 type ColumnProps = {
@@ -19,6 +21,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
   const { simpleTodoList: todos, updateSimpleTodoList: setTodos } = useStore();
   const [newTodo, setNewTodo] = useState('');
   const [projectId, setProjectId] = useState<string | undefined>();
+  const isBacklog = status === 'backlog';
 
   const columnTodos = useMemo(
     () =>
@@ -29,6 +32,12 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
       ),
     [selectedDate, status, todos]
   );
+
+  const totalTime = columnTodos
+    .filter((i) => i.text.endsWith(')'))
+    .map((a) => a.text.split('(')[1].trim().replace(')', ''))
+    .map((a) => ms(a))
+    .reduce((a, b) => a + b, 0);
 
   const nonBlockedTodos = useMemo(
     () => structuredClone(columnTodos.filter((todo) => !todo.blocked)),
@@ -69,7 +78,9 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
         status === 'done' && 'opacity-70'
       )}
     >
-      <h2 className="text-lg font-semibold mb-4 capitalize">{status}</h2>
+      <h2 className="text-lg font-semibold mb-4 capitalize">
+        {status} {isBacklog && dayjs.duration(totalTime).format('H [h] m [m]')}
+      </h2>
       <ReactSortable list={nonBlockedTodos} setList={orderTodos}>
         {nonBlockedTodos
           .map((id) => todos.find((i) => i.id === id.id)!)
@@ -87,7 +98,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
         </div>
       )}
 
-      {status === 'backlog' && (
+      {isBacklog && (
         <div className="flex gap-2 items-center mt-2">
           <SelectProject
             className="flex-1"
