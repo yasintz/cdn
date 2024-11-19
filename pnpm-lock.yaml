@@ -89,6 +89,9 @@ importers:
       dayjs:
         specifier: ^1.11.10
         version: 1.11.10
+      exome:
+        specifier: ^2.5.0
+        version: 2.5.0
       geolib:
         specifier: ^3.3.4
         version: 3.3.4
@@ -2743,6 +2746,9 @@ packages:
   execa@8.0.1:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
     engines: {node: '>=16.17'}
+
+  exome@2.5.0:
+    resolution: {integrity: sha512-Cdzo82A1kDXKt8QMaraAqAkbahbzBtZi7OVwCC0Q3yw/7q/1j0fxuhSfIv6DYOWKy8as6aIiDug+N57NmfWF9w==}
 
   ext@1.7.0:
     resolution: {integrity: sha512-6hxeJYaL110a9b5TEJSj0gojyHQAmA2ch5Os+ySCiA1QGdS697XWY1pzsrSjqA9LDEEgdB/KypIlR59RcLuHYw==}
@@ -7654,6 +7660,8 @@ snapshots:
       onetime: 6.0.0
       signal-exit: 4.1.0
       strip-final-newline: 3.0.0
+
+  exome@2.5.0: {}
 
   ext@1.7.0:
     dependencies:

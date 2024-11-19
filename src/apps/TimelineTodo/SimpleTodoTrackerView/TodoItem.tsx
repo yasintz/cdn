@@ -2,12 +2,10 @@ import { cn } from '@/lib/utils';
 import { useStore } from '../store';
 import {
   BanIcon,
-  CalendarIcon,
   CheckCircleIcon,
   FolderIcon,
   MoreHorizontalIcon,
   NotepadTextIcon,
-  PencilIcon,
   PlayIcon,
   SquareArrowOutUpRightIcon,
   TrashIcon,
@@ -25,16 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import DropdownItem from '../DropdownItem';
-import { useState } from 'react';
-import MarkdownInput from '@/components/MarkdownInput';
 import { getTagColor } from '../utils/tags';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 import { useSharedStore } from './store';
 
 const formatDuration = (diff: number, completed: boolean) => {
@@ -50,8 +39,6 @@ type TodoItemProps = {
 
 const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
   const { setSharedState } = useSharedStore();
-  const [showNote, setShowNote] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
   const {
     projects: timeTrackerProjects,
     tasks: timeTrackerTasks,
@@ -118,14 +105,6 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       timeTrackerId: timeTrackerTaskId,
     });
   };
-  const onBookmarkAdd = () => {
-    const link = prompt('Add Link');
-    if (link) {
-      updateTask(todo.id, {
-        reference: link,
-      });
-    }
-  };
 
   return (
     <div className="bg-white p-2 mb-2 rounded shadow cursor-pointer">
@@ -158,30 +137,6 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
             className="size-3 cursor-pointer"
             onClick={() => setSharedState({ selectedTodoId: todo.id })}
           />
-          <Popover open={showCalendar}>
-            <PopoverTrigger asChild>
-              <CalendarIcon
-                className={cn(
-                  'size-3 cursor-pointer',
-                  showCalendar ? 'text-blue-500' : 'hidden'
-                )}
-              />
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={new Date(todo.date)}
-                onSelect={(s) => {
-                  updateTask(todo.id, {
-                    date: dayjs(s).format(SIMPLE_TODO_DATE_FORMAT),
-                  });
-                  setShowCalendar(false);
-                }}
-                className="rounded-md border"
-              />
-            </PopoverContent>
-          </Popover>
-
           {timeTrackerTask && (
             <span className="text-xs text-gray-500">
               {formatDuration(diff, todo.completed)}
@@ -215,35 +170,9 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
                 hidden={Boolean(timeTrackerTask)}
               />
               <DropdownItem
-                title="Change Date"
-                icon={CalendarIcon}
-                onClick={() => setShowCalendar(true)}
-              />
-              <DropdownItem
-                title="Edit"
-                icon={PencilIcon}
-                onClick={() => {
-                  const text = prompt('Edit Task', todo.text);
-                  if (text) {
-                    updateTask(todo.id, { text });
-                  }
-                }}
-              />
-              <DropdownItem
-                title="Add Note"
-                icon={NotepadTextIcon}
-                onClick={() => setShowNote(true)}
-                hidden={Boolean(todo.note)}
-              />
-              <DropdownItem
                 title={todo.blocked ? 'Unblocked' : 'Blocked'}
                 icon={BanIcon}
                 onClick={() => updateTask(todo.id, { blocked: !todo.blocked })}
-              />
-              <DropdownItem
-                title="Add Reference"
-                icon={SquareArrowOutUpRightIcon}
-                onClick={onBookmarkAdd}
               />
               <DropdownItem
                 className="text-red-500"
@@ -255,13 +184,6 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
           </DropdownMenu>
         </div>
       </div>
-      {showNote && (
-        <MarkdownInput
-          onChange={(value) => updateTask(todo.id, { note: value })}
-          value={todo.note || ''}
-          className="mt-2 border rounded text-sm"
-        />
-      )}
       {subtasks.length > 0 && (
         <div className="flex flex-col gap-1 mt-2 ml-4 text-sm text-gray-700">
           {subtasks.map((subtask) => (

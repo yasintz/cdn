@@ -22,11 +22,14 @@ import { CalendarIcon } from 'lucide-react';
 import dayjs from '@/helpers/dayjs';
 import { Calendar } from '@/components/ui/calendar';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
+import { useStore as useTimeTrackerStore } from '@/apps/TimeTracker/store';
+import { Combobox } from '@/components/ui/combobox';
 
 const SelectedTodoView = () => {
   const { selectedTodoId, setSharedState } = useSharedStore();
   const { simpleTodoList, updateTask } = useStore();
   const todo = simpleTodoList.find((i) => i.id === selectedTodoId);
+  const { tasks, projects } = useTimeTrackerStore();
 
   const properties = [
     {
@@ -84,6 +87,25 @@ const SelectedTodoView = () => {
         />
       ),
     },
+    {
+      id: 'timeTracker',
+      label: 'Time Tracker',
+      component: (
+        <Combobox
+          className="w-full"
+          options={tasks.map((task) => ({
+            label: `${projects.find((p) => p.id === task.projectId)?.name}: ${
+              task.title
+            }`,
+            value: task.id,
+          }))}
+          value={todo?.timeTrackerId || ''}
+          setValue={(value) =>
+            todo && updateTask(todo.id, { timeTrackerId: value })
+          }
+        />
+      ),
+    },
   ];
 
   return (
@@ -93,12 +115,20 @@ const SelectedTodoView = () => {
     >
       <SheetContent className="sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>{todo?.text}</SheetTitle>
+          <SheetTitle className="pr-3">
+            <Input
+              value={todo?.text || ''}
+              className="border-none"
+              onChange={(e) =>
+                todo && updateTask(todo.id, { text: e.target.value })
+              }
+            />
+          </SheetTitle>
           <SheetDescription>
             <table>
               <tbody>
                 {properties.map((property) => (
-                  <tr key={property.id} className='mb-2'>
+                  <tr key={property.id} className="mb-2">
                     <td className="pr-2 flex items-center">{property.label}</td>
                     <td>{property.component}</td>
                   </tr>
