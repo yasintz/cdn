@@ -20,23 +20,23 @@ type StartTaskProps = {
   id: string;
 };
 
-type TaskInputValues = Pick<TaskType, 'title' | 'priceHr' | 'projectId'>;
+type TaskInputValues = Pick<TaskType, 'title' | 'projectId'>;
 
 const TaskInput = ({ id, now }: StartTaskProps) => {
   const [taskInput, setTaskInput] = useState<TaskInputValues>({
     title: '',
-    priceHr: 0,
     projectId: '',
   });
-  const { createTask, stopTask, tasks, updateTask, removeInput } = useStore();
+  const { createTask, stopTask, tasks, updateTask, removeInput, projects } =
+    useStore();
   const currentTask = tasks.find((i) => i.id === id);
   const projectId = currentTask?.projectId || taskInput.projectId;
   const title = currentTask?.title || taskInput.title;
-  const priceHr = currentTask?.priceHr || taskInput.priceHr;
+  const project = projects.find((i) => i.id === projectId);
 
   const diff = now - (currentTask?.startTime || 0);
   const currentTaskTotalPrice =
-    currentTask && getTaskTotalPrice(currentTask, now);
+    currentTask && getTaskTotalPrice(currentTask, project, now);
 
   const taskTitle = currentTask?.title || taskInput.title;
   const tags = getTagsFromString(taskTitle);
@@ -75,14 +75,6 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
     }
   };
 
-  const updatePriceHr = (value: number) => {
-    if (currentTask) {
-      updateTask(currentTask.id, { priceHr: value });
-    } else {
-      setTaskInput((prev) => ({ ...prev, priceHr: value }));
-    }
-  };
-
   const handleStartStop = () => {
     if (currentTask) {
       stopTask(id);
@@ -91,13 +83,11 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
         title,
         startTime: Date.now(),
         projectId,
-        priceHr,
       });
       setTaskInput((prev) => ({
         ...prev,
         title: '',
         projectId: '',
-        priceHr: 0,
       }));
     }
   };
@@ -107,7 +97,11 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
       <div className="flex items-center gap-3">
         <div className="flex flex-1 gap-2 flex-col lg:flex-row">
           <div className="flex flex-1 gap-2 lg:flex-4">
-            <SelectProject onChange={updateProjectId} projectId={projectId} className='flex-8' />
+            <SelectProject
+              onChange={updateProjectId}
+              projectId={projectId}
+              className="flex-8"
+            />
 
             <Input
               className="flex-8"
@@ -119,14 +113,9 @@ const TaskInput = ({ id, now }: StartTaskProps) => {
           </div>
 
           <div className="flex flex-1 gap-2 items-center">
-            <Input
-              style={{ flex: 1 }}
-              value={priceHr || ''}
-              type="number"
-              onChange={(e) => updatePriceHr(Number(e.target.value))}
-              placeholder="$/hr"
-              ringDisabled
-            />
+            <div className="flex-1">
+              {project?.priceHr && <>{project?.priceHr}$/hr</>}
+            </div>
             <div className="flex gap-2 items-center cursor-pointer select-none">
               {currentTask && (
                 <span

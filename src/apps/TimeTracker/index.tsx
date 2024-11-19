@@ -58,6 +58,7 @@ const TimeTracker = () => {
       </div>
 
       <TaskTable
+        projects={projects}
         tasks={tasks
           .filter(
             (task) =>

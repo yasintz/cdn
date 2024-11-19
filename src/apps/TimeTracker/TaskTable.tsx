@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { TaskType } from './store';
+import { ProjectType, TaskType } from './store';
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import TaskRow from './TaskRow';
@@ -20,14 +20,21 @@ type TaskTableComProps = {
   editingTaskId: string | undefined;
   setEditingTaskId: React.Dispatch<React.SetStateAction<string | undefined>>;
   className?: string;
+  projects: ProjectType[];
 };
 const TableCom = ({
   editingTaskId,
   tasks,
   setEditingTaskId,
   className,
+  projects,
 }: TaskTableComProps) => {
-  const allTasks = tasks.map((t) => getTaskComputed(t));
+  const allTasks = tasks.map((t) =>
+    getTaskComputed(
+      t,
+      projects.find((p) => p.id === t.projectId)
+    )
+  );
   const total = allTasks.reduce((acc, cur) => acc + cur.duration, 0);
   const totalPrice = allTasks.reduce(
     (acc, cur) => acc + (cur.totalPrice || 0),
@@ -83,9 +90,10 @@ const TableCom = ({
 
 type PropsType = {
   tasks: TaskType[];
+  projects: ProjectType[];
 };
 
-const TaskTable = ({ tasks }: PropsType) => {
+const TaskTable = ({ tasks, projects }: PropsType) => {
   const [editingTaskId, setEditingTaskId] = useState<string>();
 
   useEffect(() => {
@@ -99,6 +107,7 @@ const TaskTable = ({ tasks }: PropsType) => {
         <div className="h-[49px] overflow-hidden rounded-t-md border bg-white z-10 relative">
           <TableCom
             tasks={tasks}
+            projects={projects}
             editingTaskId={editingTaskId}
             setEditingTaskId={setEditingTaskId}
             className="syncscroll syncscroll:scroll-table"
@@ -107,6 +116,7 @@ const TaskTable = ({ tasks }: PropsType) => {
         <div className="overflow-y-scroll rounded-md border absolute top-0 left-0 right-0 bottom-0">
           <TableCom
             tasks={tasks}
+            projects={projects}
             editingTaskId={editingTaskId}
             setEditingTaskId={setEditingTaskId}
             className="syncscroll syncscroll:scroll-table"

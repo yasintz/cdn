@@ -45,9 +45,9 @@ const TaskRow = ({
   const currencies = useCurrencies();
   const now = useNow();
   const { createTask, updateTask, deleteTask, projects, stopTask } = useStore();
-  const task = useTaskComputed(taskData, taskData.endTime ? 0 : now);
+  const project = projects.find((p) => p.id === taskData.projectId);
+  const task = useTaskComputed(taskData, project, taskData.endTime ? 0 : now);
   const isBiggerThanOneDay = task.duration > ms('24 hours');
-  const project = projects.find((p) => p.id === task.projectId);
   const priceTry = (task.totalPrice || 0) * currencies.TRY;
   const isEditing = editingTaskId === task.id;
 
@@ -176,7 +176,6 @@ const TaskRow = ({
               createTask(uid(), {
                 title: task.title,
                 startTime: Date.now(),
-                priceHr: task.priceHr,
                 projectId: task.projectId,
               })
             }

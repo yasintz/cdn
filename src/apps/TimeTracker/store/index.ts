@@ -13,7 +13,6 @@ export type TaskType = {
   titleRaw: string;
   startTime: number;
   endTime?: number;
-  priceHr?: number;
   projectId: string;
 };
 
@@ -30,7 +29,7 @@ export type StoreType = {
   inputs: string[];
   createTask: (
     inputId: string,
-    task: Pick<TaskType, 'title' | 'startTime' | 'priceHr' | 'projectId'>
+    task: Pick<TaskType, 'title' | 'startTime' | 'projectId'>
   ) => void;
   stopTask: (id: string) => void;
   updateTask: (id: string, task: Partial<Omit<TaskType, 'id'>>) => void;
