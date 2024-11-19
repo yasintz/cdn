@@ -87,7 +87,9 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
 
   const handleStartTask = () => {
     const project = timeTrackerProjects.find((i) =>
-      todo.text.toLowerCase().includes(i.name.toLowerCase())
+      todo.projectId
+        ? i.id === todo.projectId
+        : todo.text.toLowerCase().includes(i.name.toLowerCase())
     );
 
     const title = project
