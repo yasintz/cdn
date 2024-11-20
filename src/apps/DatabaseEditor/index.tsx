@@ -30,6 +30,27 @@ const DatabaseEditor = () => {
   const [valueString, setValueString] = useState<string | undefined>(undefined);
   const selectedDatabase = databases.find((db) => db.id === selectedDatabaseId);
 
+  const handleUpdate = async () => {
+    const db = databases.find((db) => db.id === selectedDatabaseId);
+
+    if (!db || !valueString) {
+      return;
+    }
+
+    try {
+      JSON.parse(valueString);
+    } catch (error) {
+      alert('Invalid JSON');
+      return;
+    }
+
+    const gSheetDb = googleSheetDB(db.sheetId, db.tabId);
+
+    setLoading(true);
+    await gSheetDb.set(valueString);
+    setLoading(false);
+  };
+
   useEffect(() => {
     const db = databases.find((db) => db.id === selectedDatabaseId);
 
@@ -67,30 +88,7 @@ const DatabaseEditor = () => {
             className="min-w-56"
           />
         </div>
-        <Button
-          size="sm"
-          disabled={loading}
-          onClick={async () => {
-            const db = databases.find((db) => db.id === selectedDatabaseId);
-
-            if (!db || !valueString) {
-              return;
-            }
-
-            try {
-              JSON.parse(valueString);
-            } catch (error) {
-              alert('Invalid JSON');
-              return;
-            }
-
-            const gSheetDb = googleSheetDB(db.sheetId, db.tabId);
-
-            setLoading(true);
-            await gSheetDb.set(valueString);
-            setLoading(false);
-          }}
-        >
+        <Button size="sm" disabled={loading} onClick={handleUpdate}>
           {loading ? 'Saving...' : 'Save'}
         </Button>
       </div>
