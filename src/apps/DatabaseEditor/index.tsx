@@ -26,7 +26,7 @@ const databases: Array<DatabaseItem> = modules
 const DatabaseEditor = () => {
   const [mode, setMode] = useState<'json' | 'textarea'>('json');
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>();
-  // const [value, setValue] = useState<any>(undefined);
+  const [loading, setLoading] = useState(false);
   const [valueString, setValueString] = useState<string | undefined>(undefined);
   const selectedDatabase = databases.find((db) => db.id === selectedDatabaseId);
 
@@ -69,7 +69,8 @@ const DatabaseEditor = () => {
         </div>
         <Button
           size="sm"
-          onClick={() => {
+          disabled={loading}
+          onClick={async () => {
             const db = databases.find((db) => db.id === selectedDatabaseId);
 
             if (!db || !valueString) {
@@ -80,14 +81,17 @@ const DatabaseEditor = () => {
               JSON.parse(valueString);
             } catch (error) {
               alert('Invalid JSON');
+              return;
             }
 
             const gSheetDb = googleSheetDB(db.sheetId, db.tabId);
 
-            gSheetDb.set(valueString);
+            setLoading(true);
+            await gSheetDb.set(valueString);
+            setLoading(false);
           }}
         >
-          Save
+          {loading ? 'Saving...' : 'Save'}
         </Button>
       </div>
       {selectedDatabase && (
