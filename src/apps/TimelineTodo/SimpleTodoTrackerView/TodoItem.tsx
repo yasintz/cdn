@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils';
 import { useStore } from '../store';
 import {
   BanIcon,
@@ -25,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import DropdownItem from '../DropdownItem';
 import { getTagColor } from '../utils/tags';
 import { useSharedStore } from './store';
+import React from 'react';
 
 const formatDuration = (diff: number, completed: boolean) => {
   const format = diff > ms('1 hour') || completed ? 'HH:mm:ss' : 'mm:ss';
@@ -46,8 +46,11 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
     stopTask: stopTimeTrackerTask,
   } = useTimeTrackerStore();
   const project = timeTrackerProjects.find((i) => i.id === todo.projectId);
+  const isEstimate = todo.text.includes('Estimate:');
+  const estimateLongPressTimeout = React.useRef<NodeJS.Timeout | undefined>(
+    undefined
+  );
 
-  const subtasks = todo.subtasks || [];
   const timeTrackerTask = timeTrackerTasks.find(
     (t) => t.id === todo.timeTrackerId
   );
@@ -59,13 +62,7 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       : now - timeTrackerTask.startTime
     : 0;
 
-  const {
-    deleteSimpleTodo: deleteTodo,
-    toggleTask,
-    toggleSubtask,
-    deleteSubtask,
-    updateTask,
-  } = useStore();
+  const { deleteSimpleTodo: deleteTodo, toggleTask, updateTask } = useStore();
 
   const completeTask = () => {
     updateTask(todo.id, {
@@ -78,10 +75,9 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
     }
   };
 
-  const handleSubtaskDelete = (e: React.MouseEvent, subtaskId: string) => {
-    e.stopPropagation();
-    if (confirm('Are you sure you want to delete this subtask?')) {
-      deleteSubtask(todo.id, subtaskId);
+  const handleDeleteTask = () => {
+    if (confirm('Are you sure you want to delete?')) {
+      deleteTodo(todo.id);
     }
   };
 
@@ -107,6 +103,26 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
       timeTrackerId: timeTrackerTaskId,
     });
   };
+
+  if (isEstimate) {
+    const estimate = todo.text.split('Estimate:')[1].trim();
+    return (
+      <div
+        className="flex items-center gap-2 mb-2"
+        onMouseDown={() => {
+          estimateLongPressTimeout.current = setTimeout(() => {
+            handleDeleteTask();
+          }, 1000);
+        }}
+        onMouseUp={() => clearTimeout(estimateLongPressTimeout.current)}
+        onMouseMove={() => clearTimeout(estimateLongPressTimeout.current)}
+      >
+        <div className="flex-1 h-[1px] bg-gray-300" />
+        <div className="text-sm text-gray-400">{estimate}</div>
+        <div className="flex-1 h-[1px] bg-gray-300" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-2 mb-2 rounded shadow cursor-pointer">
@@ -180,32 +196,12 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
                 className="text-red-500"
                 icon={TrashIcon}
                 title="Delete"
-                onClick={() => deleteTodo(todo.id)}
+                onClick={() => handleDeleteTask()}
               />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
-      {subtasks.length > 0 && (
-        <div className="flex flex-col gap-1 mt-2 ml-4 text-sm text-gray-700">
-          {subtasks.map((subtask) => (
-            <div
-              key={subtask.id}
-              onClick={() => toggleSubtask(todo.id, subtask.id)}
-              className={cn(
-                'group/subtask flex gap-2 items-center',
-                subtask.completed && 'line-through'
-              )}
-            >
-              {subtask.text}
-              <TrashIcon
-                className="size-2 cursor-pointer hidden group-hover/subtask:block"
-                onClick={(e) => handleSubtaskDelete(e, subtask.id)}
-              />
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
