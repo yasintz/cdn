@@ -1,51 +1,27 @@
-import _ from 'lodash';
 import { useStore } from '../store';
 import Column from './Column';
 import Header from './Header';
 import { useSharedStore } from './store';
-import dayjs from '@/helpers/dayjs';
-import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 import SelectedTodoView from './SelectedTodoView';
+import TodoItem from './TodoItem';
+import dayjs from 'dayjs';
+import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
+import _ from 'lodash';
+import React from 'react';
 
 const boardColumns = ['backlog', 'done'];
 
 export default function SimpleTodoTracker() {
   const { simpleTodoList } = useStore();
-  const { showAllTodos, selectedDate, setSharedState } = useSharedStore();
+  const { showAllTodos, selectedDate } = useSharedStore();
 
-  if (showAllTodos) {
-    const allDates = _.uniq(
-      simpleTodoList
-        .filter((i) => !i.completed)
-        .map((todo) => dayjs(todo.date).format(SIMPLE_TODO_DATE_FORMAT))
-    );
+  const allDates = _.uniq(
+    simpleTodoList
+      .filter((i) => !i.completed)
+      .map((todo) => dayjs(todo.date).format(SIMPLE_TODO_DATE_FORMAT))
+  ).filter((i) => i !== selectedDate);
 
-    return (
-      <div className="container mx-auto p-4">
-        <Header />
-        {allDates.map((date) => (
-          <div className="mb-2" key={date}>
-            <h2
-              className="text-xl font-bold mb-2 cursor-pointer"
-              onClick={() => {
-                setSharedState({
-                  selectedDate: dayjs(date).format(SIMPLE_TODO_DATE_FORMAT),
-                  showAllTodos: false,
-                });
-              }}
-            >
-              {dayjs(date).format('MMMM D, YYYY')}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {boardColumns.map((status) => (
-                <Column key={status} status={status} selectedDate={date} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
+  const allTodos = simpleTodoList.filter((i) => !i.completed);
 
   return (
     <div className="container mx-auto p-4">
@@ -55,6 +31,24 @@ export default function SimpleTodoTracker() {
           <Column key={status} status={status} selectedDate={selectedDate} />
         ))}
       </div>
+      {showAllTodos && (
+        <div className="w-1/2 mt-2 todo-column bg-gray-100 p-4 rounded-lg">
+          {allDates.map((date) => (
+            <React.Fragment key={date}>
+              <div className="my-2">{dayjs(date).format('DD MMMM')}</div>
+              {allTodos
+                .filter((i) => i.date === date)
+                .map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    selectedDate={selectedDate}
+                  />
+                ))}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
       <SelectedTodoView />
     </div>
   );

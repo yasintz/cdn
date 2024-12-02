@@ -65,8 +65,9 @@ const SelectedTodoView = () => {
               mode="single"
               selected={new Date(todo?.date || '')}
               onSelect={(s) =>
-                setSharedState({
-                  selectedDate: dayjs(s).format(SIMPLE_TODO_DATE_FORMAT),
+                todo &&
+                updateTask(todo.id, {
+                  date: dayjs(s).format(SIMPLE_TODO_DATE_FORMAT),
                 })
               }
               className="rounded-md border"
