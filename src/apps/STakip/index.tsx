@@ -179,9 +179,9 @@ const SumeyyeTakip = () => {
           </button>
         ))}
       </div>
-      {lastOneHourData && (
-        <div className="mb-4 border-b pb-4">
-          <h2 className="text-xl font-bold mb-2">Last 1 Hour</h2>
+      <div className="mb-4 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">Last 1 Hour</h2>
+        {lastOneHourData ? (
           <div className="flex gap-3">
             {lastOneHourData.map((item, index) => (
               <UrlItem
@@ -195,8 +195,10 @@ const SumeyyeTakip = () => {
               />
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="p-4">No data in last 1 hour</div>
+        )}
+      </div>
       {urls ? (
         <div>
           <div className="space-y-4">
