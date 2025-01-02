@@ -1,3 +1,4 @@
+import { Checkbox } from '@/components/ui/checkbox';
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
 import { googleSheetDB } from '@/utils/googleSheetDb';
@@ -14,6 +15,7 @@ type DataType = {
 type GroupedDataType = {
   [key: string]: Array<{
     url: string;
+    domain: string;
     instances: Array<{
       startTime: Date;
       endTime: Date;
@@ -26,7 +28,7 @@ type GroupedDataType = {
 
 const storage = googleSheetDB('1nGqcgAJ_icHmEBn1ka5XTKLT_7rz7T9oZaB563Cwu-s');
 
-function getGroupedData(data: DataType) {
+function getGroupedData(data: DataType, domainOnly: boolean) {
   if (!data?.urls) return;
 
   const grouped: GroupedDataType = {};
@@ -51,11 +53,18 @@ function getGroupedData(data: DataType) {
       ms('2.5 minute')
     );
 
-    // Find existing URL entry for the day
-    let urlEntry = grouped[date].find((entry) => entry.url === current.url);
+    let urlEntry = grouped[date].find((entry) => {
+      if (domainOnly) {
+        const currentDomain = new URL(current.url).hostname;
+        const entryDomain = new URL(entry.url).hostname;
+        return currentDomain === entryDomain;
+      }
+      return entry.url === current.url;
+    });
 
     if (!urlEntry) {
       urlEntry = {
+        domain: new URL(current.url).hostname,
         url: current.url,
         instances: [],
         totalDuration: 0,
@@ -115,6 +124,8 @@ function createPreviousAndNextWeekDays(date: string) {
 }
 
 const SumeyyeTakip = () => {
+  const [data, setData] = useState<DataType>();
+  const [domainOnly, setDomainOnly] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(
     dayjs().format('YYYY-MM-DD')
   );
@@ -125,16 +136,27 @@ const SumeyyeTakip = () => {
   const [groupedData, setGroupedData] = useState<GroupedDataType>({});
 
   useEffect(() => {
-    storage.get().then((data) => {
-      setGroupedData(getGroupedData(data)!);
-    });
+    storage.get().then((data) => setData(data));
   }, []);
+
+  useEffect(() => {
+    if (!data) return;
+    setGroupedData(getGroupedData(data, domainOnly)!);
+  }, [data, domainOnly]);
 
   const urls = groupedData[selectedDate];
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Daily URL Summary</h1>
+
+      <div className="flex items-center gap-2 mb-4">
+        <Checkbox
+          checked={domainOnly}
+          onCheckedChange={() => setDomainOnly(!domainOnly)}
+        />
+        Domain Only
+      </div>
       <div className="flex items-center gap-2 mb-4 w-full overflow-x-auto">
         {days.map((day) => (
           <button
@@ -155,7 +177,7 @@ const SumeyyeTakip = () => {
             {urls?.map((item, index) => (
               <div key={index} className="border p-4 rounded-lg">
                 <div className="font-medium break-all mb-2">
-                  {item.url}
+                  {domainOnly ? item.domain : item.url}
                   <span className="ml-2 text-blue-600 font-bold">
                     (Total: {dayjs.duration(item.totalDuration).format('HH:mm')}
                     )
