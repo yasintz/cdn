@@ -4,12 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { uid } from '@/utils/uid';
-
-export type FolderType = {
-  id: string;
-  name: string;
-  parentId?: string;
-};
+import dayjs from '@/helpers/dayjs';
 
 export type FileSystemItem = {
   id: string;
@@ -17,6 +12,7 @@ export type FileSystemItem = {
   parentId?: string;
   type: 'file' | 'folder';
   content?: string;
+  deletedAt?: string;
 };
 
 type StoreType = {
@@ -24,6 +20,7 @@ type StoreType = {
   createItem: (file: Omit<FileSystemItem, 'id'>) => string;
   updateItem: (id: string, file: Partial<Omit<FileSystemItem, 'id'>>) => void;
   deleteItem: (id: string) => void;
+  cleanExpiredTrashItems: () => void;
 };
 
 export const useStore = create<StoreType>()(
@@ -56,6 +53,15 @@ export const useStore = create<StoreType>()(
           deleteItem: (id) => {
             set((prev) => {
               prev.items = prev.items.filter((file) => file.id !== id);
+            });
+          },
+
+          cleanExpiredTrashItems: () => {
+            set((prev) => {
+              prev.items = prev.items.filter(
+                (file) =>
+                  !file.deletedAt || dayjs().diff(file.deletedAt, 'day') > 30
+              );
             });
           },
         }),
