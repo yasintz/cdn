@@ -1,18 +1,13 @@
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
 import _ from 'lodash';
-
-interface Instance {
-  startTime: Date;
-  endTime: Date;
-  duration: number;
-  index: number;
-}
+import { List } from './List';
+import { DataItemType } from '../types';
 
 interface UrlItemProps {
   url: string;
   domain: string;
-  instances: Instance[];
+  instances: DataItemType[];
   totalDuration: number;
   domainOnly: boolean;
   className?: string;
@@ -34,15 +29,7 @@ export const UrlItem = ({
           (Total: {dayjs.duration(totalDuration).format('HH:mm')})
         </span>
       </div>
-      <div className="space-y-1">
-        {instances.map((instance, idx) => (
-          <div key={idx} className="text-sm text-gray-600 pl-4">
-            {instance.startTime.toLocaleTimeString()} -{' '}
-            {instance.endTime.toLocaleTimeString()} (
-            {dayjs.duration(instance.duration).format('HH:mm')})
-          </div>
-        ))}
-      </div>
+      <List list={instances} />
     </div>
   );
-}; 
+};
