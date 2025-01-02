@@ -59,13 +59,6 @@ const SumeyyeTakip = () => {
     return getGroupedData(oneHourData, domainOnly)[selectedDate];
   }, [data, domainOnly, selectedDate]);
 
-  const listData = useMemo(() => {
-    if (!data) return [];
-    return data
-      .filter((s) => dayjs(s.startTime).isSame(selectedDate, 'day'))
-      .reverse();
-  }, [data, selectedDate]);
-
   const days = useMemo(
     () => createPreviousAndNextWeekDays(selectedDate),
     [selectedDate]
