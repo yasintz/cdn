@@ -78,6 +78,13 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     image:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxSv7E4cJz1rLPR9yXv3K-IDlUmrl8clfgboMTYS_L4lToKVd-TPpCBZ05VIBYLnhKTbo&usqp=CAU',
   },
+  {
+    path: 'stakip',
+    lazy: () => import('../apps/STakip'),
+    title: 'STakip',
+    image:
+      'https://media.istockphoto.com/id/1394658823/vector/books-flat-vector-illustration-in-corporate-memphis-style.jpg?s=612x612&w=0&k=20&c=pmzxDgsfikhgn45c5VaxSGy6qtnSyPbnoXmtHzMFGes=',
+  },
 ];
 
 const router = createBrowserRouter([

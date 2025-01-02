@@ -11,11 +11,12 @@ const HomePage = () => {
           <Link
             to={name.cardPath || name.path!.replace('/*', '')}
             key={name.path}
+            className='w-full md:w-auto'
           >
             <Card className="overflow-hidden">
               <img
                 src={name.image as string}
-                className="w-64 aspect-video object-cover border-b"
+                className="md:w-64 w-full aspect-video object-cover border-b"
               />
               <CardHeader>
                 <CardTitle className="text-lg text-center">
