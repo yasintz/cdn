@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { googleSheetDB } from '@/utils/googleSheetDb';
 import ms from 'ms';
 import { useEffect, useMemo, useState } from 'react';
+import { UrlItem } from './components/UrlItem';
 
 type DataType = {
   urls: Array<{
@@ -28,13 +29,11 @@ type GroupedDataType = {
 
 const storage = googleSheetDB('1nGqcgAJ_icHmEBn1ka5XTKLT_7rz7T9oZaB563Cwu-s');
 
-function getGroupedData(data: DataType, domainOnly: boolean) {
-  if (!data?.urls) return;
-
+function getGroupedData(data: DataType['urls'], domainOnly: boolean) {
   const grouped: GroupedDataType = {};
 
   // Sort urls by timestamp
-  const sortedUrls = [...data.urls].sort(
+  const sortedUrls = [...data].sort(
     (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
 
@@ -125,24 +124,33 @@ function createPreviousAndNextWeekDays(date: string) {
 
 const SumeyyeTakip = () => {
   const [data, setData] = useState<DataType>();
-  const [domainOnly, setDomainOnly] = useState(false);
+  const [domainOnly, setDomainOnly] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>(
     dayjs().format('YYYY-MM-DD')
   );
+  const lastOneHourData = useMemo(() => {
+    const lastOneHour = dayjs().subtract(1, 'hour');
+    const oneHourData = data?.urls.filter((url) =>
+      dayjs(url.timestamp).isAfter(lastOneHour)
+    );
+
+    if (!oneHourData) return;
+
+    return getGroupedData(oneHourData, domainOnly)[selectedDate];
+  }, [data?.urls, domainOnly, selectedDate]);
+
   const days = useMemo(
     () => createPreviousAndNextWeekDays(selectedDate),
     [selectedDate]
   );
-  const [groupedData, setGroupedData] = useState<GroupedDataType>({});
+  const groupedData = useMemo(
+    () => (data ? getGroupedData(data.urls, domainOnly)! : {}),
+    [data, domainOnly]
+  );
 
   useEffect(() => {
     storage.get().then((data) => setData(data));
   }, []);
-
-  useEffect(() => {
-    if (!data) return;
-    setGroupedData(getGroupedData(data, domainOnly)!);
-  }, [data, domainOnly]);
 
   const urls = groupedData[selectedDate];
 
@@ -171,28 +179,36 @@ const SumeyyeTakip = () => {
           </button>
         ))}
       </div>
+      {lastOneHourData && (
+        <div className="mb-4 border-b pb-4">
+          <h2 className="text-xl font-bold mb-2">Last 1 Hour</h2>
+          <div className="flex gap-3">
+            {lastOneHourData.map((item, index) => (
+              <UrlItem
+                key={index}
+                url={item.url}
+                domain={item.domain}
+                instances={item.instances}
+                totalDuration={item.totalDuration}
+                domainOnly={domainOnly}
+                className="flex-1"
+              />
+            ))}
+          </div>
+        </div>
+      )}
       {urls ? (
         <div>
           <div className="space-y-4">
             {urls?.map((item, index) => (
-              <div key={index} className="border p-4 rounded-lg">
-                <div className="font-medium break-all mb-2">
-                  {domainOnly ? item.domain : item.url}
-                  <span className="ml-2 text-blue-600 font-bold">
-                    (Total: {dayjs.duration(item.totalDuration).format('HH:mm')}
-                    )
-                  </span>
-                </div>
-                <div className="space-y-1">
-                  {item.instances.map((instance, idx) => (
-                    <div key={idx} className="text-sm text-gray-600 pl-4">
-                      {instance.startTime.toLocaleTimeString()} -{' '}
-                      {instance.endTime.toLocaleTimeString()} (
-                      {dayjs.duration(instance.duration).format('HH:mm')} )
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <UrlItem
+                key={index}
+                url={item.url}
+                domain={item.domain}
+                instances={item.instances}
+                totalDuration={item.totalDuration}
+                domainOnly={domainOnly}
+              />
             ))}
           </div>
         </div>
