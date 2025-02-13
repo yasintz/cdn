@@ -18,6 +18,7 @@ export type SimpleTodoType = {
 export type SimpleTodoSlice = {
   simpleTodoList: SimpleTodoType[];
   updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
+  createTodos: (todos: SimpleTodoType[]) => void;
   updateTask: (id: string, task: Partial<SimpleTodoType>) => void;
   toggleTask: (id: string, selectedDate: string) => void;
   deleteSimpleTodo: (id: string) => void;
@@ -33,6 +34,11 @@ export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
   updateSimpleTodoList: (todos) => {
     set((prev) => {
       prev.simpleTodoList = todos;
+    });
+  },
+  createTodos: (todos) => {
+    set((prev) => {
+      prev.simpleTodoList = [...prev.simpleTodoList, ...todos];
     });
   },
   updateTask: (id, task) => {
