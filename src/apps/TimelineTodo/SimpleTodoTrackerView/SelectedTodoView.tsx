@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -24,12 +24,22 @@ import { Calendar } from '@/components/ui/calendar';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 import { useStore as useTimeTrackerStore } from '@/apps/TimeTracker/store';
 import { Combobox } from '@/components/ui/combobox';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import _ from 'lodash';
 
 const SelectedTodoView = () => {
   const { selectedTodoId, setSharedState } = useSharedStore();
   const { simpleTodoList, updateTask } = useStore();
   const todo = simpleTodoList.find((i) => i.id === selectedTodoId);
   const { tasks, projects } = useTimeTrackerStore();
+  const allTags = useMemo(() => {
+    return _.uniq(simpleTodoList.map((todo) => todo.tags || []).flat());
+  }, [simpleTodoList]);
 
   const properties = [
     {
@@ -105,6 +115,56 @@ const SelectedTodoView = () => {
             todo && updateTask(todo.id, { timeTrackerId: value })
           }
         />
+      ),
+    },
+    {
+      id: 'tags',
+      label: 'Tags',
+      component: (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-2">
+              <Input
+                value={todo?.tags?.join(', ') || ''}
+                onChange={() => null}
+              />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <Input
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const target = e.target as HTMLInputElement;
+                  const newTag = target.value.trim();
+                  if (newTag && todo) {
+                    updateTask(todo.id, {
+                      tags: _.uniq([...(todo.tags || []), newTag]),
+                    });
+                    target.value = '';
+                  }
+                }
+              }}
+            />
+            {allTags.map((tag) => (
+              <DropdownMenuCheckboxItem
+                key={tag}
+                checked={todo?.tags?.includes(tag)}
+                onCheckedChange={(checked) =>
+                  todo &&
+                  updateTask(todo.id, {
+                    tags: checked
+                      ? [...(todo.tags || []), tag]
+                      : (todo.tags || []).filter((t) => t !== tag),
+                  })
+                }
+              >
+                {tag}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     },
   ];

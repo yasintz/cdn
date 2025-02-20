@@ -7,20 +7,90 @@ import {
 } from '@/components/ui/popover';
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, PlusIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 import { useSharedStore } from './store';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useStore } from '../store';
+import * as React from 'react';
+
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import _ from 'lodash';
 
 const Header = () => {
   const { selectedDate, showAllTodos, setSharedState } = useSharedStore();
+  const {
+    simpleTodoList,
+    showByTags,
+    setShowByTags,
+    selectedTags,
+    setSelectedTags,
+  } = useStore();
   const { formatted, date } = useMemo(() => {
     return {
       formatted: dayjs(selectedDate).format('MMMM D, YYYY'),
       date: new Date(selectedDate),
     };
   }, [selectedDate]);
+
+  const allTags = useMemo(() => {
+    return _.uniq(simpleTodoList.map((todo) => todo.tags || []).flat());
+  }, [simpleTodoList]);
+
+  if (showByTags) {
+    return (
+      <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="show-by-date"
+            checked={false}
+            onCheckedChange={() => setShowByTags(false)}
+          />
+          <label
+            htmlFor="show-by-date"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Show by date
+          </label>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-2">
+              <Input value={selectedTags.join(', ')} onChange={() => null} />
+              <Button variant="outline">
+                <PlusIcon className="size-4" />
+              </Button>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            {allTags.map((tag) => (
+              <DropdownMenuCheckboxItem
+                key={tag}
+                checked={selectedTags.includes(tag)}
+                onCheckedChange={(checked) =>
+                  setSelectedTags(
+                    checked
+                      ? [...selectedTags, tag]
+                      : selectedTags.filter((t) => t !== tag)
+                  )
+                }
+              >
+                {tag}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-2 mb-4">
@@ -63,6 +133,19 @@ const Header = () => {
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           Show All Todos
+        </label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="show-by-tags"
+          checked={false}
+          onCheckedChange={() => setShowByTags(true)}
+        />
+        <label
+          htmlFor="show-by-tags"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Show by tags
         </label>
       </div>
     </div>

@@ -13,10 +13,15 @@ export type SimpleTodoType = {
   note?: string;
   blocked?: boolean;
   reference?: string;
+  tags?: string[];
 };
 
 export type SimpleTodoSlice = {
   simpleTodoList: SimpleTodoType[];
+  showByTags: boolean;
+  selectedTags: string[];
+  setShowByTags: (showByTags: boolean) => void;
+  setSelectedTags: (selectedTags: string[]) => void;
   updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
   createTodos: (todos: SimpleTodoType[]) => void;
   updateTask: (id: string, task: Partial<SimpleTodoType>) => void;
@@ -35,6 +40,14 @@ export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
     set((prev) => {
       prev.simpleTodoList = todos;
     });
+  },
+  showByTags: true,
+  selectedTags: ['main'],
+  setShowByTags: (showByTags) => {
+    set({ showByTags });
+  },
+  setSelectedTags: (selectedTags) => {
+    set({ selectedTags });
   },
   createTodos: (todos) => {
     set((prev) => {
