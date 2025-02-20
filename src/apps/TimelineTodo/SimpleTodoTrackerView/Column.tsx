@@ -1,15 +1,11 @@
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import React, { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useStore } from '../store';
 import TodoItem from './TodoItem';
-import { ReactSortable } from 'react-sortablejs';
-import { SimpleTodoType } from '../store/simple-todo-slice';
-import './style.scss';
-import SelectProject from '@/apps/TimeTracker/SelectProject';
 import ms from 'ms';
 import dayjs from '@/helpers/dayjs';
-// import { useSharedStore } from './store';
+import SortableTodos from './SortableTodos';
+import { NewTodoInput } from './NewTodoInput';
 
 type ColumnProps = {
   status: string;
@@ -17,9 +13,7 @@ type ColumnProps = {
 };
 
 const Column = ({ status, selectedDate }: ColumnProps) => {
-  const { simpleTodoList: todos, updateSimpleTodoList: setTodos } = useStore();
-  const [newTodo, setNewTodo] = useState('');
-  const [projectId, setProjectId] = useState<string | undefined>();
+  const { simpleTodoList: todos } = useStore();
   const isBacklog = status === 'backlog';
 
   const columnTodos = useMemo(
@@ -39,36 +33,11 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
     .reduce((a, b) => a + b, 0);
 
   const nonBlockedTodos = useMemo(
-    () => structuredClone(columnTodos.filter((todo) => !todo.blocked)),
+    () => columnTodos.filter((todo) => !todo.blocked),
     [columnTodos]
   );
 
   const blockedTodos = columnTodos.filter((i) => i.blocked);
-
-  const addTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && newTodo.trim() !== '') {
-      setTodos([
-        ...todos,
-        {
-          id: Date.now().toString(),
-          text: newTodo,
-          date: selectedDate,
-          completed: false,
-          projectId,
-          tags: ['main'],
-        },
-      ]);
-      setNewTodo('');
-    }
-  };
-
-  const orderTodos = (newState: SimpleTodoType[]) => {
-    setTodos(
-      todos
-        .filter((i) => !newState.map((j) => j.id).includes(i.id))
-        .concat(newState.map((i) => todos.find((j) => j.id === i.id)!))
-    );
-  };
 
   return (
     <div
@@ -81,14 +50,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
       <h2 className="text-lg font-semibold mb-4 capitalize">
         {status} {isBacklog && dayjs.duration(totalTime).format('H [h] m [m]')}
       </h2>
-      <ReactSortable list={nonBlockedTodos} setList={orderTodos}>
-        {nonBlockedTodos
-          .map((id) => todos.find((i) => i.id === id.id)!)
-          .map((todo) => (
-            <TodoItem key={todo.id} todo={todo} selectedDate={selectedDate} />
-          ))}
-      </ReactSortable>
-
+      <SortableTodos todos={nonBlockedTodos} selectedDate={selectedDate} />
       {blockedTodos.length > 0 && (
         <div className="mt-2 opacity-70">
           <h3 className="mb-2">Blocked Todos</h3>
@@ -98,23 +60,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
         </div>
       )}
 
-      {isBacklog && (
-        <div className="flex gap-2 items-center mt-2">
-          <SelectProject
-            className="flex-1"
-            projectId={projectId}
-            onChange={setProjectId}
-          />
-          <Input
-            type="text"
-            placeholder="Add your todo..."
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
-            onKeyPress={addTodo}
-            className="flex-8"
-          />
-        </div>
-      )}
+      {isBacklog && <NewTodoInput selectedDate={selectedDate} />}
     </div>
   );
 };

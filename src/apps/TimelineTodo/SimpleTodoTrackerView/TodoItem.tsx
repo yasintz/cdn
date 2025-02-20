@@ -25,6 +25,8 @@ import DropdownItem from '../DropdownItem';
 import { getTagColor } from '../utils/tags';
 import { useSharedStore } from './store';
 import React from 'react';
+import { cn } from '@/lib/utils';
+import Estimate from './Estimate';
 
 const formatDuration = (diff: number, completed: boolean) => {
   const format = diff > ms('1 hour') || completed ? 'HH:mm:ss' : 'mm:ss';
@@ -47,9 +49,6 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
   } = useTimeTrackerStore();
   const project = timeTrackerProjects.find((i) => i.id === todo.projectId);
   const isEstimate = todo.text.includes('Estimate:');
-  const estimateLongPressTimeout = React.useRef<NodeJS.Timeout | undefined>(
-    undefined
-  );
 
   const timeTrackerTask = timeTrackerTasks.find(
     (t) => t.id === todo.timeTrackerId
@@ -105,27 +104,16 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
   };
 
   if (isEstimate) {
-    const estimate = todo.text.split('Estimate:')[1].trim();
-    return (
-      <div
-        className="flex items-center gap-2 mb-2"
-        onMouseDown={() => {
-          estimateLongPressTimeout.current = setTimeout(() => {
-            handleDeleteTask();
-          }, 1000);
-        }}
-        onMouseUp={() => clearTimeout(estimateLongPressTimeout.current)}
-        onMouseMove={() => clearTimeout(estimateLongPressTimeout.current)}
-      >
-        <div className="flex-1 h-[1px] bg-gray-300" />
-        <div className="text-sm text-gray-400">{estimate}</div>
-        <div className="flex-1 h-[1px] bg-gray-300" />
-      </div>
-    );
+    return <Estimate todo={todo} deleteEstimate={handleDeleteTask} />;
   }
 
   return (
-    <div className="bg-white p-2 mb-2 rounded shadow cursor-pointer">
+    <div
+      className={cn(
+        'bg-white p-2 mb-2 rounded shadow cursor-pointer',
+        todo.completed && 'opacity-50'
+      )}
+    >
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
           {todo.reference && (

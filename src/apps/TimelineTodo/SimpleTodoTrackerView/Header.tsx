@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/popover';
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, PlusIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { SIMPLE_TODO_DATE_FORMAT } from '../store/utils';
 import { useSharedStore } from './store';
@@ -64,10 +64,10 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-2">
-              <Input value={selectedTags.join(', ')} onChange={() => null} />
-              <Button variant="outline">
-                <PlusIcon className="size-4" />
-              </Button>
+              <Input
+                value={`Tags: ${selectedTags.join(', ')}`}
+                onChange={() => null}
+              />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">

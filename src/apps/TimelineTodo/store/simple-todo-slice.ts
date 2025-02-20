@@ -23,6 +23,8 @@ export type SimpleTodoSlice = {
   setShowByTags: (showByTags: boolean) => void;
   setSelectedTags: (selectedTags: string[]) => void;
   updateSimpleTodoList: (todos: SimpleTodoType[]) => void;
+  addTodo: (todo: SimpleTodoType) => void;
+  orderTodos: (todos: SimpleTodoType[]) => void;
   createTodos: (todos: SimpleTodoType[]) => void;
   updateTask: (id: string, task: Partial<SimpleTodoType>) => void;
   toggleTask: (id: string, selectedDate: string) => void;
@@ -39,6 +41,20 @@ export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
   updateSimpleTodoList: (todos) => {
     set((prev) => {
       prev.simpleTodoList = todos;
+    });
+  },
+  orderTodos: (todos) => {
+    set((prev) => {
+      prev.simpleTodoList = prev.simpleTodoList.sort((a, b) => {
+        const aIndex = todos.findIndex((t) => t.id === a.id);
+        const bIndex = todos.findIndex((t) => t.id === b.id);
+        return aIndex - bIndex;
+      });
+    });
+  },
+  addTodo: (todo) => {
+    set((prev) => {
+      prev.simpleTodoList = [...prev.simpleTodoList, todo];
     });
   },
   showByTags: true,
