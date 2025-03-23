@@ -10,22 +10,20 @@ const AppTabs = () => {
         minHeight: 40,
       }}
     >
-      {routes
-        .filter((i) => !i.hiddenApp)
-        .map((i) => (
-          <NavLink
-            key={i.path}
-            to={i.cardPath || i.path!.replace('/*', '')}
-            className={({ isActive }) =>
-              cn(
-                'px-2 rounded-md whitespace-nowrap flex items-center',
-                isActive ? 'bg-gray-100 text-black' : 'text-gray-600'
-              )
-            }
-          >
-            {i.title}
-          </NavLink>
-        ))}
+      {routes.map((i) => (
+        <NavLink
+          key={i.path}
+          to={i.cardPath || i.path!.replace('/*', '')}
+          className={({ isActive }) =>
+            cn(
+              'px-2 rounded-md whitespace-nowrap flex items-center',
+              isActive ? 'bg-gray-100 text-black' : 'text-gray-600'
+            )
+          }
+        >
+          {i.title}
+        </NavLink>
+      ))}
     </div>
   );
 };
