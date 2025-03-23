@@ -4,7 +4,11 @@ import fs from 'fs';
 
 const initialFolder = 'src/app';
 
-function createRoutes(folder) {
+type DefinedRoute = {
+  path: string;
+};
+
+function createRoutes(folder): DefinedRoute[] {
   const files = fs.readdirSync(folder);
 
   const filesWithStats = files.map((file) => {
@@ -37,6 +41,14 @@ function createRoutes(folder) {
 
 const routes = createRoutes(initialFolder).flat();
 
+function convertPath(route: DefinedRoute) {
+  return route.path.split('[').join(':').split(']').join('');
+}
+
+function importRoute(route: DefinedRoute) {
+  return `import('../app/${route.path}/page').then((res) => ({ Component: res.default }))`;
+}
+
 export function generateRoutesPlugin(): Plugin {
   return {
     name: 'vite-plugin-generate-routes',
@@ -54,7 +66,19 @@ export function generateRoutesPlugin(): Plugin {
             if (line.includes('declare const')) {
               return line;
             }
-            return line.replace('$DEFINED_ROUTES', JSON.stringify(routes));
+            return line.replace(
+              '$DEFINED_ROUTES',
+              `[
+              ${routes
+                .map(
+                  (r) =>
+                    `{ path: '${convertPath(r)}', lazy: () => ${importRoute(
+                      r
+                    )} }`
+                )
+                .join(',\n')}
+            ]`
+            );
           })
           .join('\n');
       }

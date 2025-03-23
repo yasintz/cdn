@@ -2,26 +2,14 @@ import { RouteObject, createBrowserRouter } from 'react-router-dom';
 
 type DefinedRoute = {
   path: string;
-  layoutPath?: string;
+  lazy: () => Promise<{ Component: React.ComponentType<any> }>;
 };
 
 declare const $DEFINED_ROUTES: DefinedRoute[];
 
 const definedRoutes = $DEFINED_ROUTES;
-function importRoute(route: DefinedRoute) {
-  return import(`../app/${route.path}/page`).then((res) => ({
-    Component: res.default,
-  }));
-}
 
-function convertPath(route: DefinedRoute) {
-  return route.path.split('[').join(':').split(']').join('');
-}
-
-const definedRouteObjects: RouteObject[] = definedRoutes.map((r) => ({
-  path: convertPath(r),
-  lazy: () => importRoute(r),
-}));
+const definedRouteObjects: RouteObject[] = definedRoutes;
 
 type HomePageAppType =
   | {
@@ -97,13 +85,6 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     title: 'Code Snippets',
     image:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxSv7E4cJz1rLPR9yXv3K-IDlUmrl8clfgboMTYS_L4lToKVd-TPpCBZ05VIBYLnhKTbo&usqp=CAU',
-  },
-  {
-    path: 'stakip',
-    lazy: () => import('../apps/STakip'),
-    title: 'STakip',
-    image:
-      'https://media.istockphoto.com/id/1394658823/vector/books-flat-vector-illustration-in-corporate-memphis-style.jpg?s=612x612&w=0&k=20&c=pmzxDgsfikhgn45c5VaxSGy6qtnSyPbnoXmtHzMFGes=',
   },
 ];
 
