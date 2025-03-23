@@ -4,12 +4,14 @@ import path from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { typeToSchemaPlugin } from './vite-plugins/json-schema-generator';
+import { generateRoutesPlugin } from './vite-plugins/generate-routes';
 
 const isAnalyze = process.argv.includes('--analyze');
 
 export default defineConfig({
   plugins: [
     typeToSchemaPlugin(),
+    generateRoutesPlugin(),
     react(),
     tsconfigPaths(),
     isAnalyze && {

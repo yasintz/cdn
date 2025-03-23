@@ -1,25 +1,45 @@
-import AppLayout from '@/containers/AppLayout';
-import { Outlet, RouteObject, createBrowserRouter } from 'react-router-dom';
+import { RouteObject, createBrowserRouter } from 'react-router-dom';
+
+type DefinedRoute = {
+  path: string;
+  layoutPath?: string;
+};
+
+declare const $DEFINED_ROUTES: DefinedRoute[];
+
+const definedRoutes = $DEFINED_ROUTES;
+function importRoute(route: DefinedRoute) {
+  return import(`../app/${route.path}/page`).then((res) => ({
+    Component: res.default,
+  }));
+}
+
+function convertPath(route: DefinedRoute) {
+  return route.path.split('[').join(':').split(']').join('');
+}
+
+const definedRouteObjects: RouteObject[] = definedRoutes.map((r) => ({
+  path: convertPath(r),
+  lazy: () => importRoute(r),
+}));
 
 type HomePageAppType =
   | {
       title: string;
       image: string;
       cardPath?: string;
-      hiddenApp?: boolean;
     }
   | {
-      hiddenApp: true;
       cardPath?: string;
       title?: string;
       image?: string;
     };
 
 export const routes: Array<RouteObject & HomePageAppType> = [
+  ...(definedRouteObjects as any),
   {
     index: true,
     lazy: () => import('../apps/HomePage'),
-    hiddenApp: true,
   },
   {
     path: 'database-editor',
@@ -90,11 +110,6 @@ export const routes: Array<RouteObject & HomePageAppType> = [
 const router = createBrowserRouter([
   {
     path: '/cdn',
-    element: (
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
-    ),
     children: routes,
   },
 ]);

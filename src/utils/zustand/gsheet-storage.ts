@@ -1,5 +1,4 @@
 import _debounce from 'lodash/debounce';
-import { create } from 'zustand';
 import { StateStorage } from 'zustand/middleware';
 import { googleSheetDB, googleSheetDbDeprecated } from '../googleSheetDb';
 import ms from 'ms';
@@ -7,6 +6,8 @@ import _ from 'lodash';
 // @ts-expect-error type definition
 import { diffString } from 'json-diff';
 import { toast } from 'sonner';
+import { Exome, subscribe as exomeSubscribe } from 'exome';
+import { loadState, saveState } from 'exome/state';
 
 export function gSheetStorageDeprecated(sheetTabId: string): StateStorage {
   const db = googleSheetDbDeprecated(sheetTabId);
@@ -51,8 +52,12 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
     await db.set(value);
   }, 1000);
 
-  async function handleStore<S extends ReturnType<typeof create>>(
-    store: S,
+  async function handleStore(
+    store: {
+      subscribe: (callback: (state: any) => void) => void;
+      setState: (state: any) => void;
+      getState: () => any;
+    },
     keepState?: boolean
   ) {
     // @ts-expect-error keep database info in store
@@ -80,16 +85,34 @@ export function gSheetStorage(name: string, sheetId: string, tabId?: string) {
       await sync();
       restartInterval();
 
-      store.subscribe((state) => {
+      store.subscribe(() => {
+        const state = store.getState();
         promise = debouncedSet(JSON.stringify(keepState ? { state } : state));
         restartInterval();
       });
     } catch (error) {
+      console.error(error);
       toast.error(`${name} db is not working`);
     }
   }
 
+  async function handleExome(exome: Exome, convert: (s: any) => any) {
+    return handleStore({
+      subscribe: (cb) => exomeSubscribe(exome, cb),
+      setState: (state) =>
+        loadState(
+          exome,
+          JSON.stringify({
+            $$exome_id: Math.random().toString(),
+            ...convert(state),
+          })
+        ),
+      getState: () => JSON.parse(saveState(exome)),
+    });
+  }
+
   return {
     handleStore,
+    handleExome,
   };
 }

@@ -6,7 +6,7 @@ const HomePage = () => {
   return (
     <div className="flex gap-2 p-4 flex-wrap">
       {routes
-        .filter((i) => !i.hiddenApp)
+        .filter((i) => i.title)
         .map((name) => (
           <Link
             to={name.cardPath || name.path!.replace('/*', '')}
