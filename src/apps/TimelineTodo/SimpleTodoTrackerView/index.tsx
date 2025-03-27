@@ -59,13 +59,15 @@ export default function SimpleTodoTracker() {
 
   const filteredTodos = useMemo(
     () =>
-      simpleTodoList
-        .filter((i) => i.tags?.some((t) => selectedTags.includes(t)))
-
-        .filter(
-          (i) => !i.completedAt || dayjs().diff(i.completedAt) < ms('2 days')
-        ),
-
+      _.orderBy(
+        simpleTodoList
+          .filter((i) => i.tags?.some((t) => selectedTags.includes(t)))
+          .filter(
+            (i) => !i.completedAt || dayjs().diff(i.completedAt) < ms('2 days')
+          ),
+        ['completedAt'],
+        ['desc']
+      ),
     [selectedTags, simpleTodoList]
   );
 
