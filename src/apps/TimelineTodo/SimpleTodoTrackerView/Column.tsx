@@ -20,7 +20,7 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
     () =>
       todos.filter(
         (todo) =>
-          (status === 'done' ? todo.completed : !todo.completed) &&
+          (status === 'done' ? todo.completedAt : !todo.completedAt) &&
           todo.date === selectedDate
       ),
     [selectedDate, status, todos]
@@ -50,12 +50,12 @@ const Column = ({ status, selectedDate }: ColumnProps) => {
       <h2 className="text-lg font-semibold mb-4 capitalize">
         {status} {isBacklog && dayjs.duration(totalTime).format('H [h] m [m]')}
       </h2>
-      <SortableTodos todos={nonBlockedTodos} selectedDate={selectedDate} />
+      <SortableTodos todos={nonBlockedTodos} />
       {blockedTodos.length > 0 && (
         <div className="mt-2 opacity-70">
           <h3 className="mb-2">Blocked Todos</h3>
           {blockedTodos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} selectedDate={selectedDate} />
+            <TodoItem key={todo.id} todo={todo} />
           ))}
         </div>
       )}

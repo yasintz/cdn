@@ -1,6 +1,4 @@
-import dayjs from '@/helpers/dayjs';
 import type { TodoStoreCreator } from '.';
-import { SIMPLE_TODO_DATE_FORMAT } from './utils';
 
 export type SimpleTodoType = {
   id: string;
@@ -9,7 +7,7 @@ export type SimpleTodoType = {
   date: string;
   subtasks?: SimpleTodoType[];
   timeTrackerId?: string;
-  completed: boolean;
+  completedAt: string | null;
   note?: string;
   blocked?: boolean;
   reference?: string;
@@ -27,11 +25,10 @@ export type SimpleTodoSlice = {
   orderTodos: (todos: SimpleTodoType[]) => void;
   createTodos: (todos: SimpleTodoType[]) => void;
   updateTask: (id: string, task: Partial<SimpleTodoType>) => void;
-  toggleTask: (id: string, selectedDate: string) => void;
+  toggleTask: (id: string) => void;
   deleteSimpleTodo: (id: string) => void;
   addSubtask: (id: string, subtask: SimpleTodoType) => void;
   deleteSubtask: (id: string, subtaskId: string) => void;
-  toggleSubtask: (id: string, subtaskId: string) => void;
 };
 
 export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
@@ -82,14 +79,15 @@ export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
       );
     });
   },
-  toggleTask: (id, selectedDate) => {
+  toggleTask: (id) => {
     set((prev) => {
       prev.simpleTodoList = prev.simpleTodoList.map((t) =>
         t.id === id
           ? {
               ...t,
-              completed: !t.completed,
-              date: dayjs(selectedDate).format(SIMPLE_TODO_DATE_FORMAT),
+              completedAt: t.completedAt ? null : new Date().toISOString(),
+              // completed: !t.completed,
+              // date: dayjs(selectedDate).format(SIMPLE_TODO_DATE_FORMAT),
             }
           : t
       );
@@ -120,21 +118,6 @@ export const createSimpleTodoSlice: TodoStoreCreator<SimpleTodoSlice> = (
           ? {
               ...t,
               subtasks: (t.subtasks || []).filter((s) => s.id !== subtaskId),
-            }
-          : t
-      );
-    });
-  },
-
-  toggleSubtask: (id, subtaskId) => {
-    set((prev) => {
-      prev.simpleTodoList = prev.simpleTodoList.map((t) =>
-        t.id === id
-          ? {
-              ...t,
-              subtasks: (t.subtasks || []).map((s) =>
-                s.id === subtaskId ? { ...s, completed: !s.completed } : s
-              ),
             }
           : t
       );

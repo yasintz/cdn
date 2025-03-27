@@ -18,7 +18,7 @@ export const NewTodoInput = ({ selectedDate }: NewTodoInputProps) => {
         id: Date.now().toString(),
         text: newTodo,
         date: selectedDate,
-        completed: false,
+        completedAt: null,
         projectId,
         tags: selectedTags,
       });

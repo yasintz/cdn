@@ -36,10 +36,9 @@ const formatDuration = (diff: number, completed: boolean) => {
 
 type TodoItemProps = {
   todo: SimpleTodoType;
-  selectedDate: string;
 };
 
-const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
+const TodoItem = ({ todo }: TodoItemProps) => {
   const { setSharedState } = useSharedStore();
   const {
     projects: timeTrackerProjects,
@@ -65,8 +64,7 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
 
   const completeTask = () => {
     updateTask(todo.id, {
-      completed: !todo.completed,
-      date: selectedDate,
+      completedAt: new Date().toISOString(),
     });
 
     if (timeTrackerTask && !timeTrackerTask.endTime) {
@@ -110,8 +108,8 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
   return (
     <div
       className={cn(
-        'bg-white p-2 mb-2 rounded shadow cursor-pointer',
-        todo.completed && 'opacity-50'
+        'bg-white p-2 mb-2 rounded shadow cursor-pointer overflow-hidden relative',
+        todo.completedAt && 'opacity-50'
       )}
     >
       <div className="flex justify-between items-center">
@@ -126,16 +124,18 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
             </Button>
           )}
 
-          <div className="flex items-center">
+          <div className={cn('flex flex-col', project && 'pt-2.5')}>
             {project && (
-              <span
-                style={getTagColor(project.name)}
-                className="px-1 py-0.5 rounded-sm mr-1 opacity-85"
-              >
-                {project.name}:
-              </span>
+              <div className="absolute top-[-6px] left-0">
+                <span
+                  style={getTagColor(project.name)}
+                  className="text-xs px-1 py-0.5 opacity-85 rounded-br-sm"
+                >
+                  {project.name}
+                </span>
+              </div>
             )}
-            {todo.text}
+            <span>{todo.text}</span>
           </div>
         </div>
         <div className="flex gap-3 items-center">
@@ -145,13 +145,13 @@ const TodoItem = ({ todo, selectedDate }: TodoItemProps) => {
           />
           {timeTrackerTask && (
             <span className="text-xs text-gray-500">
-              {formatDuration(diff, todo.completed)}
+              {formatDuration(diff, !!todo.completedAt)}
             </span>
           )}
-          {todo.completed ? (
+          {todo.completedAt ? (
             <FolderIcon
               className="size-3 cursor-pointer"
-              onClick={() => toggleTask(todo.id, selectedDate)}
+              onClick={() => toggleTask(todo.id)}
             />
           ) : (
             <CheckCircleIcon

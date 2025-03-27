@@ -13,6 +13,7 @@ import { uid } from '@/utils/uid';
 import './style.scss';
 import SortableTodos from './SortableTodos';
 import { NewTodoInput } from './NewTodoInput';
+import ms from 'ms';
 
 const boardColumns = ['backlog', 'done'];
 
@@ -23,11 +24,11 @@ export default function SimpleTodoTracker() {
 
   const allDates = _.uniq(
     simpleTodoList
-      .filter((i) => !i.completed)
+      .filter((i) => !i.completedAt)
       .map((todo) => dayjs(todo.date).format(SIMPLE_TODO_DATE_FORMAT))
   ).filter((i) => i !== selectedDate);
 
-  const allTodos = simpleTodoList.filter((i) => !i.completed);
+  const allTodos = simpleTodoList.filter((i) => !i.completedAt);
 
   useEffect(() => {
     const pasteListener = (e: ClipboardEvent) => {
@@ -44,7 +45,9 @@ export default function SimpleTodoTracker() {
             text: line.replace('- [x]', '').trim(),
             projectId: project?.id,
             date: selectedDate,
-            completed: line.startsWith('- [x]'),
+            completedAt: line.startsWith('- [x]')
+              ? new Date().toISOString()
+              : null,
           };
         });
         createTodos(todos);
@@ -56,9 +59,13 @@ export default function SimpleTodoTracker() {
 
   const filteredTodos = useMemo(
     () =>
-      simpleTodoList.filter((i) =>
-        i.tags?.some((t) => selectedTags.includes(t))
-      ),
+      simpleTodoList
+        .filter((i) => i.tags?.some((t) => selectedTags.includes(t)))
+
+        .filter(
+          (i) => !i.completedAt || dayjs().diff(i.completedAt) < ms('2 days')
+        ),
+
     [selectedTags, simpleTodoList]
   );
 
@@ -66,7 +73,7 @@ export default function SimpleTodoTracker() {
     return (
       <div className="container mx-auto p-4 todo-column bg-gray-100 rounded-lg">
         <Header />
-        <SortableTodos todos={filteredTodos} selectedDate={selectedDate} />
+        <SortableTodos todos={filteredTodos} />
         <NewTodoInput selectedDate={selectedDate} />
         <SelectedTodoView />
       </div>
@@ -89,11 +96,7 @@ export default function SimpleTodoTracker() {
               {allTodos
                 .filter((i) => i.date === date)
                 .map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    selectedDate={selectedDate}
-                  />
+                  <TodoItem key={todo.id} todo={todo} />
                 ))}
             </React.Fragment>
           ))}
