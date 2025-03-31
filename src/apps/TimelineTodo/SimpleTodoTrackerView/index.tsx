@@ -63,7 +63,7 @@ export default function SimpleTodoTracker() {
         simpleTodoList
           .filter((i) => i.tags?.some((t) => selectedTags.includes(t)))
           .filter(
-            (i) => !i.completedAt || dayjs().diff(i.completedAt) < ms('2 days')
+            (i) => !i.completedAt || dayjs().diff(i.completedAt) < ms('1 day')
           ),
         ['completedAt'],
         ['desc']
