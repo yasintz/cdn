@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import dayjs from '@/helpers/dayjs';
 import { cn } from '@/lib/utils';

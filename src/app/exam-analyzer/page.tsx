@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState } from 'react';
 import './App.css';
 import { newImpl } from './new';
@@ -5,6 +7,7 @@ import { UserAnswer, dersler } from './modules/helpers';
 import _ from 'lodash';
 import { parseExam } from './modules/parseExam';
 import { useStore } from './useStore';
+import { Button } from '@/components/ui/Button';
 
 function ImportantSubjects({
   data: { importantSubjects, examCount },
@@ -29,7 +32,7 @@ function ImportantSubjects({
               ? importantSubjects.subjectCounts.inAllClass
               : importantSubjects.subjectCounts.byClass[item]
             )
-              .filter((i) => i.subject)
+              ?.filter((i) => i.subject)
               .slice(0, 5)
               .map((i) => (
                 <div key={i.className + i.subject}>
@@ -165,7 +168,7 @@ function Analytics({
 function AddExam({ onSuccess }: { onSuccess: () => void }) {
   const { exams, addExam } = useStore();
   const [examNumber, setExamNumber] = useState(
-    (parseInt(exams[exams.length - 1].id, 10) + 1).toString()
+    (parseInt(exams[exams.length - 1]?.id || '0', 10) + 1).toString()
   );
   const [value, setValue] = useState('');
   const [showResponse, setShowResponse] = useState(false);
@@ -198,6 +201,7 @@ function AddExam({ onSuccess }: { onSuccess: () => void }) {
       <a
         href="https://drive.google.com/file/d/1trEqAMhrrWS9z8nwf9HpvZaSczRs8bpe/view?usp=sharing"
         style={{ fontSize: '20px', margin: '12px 0 12px' }}
+        className="text-blue-500"
         target="_blank"
       >
         Sinavimi Nasil Kopyalarim
@@ -209,6 +213,7 @@ function AddExam({ onSuccess }: { onSuccess: () => void }) {
         value={examNumber}
         onChange={(e) => setExamNumber(e.target.value)}
         placeholder="Sinav Numarasi"
+        className="border"
         style={{
           fontSize: 16,
           borderRadius: '8px',
@@ -218,6 +223,7 @@ function AddExam({ onSuccess }: { onSuccess: () => void }) {
       <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        className="border"
         style={{
           margin: '1rem 0 1rem',
           borderRadius: '8px',
@@ -226,7 +232,7 @@ function AddExam({ onSuccess }: { onSuccess: () => void }) {
         }}
       />
 
-      <button
+      <Button
         style={{ width: '100%' }}
         onClick={() => {
           if (showResponse && response) {
@@ -239,7 +245,7 @@ function AddExam({ onSuccess }: { onSuccess: () => void }) {
         }}
       >
         {showResponse ? 'Kaydet' : 'Goruntule'}
-      </button>
+      </Button>
       {showResponse && response && (
         <>
           <table style={{ margin: '1rem 0 1rem' }}>
@@ -347,11 +353,11 @@ function App() {
           justifyContent: 'center',
         }}
       >
-        <button onClick={() => setPage('important-subjects')}>
+        <Button onClick={() => setPage('important-subjects')}>
           Onemli Konular
-        </button>
-        <button onClick={() => setPage('analytics')}>Analiz</button>
-        <button onClick={() => setPage('add-exam')}>Sinav Ekle</button>
+        </Button>
+        <Button onClick={() => setPage('analytics')}>Analiz</Button>
+        <Button onClick={() => setPage('add-exam')}>Sinav Ekle</Button>
       </div>
       {page === 'analytics' && (
         <div style={{ marginTop: '2rem' }}>
