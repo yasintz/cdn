@@ -7,7 +7,7 @@ import { UserAnswer, dersler } from './modules/helpers';
 import _ from 'lodash';
 import { parseExam } from './modules/parseExam';
 import { useStore } from './useStore';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 function ImportantSubjects({
   data: { importantSubjects, examCount },
