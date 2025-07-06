@@ -1,13 +1,20 @@
 import { dersler } from '../modules/helpers';
 import { newImpl } from '../new';
+import { UserAnswer } from '../modules/helpers';
+import { useState } from 'react';
 
 interface ImportantSubjectsProps {
   data: ReturnType<typeof newImpl>;
 }
 
+type ViewType = 'frequency' | 'mistakes' | 'empty';
+
 export function ImportantSubjects({
-  data: { importantSubjects, examCount },
+  data: { importantSubjects, examCount, analytics },
 }: ImportantSubjectsProps) {
+  const [selectedView, setSelectedView] = useState<ViewType>('frequency');
+  const [subjectCount, setSubjectCount] = useState<number>(5);
+
   const lessonColors: Record<string, string> = {
     'Türkçe': '#e3f2fd',
     'Matematik': '#f3e5f5',
@@ -53,8 +60,8 @@ export function ImportantSubjects({
     return colors[lesson] || '#6c757d';
   };
 
-  const getIntensityColor = (frequency: number, maxFrequency: number) => {
-    const ratio = frequency / maxFrequency;
+  const getIntensityColor = (value: number, maxValue: number) => {
+    const ratio = value / maxValue;
     if (ratio >= 0.8) return '#d32f2f'; // High intensity - red
     if (ratio >= 0.6) return '#f57c00'; // Medium-high - orange
     if (ratio >= 0.4) return '#fbc02d'; // Medium - yellow
@@ -62,16 +69,91 @@ export function ImportantSubjects({
     return '#388e3c'; // Low intensity - green
   };
 
+  // Get data based on selected view
+  const getViewData = () => {
+    switch (selectedView) {
+      case 'mistakes':
+        return {
+          title: 'En Çok Hata Yapılan Konular',
+          icon: '❌',
+          description: 'Ortalama hata oranına göre sıralanmış konular',
+          data: analytics.subjectBasedData[UserAnswer.False] || [],
+          valueKey: 'rate' as const,
+          valueLabel: 'Hata Oranı',
+          formatValue: (value: number) => `%${(value * 100).toFixed(1)}`,
+          color: '#dc3545'
+        };
+      case 'empty':
+        return {
+          title: 'En Çok Boş Bırakılan Konular',
+          icon: '⭕',
+          description: 'Ortalama boş bırakma oranına göre sıralanmış konular',
+          data: analytics.subjectBasedData[UserAnswer.Skip] || [],
+          valueKey: 'rate' as const,
+          valueLabel: 'Boş Oranı',
+          formatValue: (value: number) => `%${(value * 100).toFixed(1)}`,
+          color: '#6c757d'
+        };
+      default:
+        return {
+          title: 'En Sık Karşılaşılan Konular',
+          icon: '📊',
+          description: 'Sınav verilerinde en sık geçen konular',
+          data: Object.values(importantSubjects.subjectCounts.inAllClass).map(subject => ({
+            ...subject,
+            rate: subject.total / examCount
+          })),
+          valueKey: 'total' as const,
+          valueLabel: 'Toplam Soru',
+          formatValue: (value: number) => `${Math.round(value / examCount)}x`,
+          color: '#007bff'
+        };
+    }
+  };
+
+  const viewData = getViewData();
   const lessons = [...dersler.map((i) => i.name), 'Tum Dersler'];
 
-  // Calculate max frequency for intensity coloring
-  const allSubjects = lessons.flatMap(lesson => 
-    (lesson === 'Tum Dersler'
-      ? importantSubjects.subjectCounts.inAllClass
-      : importantSubjects.subjectCounts.byClass[lesson]
-    )?.filter((i) => i.subject) || []
-  );
-  const maxFrequency = Math.max(...allSubjects.map(subject => Math.round(subject.total / examCount)));
+  // Group data by lesson
+  const getSubjectsByLesson = (lesson: string) => {
+    if (selectedView === 'frequency') {
+      const subjects = (lesson === 'Tum Dersler'
+        ? importantSubjects.subjectCounts.inAllClass
+        : importantSubjects.subjectCounts.byClass[lesson]
+      )?.filter((i) => i.subject)?.slice(0, subjectCount) || [];
+      
+      return subjects.map(subject => ({
+        ...subject,
+        rate: subject.total / examCount,
+        displayValue: Math.round(subject.total / examCount),
+        progressValue: subject.total
+      }));
+    } else {
+      const allSubjects = viewData.data.filter(subject => 
+        lesson === 'Tum Dersler' || subject.className === lesson
+      ).slice(0, subjectCount);
+      
+      return allSubjects.map(subject => ({
+        ...subject,
+        displayValue: subject.rate,
+        progressValue: subject.rate
+      }));
+    }
+  };
+
+  // Calculate max values for progress bars
+  const getAllSubjects = () => {
+    if (selectedView === 'frequency') {
+      return lessons.flatMap(lesson => getSubjectsByLesson(lesson));
+    }
+    return viewData.data.map(subject => ({
+      ...subject,
+      progressValue: subject.rate
+    }));
+  };
+
+  const allSubjects = getAllSubjects();
+  const maxValue = Math.max(...allSubjects.map(s => s.progressValue || s.rate || 0));
 
   if (examCount === 0) {
     return (
@@ -84,7 +166,7 @@ export function ImportantSubjects({
       }}>
         <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎯</div>
         <h2 style={{ margin: '0 0 1rem 0', color: '#6c757d', fontSize: '1.5rem' }}>
-          Önemli Konular
+          Konu Analizi
         </h2>
         <p style={{ margin: '0', color: '#6c757d', fontSize: '1rem' }}>
           Analiz için en az bir sınav verisi gerekiyor.
@@ -105,23 +187,91 @@ export function ImportantSubjects({
         color: 'white',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
       }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎯</div>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{viewData.icon}</div>
         <h1 style={{ 
           margin: '0 0 0.5rem 0', 
           fontSize: '2.5rem', 
           fontWeight: '700',
           textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
-          Önemli Konular
+          {viewData.title}
         </h1>
         <p style={{ 
-          margin: '0', 
+          margin: '0 0 1.5rem 0', 
           fontSize: '1.1rem', 
           opacity: 0.9,
           fontWeight: '300'
         }}>
-          {examCount} sınav verisi analiz edilerek en sık karşılaşılan konular
+          {examCount} sınav verisi - {viewData.description}
         </p>
+
+        {/* View Selector Dropdown */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          gap: '1rem',
+          marginTop: '1rem',
+          flexWrap: 'wrap'
+        }}>
+          <select
+            value={selectedView}
+            onChange={(e) => setSelectedView(e.target.value as ViewType)}
+            style={{
+              padding: '0.75rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'rgba(255, 255, 255, 0.9)',
+              color: '#333',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              minWidth: '250px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            <option value="frequency">📊 En Sık Karşılaşılan Konular</option>
+            <option value="mistakes">❌ En Çok Hata Yapılan Konular</option>
+            <option value="empty">⭕ En Çok Boş Bırakılan Konular</option>
+          </select>
+          
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem',
+            background: 'rgba(255, 255, 255, 0.9)',
+            padding: '0.75rem',
+            borderRadius: '8px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+          }}>
+            <span style={{ 
+              fontSize: '1rem', 
+              fontWeight: '600', 
+              color: '#333',
+              whiteSpace: 'nowrap'
+            }}>
+              📊 Konu Sayısı:
+            </span>
+            <input
+              type="number"
+              min="1"
+              max="20"
+              value={subjectCount}
+              onChange={(e) => setSubjectCount(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+              style={{
+                padding: '0.5rem',
+                borderRadius: '4px',
+                border: '1px solid #ddd',
+                width: '60px',
+                textAlign: 'center',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: '#333',
+                background: 'white'
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -149,19 +299,19 @@ export function ImportantSubjects({
         </div>
 
         <div style={{
-          background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+          background: `linear-gradient(135deg, ${viewData.color} 0%, ${viewData.color}cc 100%)`,
           color: 'white',
           padding: '1.5rem',
           borderRadius: '12px',
           textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(255, 107, 107, 0.3)'
+          boxShadow: `0 4px 20px ${viewData.color}30`
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔥</div>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{viewData.icon}</div>
           <div style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.25rem' }}>
-            {allSubjects.length}
+            {viewData.data.length}
           </div>
           <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-            Toplam Konu
+            Analiz Edilen Konu
           </div>
         </div>
 
@@ -190,10 +340,7 @@ export function ImportantSubjects({
         gap: '2rem',
       }}>
         {lessons.map((lesson) => {
-          const subjects = (lesson === 'Tum Dersler'
-            ? importantSubjects.subjectCounts.inAllClass
-            : importantSubjects.subjectCounts.byClass[lesson]
-          )?.filter((i) => i.subject)?.slice(0, 5) || [];
+          const subjects = getSubjectsByLesson(lesson);
 
           if (subjects.length === 0) return null;
 
@@ -252,8 +399,8 @@ export function ImportantSubjects({
                   fontSize: '0.9rem',
                   color: '#6c757d'
                 }}>
-                  <span>📈</span>
-                  <span>{subjects.length} önemli konu</span>
+                  <span>{viewData.icon}</span>
+                  <span>{subjects.length} konu gösteriliyor</span>
                 </div>
               </div>
 
@@ -261,8 +408,8 @@ export function ImportantSubjects({
               <div style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {subjects.map((subject, index) => {
-                    const frequency = Math.round(subject.total / examCount);
-                    const progressPercentage = (frequency / maxFrequency) * 100;
+                    const progressPercentage = (subject.progressValue / maxValue) * 100;
+                    const averageQuestions = subject.total / examCount;
                     
                     return (
                       <div 
@@ -283,7 +430,7 @@ export function ImportantSubjects({
                           left: 0,
                           width: `${progressPercentage}%`,
                           height: '100%',
-                          background: `linear-gradient(135deg, ${getIntensityColor(frequency, maxFrequency)}20 0%, ${getIntensityColor(frequency, maxFrequency)}10 100%)`,
+                          background: `linear-gradient(135deg, ${viewData.color}20 0%, ${viewData.color}10 100%)`,
                           borderRadius: '12px',
                           transition: 'width 0.5s ease'
                         }} />
@@ -302,7 +449,7 @@ export function ImportantSubjects({
                               gap: '0.5rem'
                             }}>
                               <span style={{
-                                background: getIntensityColor(frequency, maxFrequency),
+                                background: viewData.color,
                                 color: 'white',
                                 padding: '0.25rem 0.5rem',
                                 borderRadius: '16px',
@@ -321,7 +468,10 @@ export function ImportantSubjects({
                                 fontSize: '0.75rem',
                                 fontWeight: '600'
                               }}>
-                                {frequency}x
+                                {selectedView === 'frequency' 
+                                  ? `${Math.round(subject.total / examCount)}x`
+                                  : viewData.formatValue(subject.rate)
+                                }
                               </span>
                             </div>
                             <div style={{
@@ -341,7 +491,7 @@ export function ImportantSubjects({
                             fontWeight: '600',
                             color: '#2c3e50',
                             lineHeight: '1.4',
-                            marginBottom: '0.25rem'
+                            marginBottom: '0.5rem'
                           }}>
                             {subject.subject}
                           </div>
@@ -351,10 +501,17 @@ export function ImportantSubjects({
                             color: '#6c757d',
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                             gap: '0.5rem'
                           }}>
-                            <span>📚</span>
-                            <span>{subject.className}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span>📚</span>
+                              <span>{subject.className}</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span>📝</span>
+                              <span>Ort: {averageQuestions.toFixed(1)} soru</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -388,8 +545,9 @@ export function ImportantSubjects({
           color: '#6c757d',
           lineHeight: '1.4'
         }}>
-          Konular, sınav verilerinizde geçen sıklığına göre sıralanmıştır. 
-          Yüksek sıklıktaki konular daha fazla çalışma gerektirebilir.
+          {selectedView === 'frequency' && 'Konular, sınav verilerinizde geçen sıklığına göre sıralanmıştır.'}
+          {selectedView === 'mistakes' && 'Konular, ortalama hata yapma oranınıza göre sıralanmıştır. Yüksek oranlı konular daha fazla çalışma gerektirebilir.'}
+          {selectedView === 'empty' && 'Konular, ortalama boş bırakma oranınıza göre sıralanmıştır. Bu konularda daha fazla pratik gerekebilir.'}
         </p>
       </div>
     </div>
