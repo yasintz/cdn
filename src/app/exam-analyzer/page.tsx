@@ -45,104 +45,50 @@ function App() {
   };
 
   return (
-    <div style={{ 
-      maxWidth: '1200px', 
-      margin: '0 auto', 
-      padding: '1rem',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
+    <div className="max-w-6xl mx-auto p-4 font-sans">
       {/* Enhanced Navigation */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '12px',
-        padding: '1.5rem',
-        marginBottom: '2rem',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-      }}>
-        <h1 style={{ 
-          textAlign: 'center', 
-          color: 'white', 
-          margin: '0 0 1.5rem 0',
-          fontSize: '2rem',
-          fontWeight: '600'
-        }}>
+      <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 mb-8 shadow-lg">
+        <h1 className="text-center text-white text-3xl font-semibold mb-6">
           Sınav Yönetim Merkezi
         </h1>
         
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-        }}>
+        <div className="flex gap-4 justify-center flex-wrap">
           <Button 
             onClick={() => setPage('all-exams')}
-            style={{
-              backgroundColor: page === 'all-exams' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-              color: page === 'all-exams' ? '#667eea' : 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: page === 'all-exams' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
-            }}
+            className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
+              page === 'all-exams' 
+                ? 'bg-white text-indigo-600 shadow-md' 
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
           >
             📋 Tüm Sınavlar
           </Button>
           
           <Button 
             onClick={() => setPage('important-subjects')}
-            style={{
-              backgroundColor: page === 'important-subjects' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-              color: page === 'important-subjects' ? '#667eea' : 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: page === 'important-subjects' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
-            }}
+            className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
+              page === 'important-subjects' 
+                ? 'bg-white text-indigo-600 shadow-md' 
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
           >
             🎯 Önemli Konular
           </Button>
           
           <Button 
             onClick={() => setPage('text-editor')}
-            style={{
-              backgroundColor: page === 'text-editor' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-              color: page === 'text-editor' ? '#667eea' : 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: page === 'text-editor' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
-            }}
+            className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
+              page === 'text-editor' 
+                ? 'bg-white text-indigo-600 shadow-md' 
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
           >
             ✏️ Metin Editörü
           </Button>
           
           <Button 
             onClick={() => setIsAddExamModalOpen(true)}
-            style={{
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-            }}
+            className="bg-green-600 text-white px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shadow-md hover:bg-green-700 border-none"
           >
             ➕ Sınav Ekle
           </Button>
@@ -151,19 +97,8 @@ function App() {
 
       {/* Time Slider for Important Subjects */}
       {page === 'important-subjects' && exams.length > 0 && (
-        <div style={{ 
-          marginBottom: '2rem',
-          padding: '1.5rem',
-          background: '#f8f9fa',
-          borderRadius: '12px',
-          border: '1px solid #e9ecef'
-        }}>
-          <h3 style={{ 
-            textAlign: 'center', 
-            margin: '0 0 1rem 0',
-            color: '#495057',
-            fontSize: '1.1rem'
-          }}>
+        <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
+          <h3 className="text-center text-gray-700 text-lg font-medium mb-4">
             Sınav Zaman Aralığı ({parseInt(time, 10) + 1} / {exams.length} sınav)
           </h3>
           <input
@@ -171,25 +106,12 @@ function App() {
             type="range"
             min="0"
             value={time}
-            style={{ 
-              width: '100%',
-              height: '6px',
-              borderRadius: '3px',
-              background: '#ddd',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
+            className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
             onChange={(e) => setTime(e.target.value)}
             max={exams.length - 1}
             step="1"
           />
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            marginTop: '0.5rem',
-            fontSize: '0.9rem',
-            color: '#6c757d'
-          }}>
+          <div className="flex justify-between mt-2 text-sm text-gray-500">
             <span>İlk Sınav</span>
             <span>Son Sınav</span>
           </div>
@@ -197,13 +119,7 @@ function App() {
       )}
 
       {/* Page Content */}
-      <div style={{
-        background: 'white',
-        borderRadius: '12px',
-        padding: '2rem',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        minHeight: '600px'
-      }}>
+      <div className="bg-white rounded-xl p-8 shadow-sm min-h-[600px]">
         {pages[page]}
       </div>
       

@@ -36,18 +36,18 @@ export function AllExams() {
 
   const getLessonColor = (lesson: string) => {
     const colors: Record<string, string> = {
-      'Türkçe': '#e3f2fd',
-      'Matematik': '#f3e5f5',
-      'Tarih': '#fff3e0',
-      'Coğrafya': '#e8f5e8',
-      'Felsefe': '#fce4ec',
-      'Din Kültürü': '#f1f8e9',
-      'Fizik': '#e0f2f1',
-      'Kimya': '#fff8e1',
-      'Biyoloji': '#f3e5f5',
-      'Geometri': '#e8eaf6'
+      'Türkçe': 'bg-blue-50',
+      'Matematik': 'bg-purple-50',
+      'Tarih': 'bg-orange-50',
+      'Coğrafya': 'bg-green-50',
+      'Felsefe': 'bg-pink-50',
+      'Din Kültürü': 'bg-lime-50',
+      'Fizik': 'bg-teal-50',
+      'Kimya': 'bg-yellow-50',
+      'Biyoloji': 'bg-purple-50',
+      'Geometri': 'bg-indigo-50'
     };
-    return colors[lesson] || '#f5f5f5';
+    return colors[lesson] || 'bg-gray-50';
   };
 
   const getLessonIcon = (lesson: string) => {
@@ -68,17 +68,11 @@ export function AllExams() {
 
   if (exams.length === 0) {
     return (
-      <div style={{ 
-        textAlign: 'center', 
-        padding: '4rem 2rem',
-        background: '#f8f9fa',
-        borderRadius: '12px',
-        border: '1px solid #e9ecef'
-      }}>
-        <h2 style={{ margin: '0 0 1rem 0', color: '#6c757d' }}>
+      <div className="text-center py-16 px-8 bg-gray-50 rounded-xl border border-gray-200">
+        <h2 className="text-xl font-medium text-gray-500 mb-4">
           📋 Henüz hiç sınav eklenmemiş
         </h2>
-        <p style={{ margin: '0', color: '#6c757d' }}>
+        <p className="text-gray-500">
           Sınav eklemek için "Sınav Ekle" butonunu kullanın.
         </p>
       </div>
@@ -154,113 +148,54 @@ export function AllExams() {
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <h2 style={{ 
-        textAlign: 'center', 
-        marginBottom: '2rem',
-        color: '#333',
-        fontSize: '2rem'
-      }}>
+    <div className="max-w-6xl mx-auto">
+      <h2 className="text-center mb-8 text-gray-800 text-3xl font-bold">
         📋 Tüm Sınavlar
       </h2>
       
       {averages && (
-        <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: '12px',
-          padding: '2rem',
-          marginBottom: '2rem',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          color: 'white'
-        }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', textAlign: 'center', fontSize: '1.5rem' }}>
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-8 mb-8 shadow-lg text-white">
+          <h3 className="text-center text-2xl font-semibold mb-6">
             📊 Ortalama Performans ({exams.length} sınav)
           </h3>
           
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
-            gap: '1rem', 
-            marginBottom: '2rem' 
-          }}>
-            <div style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-              padding: '1rem', 
-              borderRadius: '8px',
-              textAlign: 'center',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>✅ Ortalama Doğru</div>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.correct.toFixed(1)}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white/20 p-4 rounded-lg text-center backdrop-blur-sm">
+              <div className="font-bold mb-2">✅ Ortalama Doğru</div>
+              <div className="text-2xl font-bold">{averages.overall.correct.toFixed(1)}</div>
             </div>
             
-            <div style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-              padding: '1rem', 
-              borderRadius: '8px',
-              textAlign: 'center',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>❌ Ortalama Yanlış</div>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.wrong.toFixed(1)}</div>
+            <div className="bg-white/20 p-4 rounded-lg text-center backdrop-blur-sm">
+              <div className="font-bold mb-2">❌ Ortalama Yanlış</div>
+              <div className="text-2xl font-bold">{averages.overall.wrong.toFixed(1)}</div>
             </div>
             
-            <div style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-              padding: '1rem', 
-              borderRadius: '8px',
-              textAlign: 'center',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>⭕ Ortalama Boş</div>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.skip.toFixed(1)}</div>
+            <div className="bg-white/20 p-4 rounded-lg text-center backdrop-blur-sm">
+              <div className="font-bold mb-2">⭕ Ortalama Boş</div>
+              <div className="text-2xl font-bold">{averages.overall.skip.toFixed(1)}</div>
             </div>
             
-            <div style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-              padding: '1rem', 
-              borderRadius: '8px',
-              textAlign: 'center',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>🎯 Ortalama Net</div>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.net.toFixed(1)}</div>
+            <div className="bg-white/20 p-4 rounded-lg text-center backdrop-blur-sm">
+              <div className="font-bold mb-2">🎯 Ortalama Net</div>
+              <div className="text-2xl font-bold">{averages.overall.net.toFixed(1)}</div>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.3)', paddingTop: '1.5rem' }}>
-            <h4 style={{ margin: '0 0 1rem 0', textAlign: 'center', fontSize: '1.2rem' }}>
+          <div className="border-t border-white/30 pt-6">
+            <h4 className="text-center text-xl font-medium mb-4">
               📚 Ders Bazlı Ortalamalar
             </h4>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', 
-              gap: '1rem' 
-            }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {averages.subjects.map((subject) => (
-                <div key={subject.lesson} style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  padding: '1rem',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  backdropFilter: 'blur(5px)'
-                }}>
-                  <div style={{ 
-                    fontWeight: 'bold', 
-                    fontSize: '14px', 
-                    marginBottom: '0.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem'
-                  }}>
+                <div key={subject.lesson} className="bg-white/15 p-4 rounded-lg text-center backdrop-blur-sm">
+                  <div className="font-bold text-sm mb-2 flex items-center justify-center gap-2">
                     <span>{getLessonIcon(subject.lesson)}</span>
                     <span>{subject.lesson}</span>
                   </div>
-                  <div style={{ fontSize: '12px', marginBottom: '0.5rem', opacity: 0.9 }}>
+                  <div className="text-xs mb-2 opacity-90">
                     D:{subject.correct.toFixed(1)} Y:{subject.wrong.toFixed(1)} B:{subject.skip.toFixed(1)}
                   </div>
-                  <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                  <div className="text-sm font-bold">
                     Net: {subject.net.toFixed(1)}
                   </div>
                 </div>
@@ -270,7 +205,7 @@ export function AllExams() {
         </div>
       )}
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div className="flex flex-col gap-8">
         {exams.map((exam) => {
           const summary = getExamSummary(exam);
           const totalQuestions = Object.values(summary).reduce((acc, curr) => acc + curr.total, 0);
@@ -283,65 +218,36 @@ export function AllExams() {
           return (
             <div 
               key={exam.id}
-              style={{
-                background: 'white',
-                border: '1px solid #e9ecef',
-                borderRadius: '12px',
-                padding: '0',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                overflow: 'hidden'
-              }}
+              className="bg-white border border-gray-200 rounded-xl p-0 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             >
               {/* Exam Header */}
-              <div style={{
-                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-                padding: '1.5rem',
-                borderBottom: '1px solid #e9ecef',
-                cursor: 'pointer'
-              }} onClick={() => setExpandedExam(isExpanded ? null : exam.id)}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div 
+                className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200 cursor-pointer hover:from-gray-100 hover:to-gray-200 transition-colors" 
+                onClick={() => setExpandedExam(isExpanded ? null : exam.id)}
+              >
+                <div className="flex justify-between items-center">
                   <div>
-                    <h3 style={{ 
-                      margin: '0 0 0.5rem 0', 
-                      color: '#495057',
-                      fontSize: '1.4rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}>
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2 flex items-center gap-2">
                       📝 Sınav #{exam.id}
-                      <span style={{ fontSize: '1rem', color: '#6c757d' }}>
+                      <span className="text-base text-gray-500">
                         {isExpanded ? '▼' : '▶'}
                       </span>
                     </h3>
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
-                      gap: '1rem',
-                      fontSize: '14px'
-                    }}>
-                      <div style={{ color: '#28a745' }}>✅ Doğru: {totalCorrect}</div>
-                      <div style={{ color: '#dc3545' }}>❌ Yanlış: {totalWrong}</div>
-                      <div style={{ color: '#6c757d' }}>⭕ Boş: {totalSkip}</div>
-                      <div style={{ color: '#007bff', fontWeight: 'bold' }}>🎯 Net: {totalNet.toFixed(1)}</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                      <div className="text-green-600 font-medium">✅ Doğru: {totalCorrect}</div>
+                      <div className="text-red-600 font-medium">❌ Yanlış: {totalWrong}</div>
+                      <div className="text-gray-500 font-medium">⭕ Boş: {totalSkip}</div>
+                      <div className="text-blue-600 font-bold">🎯 Net: {totalNet.toFixed(1)}</div>
                     </div>
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div className="flex gap-2">
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEdit(exam);
                       }}
-                      style={{
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        cursor: 'pointer'
-                      }}
+                      className="bg-blue-600 text-white border-none px-4 py-2 rounded text-sm cursor-pointer hover:bg-blue-700 transition-colors"
                     >
                       ✏️ Düzenle
                     </Button>
@@ -350,15 +256,7 @@ export function AllExams() {
                         e.stopPropagation();
                         handleDelete(exam);
                       }}
-                      style={{
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        cursor: 'pointer'
-                      }}
+                      className="bg-red-600 text-white border-none px-4 py-2 rounded text-sm cursor-pointer hover:bg-red-700 transition-colors"
                     >
                       🗑️ Sil
                     </Button>
@@ -368,123 +266,60 @@ export function AllExams() {
 
               {/* Expanded Lesson Details */}
               {isExpanded && (
-                <div style={{ padding: '1.5rem' }}>
-                  <h4 style={{ 
-                    margin: '0 0 1.5rem 0', 
-                    color: '#495057',
-                    fontSize: '1.2rem',
-                    textAlign: 'center'
-                  }}>
+                <div className="p-6">
+                  <h4 className="text-gray-700 text-lg font-medium text-center mb-6">
                     📚 Ders Detayları
                   </h4>
                   
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                    gap: '1.5rem' 
-                  }}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Object.entries(summary).map(([lesson, data]) => (
-                      <div key={lesson} style={{ 
-                        backgroundColor: getLessonColor(lesson),
-                        padding: '1.5rem',
-                        borderRadius: '8px',
-                        border: '1px solid #e9ecef',
-                        position: 'relative'
-                      }}>
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '0.5rem',
-                          marginBottom: '1rem'
-                        }}>
-                          <span style={{ fontSize: '1.5rem' }}>{getLessonIcon(lesson)}</span>
-                          <h5 style={{ 
-                            margin: '0', 
-                            fontWeight: 'bold', 
-                            fontSize: '1.1rem',
-                            color: '#333'
-                          }}>
+                      <div key={lesson} className={`${getLessonColor(lesson)} p-6 rounded-lg border border-gray-200 relative`}>
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="text-2xl">{getLessonIcon(lesson)}</span>
+                          <h5 className="font-bold text-lg text-gray-800">
                             {lesson}
                           </h5>
                         </div>
                         
-                        <div style={{ 
-                          display: 'grid', 
-                          gridTemplateColumns: '1fr 1fr', 
-                          gap: '0.5rem',
-                          marginBottom: '1rem'
-                        }}>
-                          <div style={{ 
-                            textAlign: 'center',
-                            padding: '0.5rem',
-                            background: 'rgba(255, 255, 255, 0.7)',
-                            borderRadius: '4px'
-                          }}>
-                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Doğru</div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#28a745' }}>
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                          <div className="text-center p-2 bg-white/70 rounded">
+                            <div className="text-xs text-gray-600">Doğru</div>
+                            <div className="text-lg font-bold text-green-600">
                               {data.correct}
                             </div>
                           </div>
                           
-                          <div style={{ 
-                            textAlign: 'center',
-                            padding: '0.5rem',
-                            background: 'rgba(255, 255, 255, 0.7)',
-                            borderRadius: '4px'
-                          }}>
-                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Yanlış</div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc3545' }}>
+                          <div className="text-center p-2 bg-white/70 rounded">
+                            <div className="text-xs text-gray-600">Yanlış</div>
+                            <div className="text-lg font-bold text-red-600">
                               {data.wrong}
                             </div>
                           </div>
                           
-                          <div style={{ 
-                            textAlign: 'center',
-                            padding: '0.5rem',
-                            background: 'rgba(255, 255, 255, 0.7)',
-                            borderRadius: '4px'
-                          }}>
-                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Boş</div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#6c757d' }}>
+                          <div className="text-center p-2 bg-white/70 rounded">
+                            <div className="text-xs text-gray-600">Boş</div>
+                            <div className="text-lg font-bold text-gray-500">
                               {data.skip}
                             </div>
                           </div>
                           
-                          <div style={{ 
-                            textAlign: 'center',
-                            padding: '0.5rem',
-                            background: 'rgba(255, 255, 255, 0.7)',
-                            borderRadius: '4px'
-                          }}>
-                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Net</div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#007bff' }}>
+                          <div className="text-center p-2 bg-white/70 rounded">
+                            <div className="text-xs text-gray-600">Net</div>
+                            <div className="text-lg font-bold text-blue-600">
                               {calculateNet(data.correct, data.wrong).toFixed(1)}
                             </div>
                           </div>
                         </div>
                         
                         {/* Progress Bar */}
-                        <div style={{
-                          width: '100%',
-                          height: '8px',
-                          background: '#e9ecef',
-                          borderRadius: '4px',
-                          overflow: 'hidden'
-                        }}>
-                          <div style={{
-                            height: '100%',
-                            background: 'linear-gradient(90deg, #28a745 0%, #28a745 50%, #dc3545 50%, #dc3545 100%)',
-                            width: `${((data.correct + data.wrong) / data.total) * 100}%`,
-                            transition: 'width 0.3s ease'
-                          }} />
+                        <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mb-2">
+                          <div 
+                            className="h-full bg-gradient-to-r from-green-500 via-green-500 to-red-500 transition-all duration-300"
+                            style={{ width: `${((data.correct + data.wrong) / data.total) * 100}%` }}
+                          />
                         </div>
                         
-                        <div style={{ 
-                          fontSize: '11px', 
-                          color: '#6c757d',
-                          textAlign: 'center',
-                          marginTop: '0.5rem'
-                        }}>
+                        <div className="text-xs text-gray-600 text-center">
                           {data.total} soru • %{((data.correct / data.total) * 100).toFixed(1)} başarı
                         </div>
                       </div>

@@ -180,36 +180,19 @@ Biyoloji
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <h2 style={{ 
-        textAlign: 'center', 
-        marginBottom: '2rem',
-        color: '#333',
-        fontSize: '2rem'
-      }}>
+    <div className="max-w-6xl mx-auto">
+      <h2 className="text-center mb-8 text-gray-800 text-3xl font-bold">
         ✏️ Metin Editörü
       </h2>
       
       {/* Exam Selection */}
-      <div style={{
-        marginBottom: '2rem',
-        padding: '1.5rem',
-        background: '#f8f9fa',
-        borderRadius: '12px',
-        border: '1px solid #e9ecef'
-      }}>
-        <h3 style={{ margin: '0 0 1rem 0', color: '#495057' }}>Sınav Seç</h3>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
+        <h3 className="text-gray-700 text-lg font-medium mb-4">Sınav Seç</h3>
+        <div className="flex gap-4 items-center flex-wrap">
           <select
             value={selectedExamId}
             onChange={(e) => setSelectedExamId(e.target.value)}
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid #ced4da',
-              borderRadius: '6px',
-              fontSize: '14px',
-              minWidth: '200px'
-            }}
+            className="px-4 py-2 border border-gray-300 rounded text-sm min-w-[200px] focus:border-blue-500 outline-none"
           >
             <option value="">Sınav seçin...</option>
             <option value="new">🆕 Yeni Sınav</option>
@@ -221,31 +204,17 @@ Biyoloji
           </select>
           
           {selectedExamId && (
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="flex gap-2">
               <Button
                 onClick={handlePreview}
-                style={{
-                  backgroundColor: '#17a2b8',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '6px',
-                  fontSize: '14px'
-                }}
+                className="bg-cyan-600 text-white border-none px-4 py-2 rounded text-sm hover:bg-cyan-700 transition-colors"
               >
                 👁️ Önizleme
               </Button>
               
               <Button
                 onClick={handleSave}
-                style={{
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '6px',
-                  fontSize: '14px'
-                }}
+                className="bg-green-600 text-white border-none px-4 py-2 rounded text-sm hover:bg-green-700 transition-colors"
               >
                 💾 Kaydet
               </Button>
@@ -253,14 +222,7 @@ Biyoloji
               {isEditing && (
                 <Button
                   onClick={handleDelete}
-                  style={{
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '6px',
-                    fontSize: '14px'
-                  }}
+                  className="bg-red-600 text-white border-none px-4 py-2 rounded text-sm hover:bg-red-700 transition-colors"
                 >
                   🗑️ Sil
                 </Button>
@@ -271,22 +233,16 @@ Biyoloji
       </div>
 
       {selectedExamId && (
-        <div style={{ display: 'flex', gap: '2rem', minHeight: '600px' }}>
+        <div className="flex gap-8 min-h-[600px]">
           {/* Text Editor */}
-          <div style={{ flex: 1 }}>
-            <div style={{
-              background: 'white',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              height: '100%'
-            }}>
-              <h3 style={{ margin: '0 0 1rem 0', color: '#495057' }}>
+          <div className="flex-1">
+            <div className="bg-white rounded-xl p-6 shadow-sm h-full">
+              <h3 className="text-gray-700 text-lg font-medium mb-4">
                 📝 Sınav Metni
               </h3>
               
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+              <div className="mb-4">
+                <label className="block mb-2 font-bold text-gray-800">
                   Sınav ID:
                 </label>
                 <input
@@ -294,45 +250,23 @@ Biyoloji
                   value={examId}
                   onChange={(e) => setExamId(e.target.value)}
                   placeholder="Örnek: 2024-01-15"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #ced4da',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                  }}
+                  className="w-full px-3 py-3 border border-gray-300 rounded text-sm focus:border-blue-500 outline-none transition-colors"
                 />
               </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+              <div className="mb-4">
+                <label className="block mb-2 font-bold text-gray-800">
                   Sınav İçeriği:
                 </label>
                 <textarea
                   value={examContent}
                   onChange={(e) => setExamContent(e.target.value)}
                   placeholder="Sınav içeriğini buraya yazın..."
-                  style={{
-                    width: '100%',
-                    height: '500px',
-                    padding: '1rem',
-                    border: '1px solid #ced4da',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'Consolas, Monaco, monospace',
-                    lineHeight: '1.5',
-                    resize: 'vertical'
-                  }}
+                  className="w-full h-[500px] px-4 py-4 border border-gray-300 rounded text-sm font-mono leading-relaxed resize-y focus:border-blue-500 outline-none transition-colors"
                 />
               </div>
 
-              <div style={{
-                padding: '1rem',
-                background: '#e3f2fd',
-                borderRadius: '6px',
-                fontSize: '12px',
-                color: '#1565c0'
-              }}>
+              <div className="p-4 bg-blue-50 rounded text-xs text-blue-800">
                 <strong>Format:</strong> Her ders adından sonra sorular yazılmalı. 
                 <br />
                 <strong>Soru formatı:</strong> [Soru No] [Konu] [Doğru Cevap] [Verilen Cevap] [+/-/boş/IPT]
@@ -344,59 +278,40 @@ Biyoloji
 
           {/* Preview */}
           {previewMode && parsedPreview && (
-            <div style={{ flex: 1 }}>
-              <div style={{
-                background: 'white',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                height: '100%',
-                overflow: 'auto'
-              }}>
-                <h3 style={{ margin: '0 0 1rem 0', color: '#495057' }}>
+            <div className="flex-1">
+              <div className="bg-white rounded-xl p-6 shadow-sm h-full overflow-auto">
+                <h3 className="text-gray-700 text-lg font-medium mb-4">
                   👁️ Önizleme
                 </h3>
                 
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <h4 style={{ 
-                    margin: '0 0 0.5rem 0', 
-                    color: '#28a745',
-                    fontSize: '1.1rem'
-                  }}>
+                <div className="mb-6">
+                  <h4 className="text-green-600 text-lg font-medium mb-2">
                     Sınav #{parsedPreview.id}
                   </h4>
                 </div>
 
                 {/* Lesson Statistics */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <h4 style={{ margin: '0 0 1rem 0', color: '#495057' }}>
+                <div className="mb-6">
+                  <h4 className="text-gray-700 text-base font-medium mb-4">
                     📊 Ders Bazlı İstatistikler
                   </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div className="flex flex-col gap-2">
                     {Object.entries(getLessonStats(parsedPreview)).map(([lesson, stats]) => (
-                      <div key={lesson} style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '0.75rem',
-                        background: '#f8f9fa',
-                        borderRadius: '6px',
-                        border: '1px solid #e9ecef'
-                      }}>
-                        <div style={{ fontWeight: 'bold', color: '#495057' }}>
+                      <div key={lesson} className="flex justify-between items-center p-3 bg-gray-50 rounded border border-gray-200">
+                        <div className="font-bold text-gray-700">
                           {lesson}
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem', fontSize: '13px' }}>
-                          <span style={{ color: '#28a745' }}>
+                        <div className="flex gap-4 text-sm">
+                          <span className="text-green-600">
                             ✅ {stats.correct}
                           </span>
-                          <span style={{ color: '#dc3545' }}>
+                          <span className="text-red-600">
                             ❌ {stats.wrong}
                           </span>
-                          <span style={{ color: '#6c757d' }}>
+                          <span className="text-gray-500">
                             ⭕ {stats.skip}
                           </span>
-                          <span style={{ color: '#007bff', fontWeight: 'bold' }}>
+                          <span className="text-blue-600 font-bold">
                             Net: {(stats.correct - stats.wrong / 4).toFixed(1)}
                           </span>
                         </div>
@@ -407,41 +322,21 @@ Biyoloji
 
                 {/* Lesson Details */}
                 <div>
-                  <h4 style={{ margin: '0 0 1rem 0', color: '#495057' }}>
+                  <h4 className="text-gray-700 text-base font-medium mb-4">
                     📚 Ders Detayları
                   </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="flex flex-col gap-4">
                     {Object.entries(parsedPreview.examResponse).map(([lesson, subjects]) => (
-                      <div key={lesson} style={{
-                        padding: '1rem',
-                        background: '#f8f9fa',
-                        borderRadius: '8px',
-                        border: '1px solid #e9ecef'
-                      }}>
-                        <h5 style={{ 
-                          margin: '0 0 0.5rem 0', 
-                          color: '#495057',
-                          fontSize: '1rem'
-                        }}>
+                      <div key={lesson} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h5 className="text-gray-700 text-base font-medium mb-2">
                           {lesson}
                         </h5>
-                        <div style={{ fontSize: '12px', color: '#6c757d' }}>
+                        <div className="text-xs text-gray-600 mb-2">
                           {Object.keys(subjects).length} farklı konu
                         </div>
-                        <div style={{ 
-                          marginTop: '0.5rem',
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: '0.25rem'
-                        }}>
+                        <div className="flex flex-wrap gap-1 mt-2">
                           {Object.keys(subjects).map(subject => (
-                            <span key={subject} style={{
-                              padding: '0.25rem 0.5rem',
-                              background: '#e3f2fd',
-                              borderRadius: '4px',
-                              fontSize: '11px',
-                              color: '#1565c0'
-                            }}>
+                            <span key={subject} className="px-2 py-1 bg-blue-50 rounded text-xs text-blue-800">
                               {subject}
                             </span>
                           ))}
@@ -457,17 +352,11 @@ Biyoloji
       )}
 
       {!selectedExamId && (
-        <div style={{
-          textAlign: 'center',
-          padding: '4rem 2rem',
-          background: '#f8f9fa',
-          borderRadius: '12px',
-          border: '1px solid #e9ecef'
-        }}>
-          <h3 style={{ margin: '0 0 1rem 0', color: '#6c757d' }}>
+        <div className="text-center py-16 px-8 bg-gray-50 rounded-xl border border-gray-200">
+          <h3 className="text-gray-500 text-xl font-medium mb-4">
             📝 Sınav Düzenle
           </h3>
-          <p style={{ margin: '0', color: '#6c757d' }}>
+          <p className="text-gray-500">
             Yukarıdan bir sınav seçin veya yeni sınav oluşturun
           </p>
         </div>

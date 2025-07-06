@@ -152,110 +152,44 @@ export function EditExamModal({
   const lessonsOrder = ['Türkçe', 'Matematik', 'Geometri', 'Tarih', 'Coğrafya', 'Felsefe', 'Din Kültürü', 'Fizik', 'Kimya', 'Biyoloji'];
 
   return (
-    <div className="modal-overlay" style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-    }}>
-      <div className="modal-content" style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        width: '95%',
-        maxWidth: '1400px',
-        maxHeight: '90vh',
-        overflow: 'hidden',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-        border: '1px solid #ddd',
-      }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]">
+      <div className="bg-white rounded-lg w-[95%] max-w-7xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-300">
         {/* Header */}
-        <div style={{
-          padding: '1rem 1.5rem',
-          borderBottom: '1px solid #ddd',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: '#f8f9fa',
-        }}>
-          <h2 style={{ 
-            margin: 0, 
-            fontSize: '1.1rem', 
-            fontWeight: '600',
-            color: '#333',
-          }}>
+        <div className="px-6 py-4 border-b border-gray-300 flex items-center justify-between bg-gray-50">
+          <h2 className="text-lg font-semibold text-gray-800">
             Sınav Düzenle
           </h2>
           <button
             onClick={handleClose}
-            style={{
-              padding: '0.5rem',
-              borderRadius: '4px',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: '#666',
-              cursor: 'pointer',
-            }}
+            className="p-2 rounded hover:bg-gray-200 text-gray-600 cursor-pointer transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Content */}
-        <div style={{
-          padding: '1.5rem',
-          maxHeight: 'calc(90vh - 120px)',
-          overflowY: 'auto',
-        }}>
+        <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
           {error && (
-            <div style={{
-              backgroundColor: '#fee',
-              border: '1px solid #fcc',
-              borderRadius: '4px',
-              padding: '0.75rem',
-              marginBottom: '1rem',
-              color: '#c33',
-              fontSize: '0.9rem',
-            }}>
+            <div className="bg-red-50 border border-red-200 rounded px-3 py-3 mb-4 text-red-800 text-sm">
               {error}
             </div>
           )}
 
           {/* Exam ID */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ 
-              display: 'block',
-              marginBottom: '0.5rem', 
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              color: '#333',
-            }}>
+          <div className="mb-6">
+            <label className="block mb-2 text-sm font-medium text-gray-800">
               Sınav ID
             </label>
             <input
               type="text"
               value={examId}
               onChange={(e) => setExamId(e.target.value)}
-              style={{
-                width: '300px',
-                padding: '0.5rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                outline: 'none',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#007bff'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
+              className="w-80 px-2 py-2 border border-gray-300 rounded text-sm outline-none focus:border-blue-500 transition-colors"
             />
           </div>
 
           {/* Lessons Tables */}
-          <div style={{ display: 'grid', gap: '2rem' }}>
+          <div className="grid gap-8">
             {lessonsOrder.map(lessonName => {
               const lessonData = lessonsData[lessonName];
               
@@ -266,38 +200,15 @@ export function EditExamModal({
               const questions = Object.entries(lessonData).sort(([a], [b]) => parseInt(a) - parseInt(b));
 
               return (
-                <div key={lessonName} style={{ pageBreakInside: 'avoid' }}>
+                <div key={lessonName} className="break-inside-avoid">
                   {/* Lesson Header */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: '0.75rem',
-                    paddingBottom: '0.5rem',
-                    borderBottom: '2px solid #333',
-                  }}>
-                    <h3 style={{ 
-                      margin: 0, 
-                      fontSize: '1rem', 
-                      fontWeight: '600',
-                      color: '#333',
-                    }}>
+                  <div className="flex items-center justify-between mb-3 pb-2 border-b-2 border-gray-800">
+                    <h3 className="text-base font-semibold text-gray-800">
                       {lessonName}
                     </h3>
                     <button
                       onClick={() => addQuestion(lessonName)}
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        border: '1px solid #ddd',
-                        backgroundColor: '#f8f9fa',
-                        color: '#666',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                      }}
+                      className="px-2 py-1 rounded border border-gray-300 bg-gray-50 text-gray-600 cursor-pointer text-sm flex items-center gap-1 hover:bg-gray-100 transition-colors"
                       title="Soru Ekle"
                     >
                       <Plus size={14} />
@@ -306,120 +217,49 @@ export function EditExamModal({
                   </div>
 
                   {/* Questions Table */}
-                  <table style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    fontSize: '0.85rem',
-                    backgroundColor: 'white',
-                    border: '1px solid #ddd',
-                  }}>
+                  <table className="w-full border-collapse text-sm bg-white border border-gray-300">
                     <thead>
-                      <tr style={{ backgroundColor: '#f8f9fa' }}>
-                        <th style={{ 
-                          padding: '0.5rem', 
-                          textAlign: 'left', 
-                          borderRight: '1px solid #ddd',
-                          width: '60px',
-                          fontWeight: '500',
-                        }}>
+                      <tr className="bg-gray-50">
+                        <th className="p-2 text-left border-r border-gray-300 w-16 font-medium">
                           No
                         </th>
-                        <th style={{ 
-                          padding: '0.5rem', 
-                          textAlign: 'left', 
-                          borderRight: '1px solid #ddd',
-                          fontWeight: '500',
-                        }}>
+                        <th className="p-2 text-left border-r border-gray-300 font-medium">
                           Soru
                         </th>
-                        <th style={{ 
-                          padding: '0.5rem', 
-                          textAlign: 'center', 
-                          borderRight: '1px solid #ddd',
-                          width: '80px',
-                          fontWeight: '500',
-                        }}>
+                        <th className="p-2 text-center border-r border-gray-300 w-20 font-medium">
                           Doğru
                         </th>
-                        <th style={{ 
-                          padding: '0.5rem', 
-                          textAlign: 'center', 
-                          borderRight: '1px solid #ddd',
-                          width: '80px',
-                          fontWeight: '500',
-                        }}>
+                        <th className="p-2 text-center border-r border-gray-300 w-20 font-medium">
                           Verilen
                         </th>
-                        <th style={{ 
-                          padding: '0.5rem', 
-                          textAlign: 'center', 
-                          borderRight: '1px solid #ddd',
-                          width: '80px',
-                          fontWeight: '500',
-                        }}>
+                        <th className="p-2 text-center border-r border-gray-300 w-20 font-medium">
                           Durum
                         </th>
-                        <th style={{ 
-                          padding: '0.5rem', 
-                          textAlign: 'center',
-                          width: '40px',
-                          fontWeight: '500',
-                        }}>
+                        <th className="p-2 text-center w-10 font-medium">
                           ⚙️
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {questions.map(([questionNumber, questionData]) => (
-                        <tr key={questionNumber} style={{ borderBottom: '1px solid #eee' }}>
-                          <td style={{ 
-                            padding: '0.5rem', 
-                            borderRight: '1px solid #eee',
-                            fontWeight: '500',
-                            color: '#666',
-                          }}>
+                        <tr key={questionNumber} className="border-b border-gray-200">
+                          <td className="p-2 border-r border-gray-200 font-medium text-gray-600">
                             {questionNumber}
                           </td>
-                          <td style={{ 
-                            padding: '0.5rem', 
-                            borderRight: '1px solid #eee',
-                          }}>
+                          <td className="p-2 border-r border-gray-200">
                             <input
                               type="text"
                               value={questionData.question}
                               onChange={(e) => updateQuestion(lessonName, questionNumber, 'question', e.target.value)}
                               placeholder="Soru metnini girin..."
-                              style={{
-                                width: '100%',
-                                padding: '0.25rem',
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '0.85rem',
-                                backgroundColor: 'transparent',
-                              }}
-                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
-                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                              className="w-full px-1 py-1 border-none outline-none text-sm bg-transparent focus:bg-gray-50 transition-colors"
                             />
                           </td>
-                          <td style={{ 
-                            padding: '0.5rem', 
-                            textAlign: 'center',
-                            borderRight: '1px solid #eee',
-                          }}>
+                          <td className="p-2 text-center border-r border-gray-200">
                             <select
                               value={questionData.rightAnswer}
                               onChange={(e) => updateQuestion(lessonName, questionNumber, 'rightAnswer', e.target.value)}
-                              style={{
-                                width: '100%',
-                                padding: '0.25rem',
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '0.85rem',
-                                backgroundColor: 'transparent',
-                                textAlign: 'center',
-                              }}
-                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
-                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                              className="w-full px-1 py-1 border-none outline-none text-sm bg-transparent text-center focus:bg-gray-50 transition-colors"
                             >
                               <option value="">-</option>
                               <option value="A">A</option>
@@ -429,25 +269,11 @@ export function EditExamModal({
                               <option value="E">E</option>
                             </select>
                           </td>
-                          <td style={{ 
-                            padding: '0.5rem', 
-                            textAlign: 'center',
-                            borderRight: '1px solid #eee',
-                          }}>
+                          <td className="p-2 text-center border-r border-gray-200">
                             <select
                               value={questionData.givenAnswer}
                               onChange={(e) => updateQuestion(lessonName, questionNumber, 'givenAnswer', e.target.value)}
-                              style={{
-                                width: '100%',
-                                padding: '0.25rem',
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '0.85rem',
-                                backgroundColor: 'transparent',
-                                textAlign: 'center',
-                              }}
-                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
-                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                              className="w-full px-1 py-1 border-none outline-none text-sm bg-transparent text-center focus:bg-gray-50 transition-colors"
                             >
                               <option value="">-</option>
                               <option value="A">A</option>
@@ -457,25 +283,11 @@ export function EditExamModal({
                               <option value="E">E</option>
                             </select>
                           </td>
-                          <td style={{ 
-                            padding: '0.5rem', 
-                            textAlign: 'center',
-                            borderRight: '1px solid #eee',
-                          }}>
+                          <td className="p-2 text-center border-r border-gray-200">
                             <select
                               value={questionData.answer}
                               onChange={(e) => updateQuestion(lessonName, questionNumber, 'answer', e.target.value as UserAnswer)}
-                              style={{
-                                width: '100%',
-                                padding: '0.25rem',
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '0.85rem',
-                                backgroundColor: 'transparent',
-                                textAlign: 'center',
-                              }}
-                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
-                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                              className="w-full px-1 py-1 border-none outline-none text-sm bg-transparent text-center focus:bg-gray-50 transition-colors"
                             >
                               <option value={UserAnswer.True}>✓ Doğru</option>
                               <option value={UserAnswer.False}>✗ Yanlış</option>
@@ -483,21 +295,10 @@ export function EditExamModal({
                               <option value={UserAnswer.Cancel}>⊗ İptal</option>
                             </select>
                           </td>
-                          <td style={{ 
-                            padding: '0.5rem', 
-                            textAlign: 'center',
-                          }}>
+                          <td className="p-2 text-center">
                             <button
                               onClick={() => removeQuestion(lessonName, questionNumber)}
-                              style={{
-                                padding: '0.25rem',
-                                borderRadius: '3px',
-                                border: 'none',
-                                backgroundColor: 'transparent',
-                                color: '#dc3545',
-                                cursor: 'pointer',
-                                fontSize: '0.75rem',
-                              }}
+                              className="p-1 rounded border-none bg-transparent text-red-600 cursor-pointer text-xs hover:bg-red-50 transition-colors"
                               title="Soru Sil"
                             >
                               <Trash2 size={12} />
@@ -514,44 +315,24 @@ export function EditExamModal({
         </div>
 
         {/* Footer */}
-        <div style={{
-          padding: '1rem 1.5rem',
-          borderTop: '1px solid #ddd',
-          display: 'flex',
-          gap: '0.75rem',
-          justifyContent: 'flex-end',
-          backgroundColor: '#f8f9fa',
-        }}>
+        <div className="px-6 py-4 border-t border-gray-300 flex gap-3 justify-end bg-gray-50">
           <Button
             onClick={handleClose}
             disabled={isLoading}
-            style={{
-              backgroundColor: 'transparent',
-              color: '#666',
-              border: '1px solid #ddd',
-              padding: '0.5rem 1rem',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              fontSize: '0.9rem',
-            }}
+            className={`bg-transparent text-gray-600 border border-gray-300 px-4 py-2 rounded text-sm ${
+              isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+            }`}
           >
             İptal
           </Button>
           <Button
             onClick={handleSave}
             disabled={isLoading}
-            style={{
-              backgroundColor: isLoading ? '#999' : '#007bff',
-              color: 'white',
-              border: 'none',
-              padding: '0.5rem 1rem',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}
+            className={`text-white border-none px-4 py-2 rounded text-sm flex items-center gap-2 ${
+              isLoading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-600 cursor-pointer hover:bg-blue-700'
+            }`}
           >
             <Save size={14} />
             {isLoading ? 'Kaydediliyor...' : 'Kaydet'}

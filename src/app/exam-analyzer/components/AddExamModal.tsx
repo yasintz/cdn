@@ -61,89 +61,44 @@ export function AddExamModal({ isOpen, onClose, onSuccess }: AddExamModalProps) 
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '2rem',
-        borderRadius: '8px',
-        width: '95%',
-        maxWidth: '1200px',
-        maxHeight: '95vh',
-        overflow: 'auto',
-      }}>
-        <h2 style={{ marginBottom: '1rem' }}>Yeni Sınav Ekle</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]">
+      <div className="bg-white p-8 rounded-lg w-[95%] max-w-6xl max-h-[95vh] overflow-auto">
+        <h2 className="mb-4 text-2xl font-bold text-gray-800">Yeni Sınav Ekle</h2>
         
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="flex flex-col">
           <a
             href="https://drive.google.com/file/d/1trEqAMhrrWS9z8nwf9HpvZaSczRs8bpe/view?usp=sharing"
-            style={{ fontSize: '20px', margin: '12px 0 12px' }}
-            className="text-blue-500"
+            className="text-xl my-3 text-blue-500 hover:text-blue-600 transition-colors"
             target="_blank"
           >
             Sinavimi Nasil Kopyalarim
           </a>
-          <div style={{ marginBottom: '12px' }}>
+          <div className="mb-3 text-gray-700">
             Daha once eklenen sinavlar: {exams.map((i) => i.id).join(', ')}
           </div>
           <input
             value={examNumber}
             onChange={(e) => setExamNumber(e.target.value)}
             placeholder="Sinav Numarasi"
-            className="border"
-            style={{
-              fontSize: 16,
-              borderRadius: '8px',
-              padding: '0.7rem',
-              marginBottom: '1rem',
-            }}
+            className="border border-gray-300 rounded-lg p-3 mb-4 text-base focus:border-blue-500 outline-none transition-colors"
           />
           <textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="border"
-            style={{
-              margin: '1rem 0 1rem',
-              borderRadius: '8px',
-              padding: '1rem',
-              height: '400px',
-            }}
+            className="border border-gray-300 rounded-lg p-4 h-[400px] my-4 font-mono text-sm resize-y focus:border-blue-500 outline-none transition-colors"
+            placeholder="Sınav verilerini buraya yapıştırın..."
           />
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <div className="flex gap-4 justify-end mb-4">
             <Button
               onClick={handleClose}
-              style={{
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
+              className="bg-gray-500 text-white border-none px-4 py-2 rounded cursor-pointer hover:bg-gray-600 transition-colors"
             >
               İptal
             </Button>
             <Button
               onClick={handleSave}
-              style={{
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
+              className="bg-blue-600 text-white border-none px-4 py-2 rounded cursor-pointer hover:bg-blue-700 transition-colors"
             >
               {showResponse ? 'Kaydet' : 'Goruntule'}
             </Button>
@@ -151,78 +106,83 @@ export function AddExamModal({ isOpen, onClose, onSuccess }: AddExamModalProps) 
 
           {showResponse && response && (
             <>
-              <table style={{ margin: '1rem 0 1rem' }}>
-                <thead>
-                  <tr>
-                    <th>Ders</th>
-                    <th>Soru</th>
-                    <th>Dogru</th>
-                    <th>Yanlis</th>
-                    <th>Bos</th>
-                    <th>Net</th>
-                    <th>ORT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dersler.map((ders) => {
-                    const data = response.result.analytics.lessonBasedData.find(
-                      (i) => i.lesson === ders.name
-                    )?.data;
-
-                    return (
-                      <tr key={ders.name}>
-                        <td data-no-center>{ders.name}</td>
-                        <td>{ders.count}</td>
-                        <td>{data?.[UserAnswer.True]}</td>
-                        <td>{data?.[UserAnswer.False]}</td>
-                        <td>{data?.[UserAnswer.Skip]}</td>
-                        <td>{data?.Net}</td>
-                        <td />
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <h3 className="center">Konu Analizi</h3>
-              {dersler.map((ders) => (
-                <table key={ders.name} style={{ margin: '1rem 0 1rem' }}>
+              <div className="overflow-x-auto mb-4">
+                <table className="w-full border-collapse border border-gray-300">
                   <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>Konu</th>
-                      <th>DC</th>
-                      <th>OC</th>
-                      <th>SO</th>
-                      <th>CZM</th>
+                    <tr className="bg-gray-50">
+                      <th className="border border-gray-300 p-2 text-left">Ders</th>
+                      <th className="border border-gray-300 p-2 text-center">Soru</th>
+                      <th className="border border-gray-300 p-2 text-center">Dogru</th>
+                      <th className="border border-gray-300 p-2 text-center">Yanlis</th>
+                      <th className="border border-gray-300 p-2 text-center">Bos</th>
+                      <th className="border border-gray-300 p-2 text-center">Net</th>
+                      <th className="border border-gray-300 p-2 text-center">ORT</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr style={{ backgroundColor: '#5484c3' }}>
-                      <td colSpan={6}>{ders.name}</td>
-                    </tr>
-                    {Object.entries(response.exam.sinav[ders.name]).map(
-                      ([no, result]) => (
-                        <tr key={result.question + no}>
-                          <td>{no}</td>
-                          <td data-no-center>{result.question}</td>
-                          <td>{result.rightAnswer}</td>
-                          <td>{result.givenAnswer}</td>
-                          <td
-                            style={{
-                              backgroundColor:
-                                result.answer === UserAnswer.False
-                                  ? '#f74e4e'
-                                  : undefined,
-                            }}
-                          >
-                            {showUserAnswer[result.answer]}
-                          </td>
-                          <td></td>
+                    {dersler.map((ders) => {
+                      const data = response.result.analytics.lessonBasedData.find(
+                        (i) => i.lesson === ders.name
+                      )?.data;
+
+                      return (
+                        <tr key={ders.name} className="hover:bg-gray-50">
+                          <td className="border border-gray-300 p-2 text-left font-medium">{ders.name}</td>
+                          <td className="border border-gray-300 p-2 text-center">{ders.count}</td>
+                          <td className="border border-gray-300 p-2 text-center text-green-600 font-medium">{data?.[UserAnswer.True]}</td>
+                          <td className="border border-gray-300 p-2 text-center text-red-600 font-medium">{data?.[UserAnswer.False]}</td>
+                          <td className="border border-gray-300 p-2 text-center text-gray-500 font-medium">{data?.[UserAnswer.Skip]}</td>
+                          <td className="border border-gray-300 p-2 text-center text-blue-600 font-bold">{data?.Net}</td>
+                          <td className="border border-gray-300 p-2 text-center"></td>
                         </tr>
-                      )
-                    )}
+                      );
+                    })}
                   </tbody>
                 </table>
+              </div>
+              
+              <h3 className="text-center text-xl font-bold text-gray-800 mb-4">Konu Analizi</h3>
+              
+              {dersler.map((ders) => (
+                <div key={ders.name} className="mb-6">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="border border-gray-300 p-2 text-center">No</th>
+                          <th className="border border-gray-300 p-2 text-left">Konu</th>
+                          <th className="border border-gray-300 p-2 text-center">DC</th>
+                          <th className="border border-gray-300 p-2 text-center">OC</th>
+                          <th className="border border-gray-300 p-2 text-center">SO</th>
+                          <th className="border border-gray-300 p-2 text-center">CZM</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-blue-500 text-white">
+                          <td colSpan={6} className="border border-gray-300 p-2 font-bold text-center">{ders.name}</td>
+                        </tr>
+                        {Object.entries(response.exam.sinav[ders.name] || {}).map(
+                          ([no, result]) => (
+                            <tr key={result.question + no} className="hover:bg-gray-50">
+                              <td className="border border-gray-300 p-1 text-center font-medium">{no}</td>
+                              <td className="border border-gray-300 p-1 text-left">{result.question}</td>
+                              <td className="border border-gray-300 p-1 text-center font-medium">{result.rightAnswer}</td>
+                              <td className="border border-gray-300 p-1 text-center font-medium">{result.givenAnswer}</td>
+                              <td 
+                                className={`border border-gray-300 p-1 text-center font-bold ${
+                                  result.answer === UserAnswer.False ? 'bg-red-400 text-white' : ''
+                                }`}
+                              >
+                                {showUserAnswer[result.answer]}
+                              </td>
+                              <td className="border border-gray-300 p-1 text-center"></td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               ))}
             </>
           )}

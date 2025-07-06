@@ -16,17 +16,17 @@ export function ImportantSubjects({
   const [subjectCount, setSubjectCount] = useState<number>(5);
 
   const lessonColors: Record<string, string> = {
-    'Türkçe': '#e3f2fd',
-    'Matematik': '#f3e5f5',
-    'Tarih': '#fff3e0',
-    'Coğrafya': '#e8f5e8',
-    'Felsefe': '#fce4ec',
-    'Din Kültürü': '#f1f8e9',
-    'Fizik': '#e0f2f1',
-    'Kimya': '#fff8e1',
-    'Biyoloji': '#f3e5f5',
-    'Geometri': '#e8eaf6',
-    'Tum Dersler': '#f8f9fa'
+    'Türkçe': 'bg-blue-50',
+    'Matematik': 'bg-purple-50',
+    'Tarih': 'bg-orange-50',
+    'Coğrafya': 'bg-green-50',
+    'Felsefe': 'bg-pink-50',
+    'Din Kültürü': 'bg-lime-50',
+    'Fizik': 'bg-teal-50',
+    'Kimya': 'bg-yellow-50',
+    'Biyoloji': 'bg-purple-50',
+    'Geometri': 'bg-indigo-50',
+    'Tum Dersler': 'bg-gray-50'
   };
 
   const lessonIcons: Record<string, string> = {
@@ -45,28 +45,28 @@ export function ImportantSubjects({
 
   const getBorderColor = (lesson: string) => {
     const colors: Record<string, string> = {
-      'Türkçe': '#2196f3',
-      'Matematik': '#9c27b0',
-      'Tarih': '#ff9800',
-      'Coğrafya': '#4caf50',
-      'Felsefe': '#e91e63',
-      'Din Kültürü': '#8bc34a',
-      'Fizik': '#00bcd4',
-      'Kimya': '#ffc107',
-      'Biyoloji': '#9c27b0',
-      'Geometri': '#3f51b5',
-      'Tum Dersler': '#6c757d'
+      'Türkçe': 'border-blue-500',
+      'Matematik': 'border-purple-500',
+      'Tarih': 'border-orange-500',
+      'Coğrafya': 'border-green-500',
+      'Felsefe': 'border-pink-500',
+      'Din Kültürü': 'border-lime-500',
+      'Fizik': 'border-teal-500',
+      'Kimya': 'border-yellow-500',
+      'Biyoloji': 'border-purple-500',
+      'Geometri': 'border-indigo-500',
+      'Tum Dersler': 'border-gray-500'
     };
-    return colors[lesson] || '#6c757d';
+    return colors[lesson] || 'border-gray-500';
   };
 
   const getIntensityColor = (value: number, maxValue: number) => {
     const ratio = value / maxValue;
-    if (ratio >= 0.8) return '#d32f2f'; // High intensity - red
-    if (ratio >= 0.6) return '#f57c00'; // Medium-high - orange
-    if (ratio >= 0.4) return '#fbc02d'; // Medium - yellow
-    if (ratio >= 0.2) return '#689f38'; // Low-medium - light green
-    return '#388e3c'; // Low intensity - green
+    if (ratio >= 0.8) return 'text-red-700'; // High intensity - red
+    if (ratio >= 0.6) return 'text-orange-600'; // Medium-high - orange
+    if (ratio >= 0.4) return 'text-yellow-600'; // Medium - yellow
+    if (ratio >= 0.2) return 'text-green-600'; // Low-medium - light green
+    return 'text-green-700'; // Low intensity - green
   };
 
   // Get data based on selected view
@@ -81,7 +81,8 @@ export function ImportantSubjects({
           valueKey: 'rate' as const,
           valueLabel: 'Hata Oranı',
           formatValue: (value: number) => `%${(value * 100).toFixed(1)}`,
-          color: '#dc3545'
+          color: 'bg-red-500',
+          colorClass: 'bg-red-500'
         };
       case 'empty':
         return {
@@ -92,7 +93,8 @@ export function ImportantSubjects({
           valueKey: 'rate' as const,
           valueLabel: 'Boş Oranı',
           formatValue: (value: number) => `%${(value * 100).toFixed(1)}`,
-          color: '#6c757d'
+          color: 'bg-gray-500',
+          colorClass: 'bg-gray-500'
         };
       default:
         return {
@@ -106,7 +108,8 @@ export function ImportantSubjects({
           valueKey: 'total' as const,
           valueLabel: 'Toplam Soru',
           formatValue: (value: number) => `${Math.round(value / examCount)}x`,
-          color: '#007bff'
+          color: 'bg-blue-500',
+          colorClass: 'bg-blue-500'
         };
     }
   };
@@ -157,18 +160,12 @@ export function ImportantSubjects({
 
   if (examCount === 0) {
     return (
-      <div style={{ 
-        textAlign: 'center', 
-        padding: '4rem 2rem',
-        background: '#f8f9fa',
-        borderRadius: '16px',
-        border: '1px solid #e9ecef'
-      }}>
-        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎯</div>
-        <h2 style={{ margin: '0 0 1rem 0', color: '#6c757d', fontSize: '1.5rem' }}>
+      <div className="text-center py-16 px-8 bg-gray-50 rounded-2xl border border-gray-200">
+        <div className="text-6xl mb-4">🎯</div>
+        <h2 className="text-2xl font-medium text-gray-500 mb-4">
           Konu Analizi
         </h2>
-        <p style={{ margin: '0', color: '#6c757d', fontSize: '1rem' }}>
+        <p className="text-gray-500 text-base">
           Analiz için en az bir sınav verisi gerekiyor.
         </p>
       </div>
@@ -176,80 +173,31 @@ export function ImportantSubjects({
   }
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+    <div className="max-w-7xl mx-auto">
       {/* Header Section */}
-      <div style={{
-        textAlign: 'center',
-        marginBottom: '2rem',
-        padding: '2rem',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '16px',
-        color: 'white',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
-      }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{viewData.icon}</div>
-        <h1 style={{ 
-          margin: '0 0 0.5rem 0', 
-          fontSize: '2.5rem', 
-          fontWeight: '700',
-          textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-        }}>
+      <div className="text-center mb-8 p-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl text-white shadow-2xl">
+        <div className="text-5xl mb-4">{viewData.icon}</div>
+        <h1 className="text-4xl font-bold mb-2 drop-shadow-sm">
           {viewData.title}
         </h1>
-        <p style={{ 
-          margin: '0 0 1.5rem 0', 
-          fontSize: '1.1rem', 
-          opacity: 0.9,
-          fontWeight: '300'
-        }}>
+        <p className="text-lg opacity-90 font-light mb-6">
           {examCount} sınav verisi - {viewData.description}
         </p>
 
         {/* View Selector Dropdown */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          gap: '1rem',
-          marginTop: '1rem',
-          flexWrap: 'wrap'
-        }}>
+        <div className="flex justify-center items-center gap-4 mt-4 flex-wrap">
           <select
             value={selectedView}
             onChange={(e) => setSelectedView(e.target.value as ViewType)}
-            style={{
-              padding: '0.75rem 1rem',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'rgba(255, 255, 255, 0.9)',
-              color: '#333',
-              fontSize: '1rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              minWidth: '250px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
-            }}
+            className="px-4 py-3 rounded-lg border-none bg-white/90 text-gray-800 text-base font-semibold cursor-pointer min-w-[250px] shadow-lg"
           >
             <option value="frequency">📊 En Sık Karşılaşılan Konular</option>
             <option value="mistakes">❌ En Çok Hata Yapılan Konular</option>
             <option value="empty">⭕ En Çok Boş Bırakılan Konular</option>
           </select>
           
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.5rem',
-            background: 'rgba(255, 255, 255, 0.9)',
-            padding: '0.75rem',
-            borderRadius: '8px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
-          }}>
-            <span style={{ 
-              fontSize: '1rem', 
-              fontWeight: '600', 
-              color: '#333',
-              whiteSpace: 'nowrap'
-            }}>
+          <div className="flex items-center gap-2 bg-white/90 px-3 py-3 rounded-lg shadow-lg">
+            <span className="text-base font-semibold text-gray-800 whitespace-nowrap">
               📊 Konu Sayısı:
             </span>
             <input
@@ -258,87 +206,47 @@ export function ImportantSubjects({
               max="20"
               value={subjectCount}
               onChange={(e) => setSubjectCount(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
-              style={{
-                padding: '0.5rem',
-                borderRadius: '4px',
-                border: '1px solid #ddd',
-                width: '60px',
-                textAlign: 'center',
-                fontSize: '1rem',
-                fontWeight: '600',
-                color: '#333',
-                background: 'white'
-              }}
+              className="px-2 py-1 rounded border border-gray-300 w-15 text-center text-base font-semibold text-gray-800 bg-white"
             />
           </div>
         </div>
       </div>
 
       {/* Statistics Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1rem',
-        marginBottom: '2rem'
-      }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-          padding: '1.5rem',
-          borderRadius: '12px',
-          textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)'
-        }}>
-          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📊</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-xl text-center shadow-lg">
+          <div className="text-3xl mb-2">📊</div>
+          <div className="text-3xl font-bold mb-1">
             {examCount}
           </div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+          <div className="text-sm opacity-90">
             Toplam Sınav
           </div>
         </div>
 
-        <div style={{
-          background: `linear-gradient(135deg, ${viewData.color} 0%, ${viewData.color}cc 100%)`,
-          color: 'white',
-          padding: '1.5rem',
-          borderRadius: '12px',
-          textAlign: 'center',
-          boxShadow: `0 4px 20px ${viewData.color}30`
-        }}>
-          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{viewData.icon}</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+        <div className={`bg-gradient-to-br from-current to-current/80 text-white p-6 rounded-xl text-center shadow-lg ${viewData.colorClass}`}>
+          <div className="text-3xl mb-2">{viewData.icon}</div>
+          <div className="text-3xl font-bold mb-1">
             {viewData.data.length}
           </div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+          <div className="text-sm opacity-90">
             Analiz Edilen Konu
           </div>
         </div>
 
-        <div style={{
-          background: 'linear-gradient(135deg, #54a0ff 0%, #2e86de 100%)',
-          color: 'white',
-          padding: '1.5rem',
-          borderRadius: '12px',
-          textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(84, 160, 255, 0.3)'
-        }}>
-          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⚡</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl text-center shadow-lg">
+          <div className="text-3xl mb-2">⚡</div>
+          <div className="text-3xl font-bold mb-1">
             {lessons.length - 1}
           </div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+          <div className="text-sm opacity-90">
             Ders Alanı
           </div>
         </div>
       </div>
 
       {/* Lessons Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
-        gap: '2rem',
-      }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {lessons.map((lesson) => {
           const subjects = getSubjectsByLesson(lesson);
 
@@ -347,66 +255,30 @@ export function ImportantSubjects({
           return (
             <div 
               key={lesson} 
-              style={{
-                background: 'white',
-                borderRadius: '16px',
-                padding: '0',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-                border: `3px solid ${getBorderColor(lesson)}`,
-                overflow: 'hidden',
-                transition: 'all 0.3s ease',
-                position: 'relative'
-              }}
+              className={`bg-white rounded-2xl p-0 shadow-xl border-4 ${getBorderColor(lesson)} overflow-hidden transition-all duration-300 hover:shadow-2xl relative`}
             >
               {/* Card Header */}
-              <div style={{
-                background: `linear-gradient(135deg, ${getBorderColor(lesson)}15 0%, ${getBorderColor(lesson)}05 100%)`,
-                padding: '1.5rem',
-                borderBottom: `2px solid ${getBorderColor(lesson)}20`,
-                position: 'relative'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  top: '1rem',
-                  right: '1rem',
-                  fontSize: '3rem',
-                  opacity: 0.1
-                }}>
+              <div className={`${lessonColors[lesson]} p-6 border-b-2 ${getBorderColor(lesson)}/20 relative`}>
+                <div className="absolute top-4 right-4 text-5xl opacity-10">
                   {lessonIcons[lesson]}
                 </div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  marginBottom: '0.5rem'
-                }}>
-                  <span style={{ fontSize: '1.8rem' }}>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-3xl">
                     {lessonIcons[lesson]}
                   </span>
-                  <h3 style={{ 
-                    margin: '0',
-                    fontSize: '1.4rem',
-                    fontWeight: '700',
-                    color: '#2c3e50'
-                  }}>
+                  <h3 className="text-xl font-bold text-gray-800">
                     {lesson}
                   </h3>
                 </div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.9rem',
-                  color: '#6c757d'
-                }}>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
                   <span>{viewData.icon}</span>
                   <span>{subjects.length} konu gösteriliyor</span>
                 </div>
               </div>
 
               {/* Subjects List */}
-              <div style={{ padding: '1.5rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="p-6">
+                <div className="flex flex-col gap-4">
                   {subjects.map((subject, index) => {
                     const progressPercentage = (subject.progressValue / maxValue) * 100;
                     const averageQuestions = subject.total / examCount;
@@ -414,101 +286,44 @@ export function ImportantSubjects({
                     return (
                       <div 
                         key={`${subject.className}-${subject.subject}`}
-                        style={{
-                          background: '#f8f9fa',
-                          borderRadius: '12px',
-                          padding: '1rem',
-                          border: '1px solid #e9ecef',
-                          position: 'relative',
-                          overflow: 'hidden'
-                        }}
+                        className="bg-gray-50 rounded-xl p-4 border border-gray-200 relative overflow-hidden"
                       >
                         {/* Progress Background */}
-                        <div style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: `${progressPercentage}%`,
-                          height: '100%',
-                          background: `linear-gradient(135deg, ${viewData.color}20 0%, ${viewData.color}10 100%)`,
-                          borderRadius: '12px',
-                          transition: 'width 0.5s ease'
-                        }} />
+                        <div 
+                          className={`absolute top-0 left-0 h-full ${viewData.colorClass}/20 rounded-xl transition-all duration-500`}
+                          style={{ width: `${progressPercentage}%` }}
+                        />
 
                         {/* Content */}
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '0.5rem'
-                          }}>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.5rem'
-                            }}>
-                              <span style={{
-                                background: viewData.color,
-                                color: 'white',
-                                padding: '0.25rem 0.5rem',
-                                borderRadius: '16px',
-                                fontSize: '0.75rem',
-                                fontWeight: '700',
-                                minWidth: '2rem',
-                                textAlign: 'center'
-                              }}>
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className={`${viewData.colorClass} text-white px-2 py-1 rounded-2xl text-xs font-bold min-w-8 text-center`}>
                                 #{index + 1}
                               </span>
-                              <span style={{
-                                background: `${getBorderColor(lesson)}20`,
-                                color: getBorderColor(lesson),
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '16px',
-                                fontSize: '0.75rem',
-                                fontWeight: '600'
-                              }}>
+                              <span className={`${getBorderColor(lesson)}/20 ${getBorderColor(lesson).replace('border-', 'text-')} px-3 py-1 rounded-2xl text-xs font-semibold`}>
                                 {selectedView === 'frequency' 
                                   ? `${Math.round(subject.total / examCount)}x`
                                   : viewData.formatValue(subject.rate)
                                 }
                               </span>
                             </div>
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.25rem',
-                              fontSize: '0.8rem',
-                              color: '#6c757d'
-                            }}>
+                            <div className="flex items-center gap-1 text-xs text-gray-500">
                               <span>📊</span>
                               <span>{progressPercentage.toFixed(1)}%</span>
                             </div>
                           </div>
                           
-                          <div style={{
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            color: '#2c3e50',
-                            lineHeight: '1.4',
-                            marginBottom: '0.5rem'
-                          }}>
+                          <div className="text-base font-semibold text-gray-800 leading-snug mb-2">
                             {subject.subject}
                           </div>
                           
-                          <div style={{
-                            fontSize: '0.8rem',
-                            color: '#6c757d',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '0.5rem'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div className="text-xs text-gray-500 flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
                               <span>📚</span>
                               <span>{subject.className}</span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div className="flex items-center gap-2">
                               <span>📝</span>
                               <span>Ort: {averageQuestions.toFixed(1)} soru</span>
                             </div>
@@ -525,26 +340,14 @@ export function ImportantSubjects({
       </div>
 
       {/* Footer Info */}
-      <div style={{
-        marginTop: '2rem',
-        padding: '1.5rem',
-        background: '#f8f9fa',
-        borderRadius: '12px',
-        border: '1px solid #e9ecef',
-        textAlign: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <span style={{ fontSize: '1.2rem' }}>💡</span>
-          <span style={{ fontSize: '1rem', fontWeight: '600', color: '#495057' }}>
+      <div className="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200 text-center">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <span className="text-xl">💡</span>
+          <span className="text-base font-semibold text-gray-700">
             Analiz Bilgisi
           </span>
         </div>
-        <p style={{ 
-          margin: '0', 
-          fontSize: '0.9rem', 
-          color: '#6c757d',
-          lineHeight: '1.4'
-        }}>
+        <p className="text-sm text-gray-600 leading-relaxed">
           {selectedView === 'frequency' && 'Konular, sınav verilerinizde geçen sıklığına göre sıralanmıştır.'}
           {selectedView === 'mistakes' && 'Konular, ortalama hata yapma oranınıza göre sıralanmıştır. Yüksek oranlı konular daha fazla çalışma gerektirebilir.'}
           {selectedView === 'empty' && 'Konular, ortalama boş bırakma oranınıza göre sıralanmıştır. Bu konularda daha fazla pratik gerekebilir.'}
