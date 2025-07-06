@@ -3,11 +3,13 @@ import { UserAnswer } from '../modules/helpers';
 import { parseExam } from '../modules/parseExam';
 import { useStore } from '../useStore';
 import { EditExamModal } from './EditExamModal';
+import { Button } from '@/components/ui/button';
 
 export function AllExams() {
   const { exams, updateExam, deleteExam } = useStore();
   const [editingExam, setEditingExam] = useState<ReturnType<typeof parseExam> | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedExam, setExpandedExam] = useState<string | null>(null);
 
   const getExamSummary = (exam: ReturnType<typeof parseExam>) => {
     const summary: Record<string, { total: number; correct: number; wrong: number; skip: number }> = {};
@@ -32,11 +34,53 @@ export function AllExams() {
     return correct - (wrong / 4);
   };
 
+  const getLessonColor = (lesson: string) => {
+    const colors: Record<string, string> = {
+      'Türkçe': '#e3f2fd',
+      'Matematik': '#f3e5f5',
+      'Tarih': '#fff3e0',
+      'Coğrafya': '#e8f5e8',
+      'Felsefe': '#fce4ec',
+      'Din Kültürü': '#f1f8e9',
+      'Fizik': '#e0f2f1',
+      'Kimya': '#fff8e1',
+      'Biyoloji': '#f3e5f5',
+      'Geometri': '#e8eaf6'
+    };
+    return colors[lesson] || '#f5f5f5';
+  };
+
+  const getLessonIcon = (lesson: string) => {
+    const icons: Record<string, string> = {
+      'Türkçe': '📚',
+      'Matematik': '🔢',
+      'Tarih': '🏛️',
+      'Coğrafya': '🌍',
+      'Felsefe': '🤔',
+      'Din Kültürü': '📿',
+      'Fizik': '⚛️',
+      'Kimya': '🧪',
+      'Biyoloji': '🧬',
+      'Geometri': '📐'
+    };
+    return icons[lesson] || '📋';
+  };
+
   if (exams.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <h2>Henüz hiç sınav eklenmemiş</h2>
-        <p>Sınav eklemek için "Sınav Ekle" sayfasını kullanın.</p>
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '4rem 2rem',
+        background: '#f8f9fa',
+        borderRadius: '12px',
+        border: '1px solid #e9ecef'
+      }}>
+        <h2 style={{ margin: '0 0 1rem 0', color: '#6c757d' }}>
+          📋 Henüz hiç sınav eklenmemiş
+        </h2>
+        <p style={{ margin: '0', color: '#6c757d' }}>
+          Sınav eklemek için "Sınav Ekle" butonunu kullanın.
+        </p>
       </div>
     );
   }
@@ -110,87 +154,114 @@ export function AllExams() {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Tüm Sınavlar</h2>
+    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <h2 style={{ 
+        textAlign: 'center', 
+        marginBottom: '2rem',
+        color: '#333',
+        fontSize: '2rem'
+      }}>
+        📋 Tüm Sınavlar
+      </h2>
       
       {averages && (
         <div style={{
-          border: '2px solid #4a90e2',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          backgroundColor: '#f8fbff',
-          marginBottom: '2rem'
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: '12px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          color: 'white'
         }}>
-          <h3 style={{ margin: '0 0 1rem 0', textAlign: 'center', color: '#2c5aa0' }}>
-            Ortalama Performans ({exams.length} sınav)
+          <h3 style={{ margin: '0 0 1.5rem 0', textAlign: 'center', fontSize: '1.5rem' }}>
+            📊 Ortalama Performans ({exams.length} sınav)
           </h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
+            gap: '1rem', 
+            marginBottom: '2rem' 
+          }}>
             <div style={{ 
-              backgroundColor: '#e8f5e8', 
-              padding: '0.75rem', 
-              borderRadius: '6px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+              padding: '1rem', 
+              borderRadius: '8px',
               textAlign: 'center',
-              border: '1px solid #c3e6c3'
+              backdropFilter: 'blur(10px)'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#2d5a2d' }}>Ortalama Doğru</div>
-              <div style={{ fontSize: '20px', color: '#2d5a2d' }}>{averages.overall.correct.toFixed(1)}</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>✅ Ortalama Doğru</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.correct.toFixed(1)}</div>
             </div>
             
             <div style={{ 
-              backgroundColor: '#ffeaea', 
-              padding: '0.75rem', 
-              borderRadius: '6px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+              padding: '1rem', 
+              borderRadius: '8px',
               textAlign: 'center',
-              border: '1px solid #f5c2c7'
+              backdropFilter: 'blur(10px)'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#a52a2a' }}>Ortalama Yanlış</div>
-              <div style={{ fontSize: '20px', color: '#a52a2a' }}>{averages.overall.wrong.toFixed(1)}</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>❌ Ortalama Yanlış</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.wrong.toFixed(1)}</div>
             </div>
             
             <div style={{ 
-              backgroundColor: '#f0f0f0', 
-              padding: '0.75rem', 
-              borderRadius: '6px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+              padding: '1rem', 
+              borderRadius: '8px',
               textAlign: 'center',
-              border: '1px solid #d6d8db'
+              backdropFilter: 'blur(10px)'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#666' }}>Ortalama Boş</div>
-              <div style={{ fontSize: '20px', color: '#666' }}>{averages.overall.skip.toFixed(1)}</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>⭕ Ortalama Boş</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.skip.toFixed(1)}</div>
             </div>
             
             <div style={{ 
-              backgroundColor: '#e8f4fd', 
-              padding: '0.75rem', 
-              borderRadius: '6px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)', 
+              padding: '1rem', 
+              borderRadius: '8px',
               textAlign: 'center',
-              border: '1px solid #b8daff'
+              backdropFilter: 'blur(10px)'
             }}>
-              <div style={{ fontWeight: 'bold', color: '#1e5a96' }}>Ortalama Net</div>
-              <div style={{ fontSize: '20px', color: '#1e5a96' }}>{averages.overall.net.toFixed(2)}</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>🎯 Ortalama Net</div>
+              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{averages.overall.net.toFixed(1)}</div>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem' }}>
-            <h4 style={{ margin: '0 0 1rem 0', textAlign: 'center', color: '#666' }}>Ders Bazlı Ortalamalar</h4>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
+          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.3)', paddingTop: '1.5rem' }}>
+            <h4 style={{ margin: '0 0 1rem 0', textAlign: 'center', fontSize: '1.2rem' }}>
+              📚 Ders Bazlı Ortalamalar
+            </h4>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', 
+              gap: '1rem' 
+            }}>
               {averages.subjects.map((subject) => (
                 <div key={subject.lesson} style={{ 
-                  backgroundColor: '#fff',
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #e0e0e0',
-                  minWidth: '140px',
-                  textAlign: 'center'
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  backdropFilter: 'blur(5px)'
                 }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '0.5rem', color: '#333' }}>
-                    {subject.lesson}
+                  <div style={{ 
+                    fontWeight: 'bold', 
+                    fontSize: '14px', 
+                    marginBottom: '0.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <span>{getLessonIcon(subject.lesson)}</span>
+                    <span>{subject.lesson}</span>
                   </div>
-                  <div style={{ fontSize: '11px', color: '#666', marginBottom: '0.25rem' }}>
+                  <div style={{ fontSize: '12px', marginBottom: '0.5rem', opacity: 0.9 }}>
                     D:{subject.correct.toFixed(1)} Y:{subject.wrong.toFixed(1)} B:{subject.skip.toFixed(1)}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#1e5a96', fontWeight: 'bold' }}>
-                    Net: {subject.net.toFixed(2)}
+                  <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                    Net: {subject.net.toFixed(1)}
                   </div>
                 </div>
               ))}
@@ -199,7 +270,7 @@ export function AllExams() {
         </div>
       )}
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {exams.map((exam) => {
           const summary = getExamSummary(exam);
           const totalQuestions = Object.values(summary).reduce((acc, curr) => acc + curr.total, 0);
@@ -207,119 +278,220 @@ export function AllExams() {
           const totalWrong = Object.values(summary).reduce((acc, curr) => acc + curr.wrong, 0);
           const totalSkip = Object.values(summary).reduce((acc, curr) => acc + curr.skip, 0);
           const totalNet = calculateNet(totalCorrect, totalWrong);
+          const isExpanded = expandedExam === exam.id;
 
           return (
             <div 
               key={exam.id}
               style={{
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                padding: '1.5rem',
-                backgroundColor: '#f9f9f9'
+                background: 'white',
+                border: '1px solid #e9ecef',
+                borderRadius: '12px',
+                padding: '0',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, color: '#333' }}>Sınav #{exam.id}</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ fontSize: '14px', color: '#666' }}>
-                    Toplam: {totalQuestions} soru
+              {/* Exam Header */}
+              <div style={{
+                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                padding: '1.5rem',
+                borderBottom: '1px solid #e9ecef',
+                cursor: 'pointer'
+              }} onClick={() => setExpandedExam(isExpanded ? null : exam.id)}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ 
+                      margin: '0 0 0.5rem 0', 
+                      color: '#495057',
+                      fontSize: '1.4rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      📝 Sınav #{exam.id}
+                      <span style={{ fontSize: '1rem', color: '#6c757d' }}>
+                        {isExpanded ? '▼' : '▶'}
+                      </span>
+                    </h3>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
+                      gap: '1rem',
+                      fontSize: '14px'
+                    }}>
+                      <div style={{ color: '#28a745' }}>✅ Doğru: {totalCorrect}</div>
+                      <div style={{ color: '#dc3545' }}>❌ Yanlış: {totalWrong}</div>
+                      <div style={{ color: '#6c757d' }}>⭕ Boş: {totalSkip}</div>
+                      <div style={{ color: '#007bff', fontWeight: 'bold' }}>🎯 Net: {totalNet.toFixed(1)}</div>
+                    </div>
                   </div>
+                  
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button
-                      onClick={() => handleEdit(exam)}
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(exam);
+                      }}
                       style={{
                         backgroundColor: '#007bff',
                         color: 'white',
                         border: 'none',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        cursor: 'pointer'
                       }}
                     >
-                      Düzenle
-                    </button>
-                    <button
-                      onClick={() => handleDelete(exam)}
+                      ✏️ Düzenle
+                    </Button>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(exam);
+                      }}
                       style={{
                         backgroundColor: '#dc3545',
                         color: 'white',
                         border: 'none',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        cursor: 'pointer'
                       }}
                     >
-                      Sil
-                    </button>
+                      🗑️ Sil
+                    </Button>
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-                <div style={{ 
-                  backgroundColor: '#e8f5e8', 
-                  padding: '0.5rem', 
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontWeight: 'bold', color: '#2d5a2d' }}>Doğru</div>
-                  <div style={{ fontSize: '18px', color: '#2d5a2d' }}>{totalCorrect}</div>
-                </div>
-                
-                <div style={{ 
-                  backgroundColor: '#ffeaea', 
-                  padding: '0.5rem', 
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontWeight: 'bold', color: '#a52a2a' }}>Yanlış</div>
-                  <div style={{ fontSize: '18px', color: '#a52a2a' }}>{totalWrong}</div>
-                </div>
-                
-                <div style={{ 
-                  backgroundColor: '#f0f0f0', 
-                  padding: '0.5rem', 
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontWeight: 'bold', color: '#666' }}>Boş</div>
-                  <div style={{ fontSize: '18px', color: '#666' }}>{totalSkip}</div>
-                </div>
-                
-                <div style={{ 
-                  backgroundColor: '#e8f4fd', 
-                  padding: '0.5rem', 
-                  borderRadius: '4px',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontWeight: 'bold', color: '#1e5a96' }}>Net</div>
-                  <div style={{ fontSize: '18px', color: '#1e5a96' }}>{totalNet.toFixed(2)}</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                {Object.entries(summary).map(([lesson, data]) => (
-                  <div key={lesson} style={{ 
-                    backgroundColor: '#fff',
-                    padding: '0.5rem',
-                    borderRadius: '4px',
-                    border: '1px solid #eee',
-                    minWidth: '120px'
+              {/* Expanded Lesson Details */}
+              {isExpanded && (
+                <div style={{ padding: '1.5rem' }}>
+                  <h4 style={{ 
+                    margin: '0 0 1.5rem 0', 
+                    color: '#495057',
+                    fontSize: '1.2rem',
+                    textAlign: 'center'
                   }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '12px', marginBottom: '0.25rem' }}>
-                      {lesson}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#666' }}>
-                      D:{data.correct} Y:{data.wrong} B:{data.skip}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#1e5a96', fontWeight: 'bold' }}>
-                      Net: {calculateNet(data.correct, data.wrong).toFixed(1)}
-                    </div>
+                    📚 Ders Detayları
+                  </h4>
+                  
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                    gap: '1.5rem' 
+                  }}>
+                    {Object.entries(summary).map(([lesson, data]) => (
+                      <div key={lesson} style={{ 
+                        backgroundColor: getLessonColor(lesson),
+                        padding: '1.5rem',
+                        borderRadius: '8px',
+                        border: '1px solid #e9ecef',
+                        position: 'relative'
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '0.5rem',
+                          marginBottom: '1rem'
+                        }}>
+                          <span style={{ fontSize: '1.5rem' }}>{getLessonIcon(lesson)}</span>
+                          <h5 style={{ 
+                            margin: '0', 
+                            fontWeight: 'bold', 
+                            fontSize: '1.1rem',
+                            color: '#333'
+                          }}>
+                            {lesson}
+                          </h5>
+                        </div>
+                        
+                        <div style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: '1fr 1fr', 
+                          gap: '0.5rem',
+                          marginBottom: '1rem'
+                        }}>
+                          <div style={{ 
+                            textAlign: 'center',
+                            padding: '0.5rem',
+                            background: 'rgba(255, 255, 255, 0.7)',
+                            borderRadius: '4px'
+                          }}>
+                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Doğru</div>
+                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#28a745' }}>
+                              {data.correct}
+                            </div>
+                          </div>
+                          
+                          <div style={{ 
+                            textAlign: 'center',
+                            padding: '0.5rem',
+                            background: 'rgba(255, 255, 255, 0.7)',
+                            borderRadius: '4px'
+                          }}>
+                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Yanlış</div>
+                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc3545' }}>
+                              {data.wrong}
+                            </div>
+                          </div>
+                          
+                          <div style={{ 
+                            textAlign: 'center',
+                            padding: '0.5rem',
+                            background: 'rgba(255, 255, 255, 0.7)',
+                            borderRadius: '4px'
+                          }}>
+                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Boş</div>
+                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#6c757d' }}>
+                              {data.skip}
+                            </div>
+                          </div>
+                          
+                          <div style={{ 
+                            textAlign: 'center',
+                            padding: '0.5rem',
+                            background: 'rgba(255, 255, 255, 0.7)',
+                            borderRadius: '4px'
+                          }}>
+                            <div style={{ fontSize: '12px', color: '#6c757d' }}>Net</div>
+                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#007bff' }}>
+                              {calculateNet(data.correct, data.wrong).toFixed(1)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div style={{
+                          width: '100%',
+                          height: '8px',
+                          background: '#e9ecef',
+                          borderRadius: '4px',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #28a745 0%, #28a745 50%, #dc3545 50%, #dc3545 100%)',
+                            width: `${((data.correct + data.wrong) / data.total) * 100}%`,
+                            transition: 'width 0.3s ease'
+                          }} />
+                        </div>
+                        
+                        <div style={{ 
+                          fontSize: '11px', 
+                          color: '#6c757d',
+                          textAlign: 'center',
+                          marginTop: '0.5rem'
+                        }}>
+                          {data.total} soru • %{((data.correct / data.total) * 100).toFixed(1)} başarı
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
           );
         })}
