@@ -7,7 +7,6 @@ import { newImpl } from './new';
 import { useStore } from './useStore';
 import { Button } from '@/components/ui/button';
 import { ImportantSubjects } from './components/ImportantSubjects';
-import { Analytics } from './components/Analytics';
 import { AddExamModal } from './components/AddExamModal';
 import { AllExams } from './components/AllExams';
 import { TextEditor } from './components/TextEditor';
@@ -16,8 +15,8 @@ function App() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const currentPage = searchParams.get('page') as 'analytics' | 'important-subjects' | 'all-exams' | 'text-editor' | null;
-  const page = currentPage || 'analytics';
+  const currentPage = searchParams.get('page') as 'important-subjects' | 'all-exams' | 'text-editor' | null;
+  const page = currentPage || 'all-exams';
   
   const { exams } = useStore();
   const [time, setTime] = useState(Math.max(0, exams.length - 1).toString());
@@ -36,11 +35,10 @@ function App() {
 
   const handleAddExamSuccess = () => {
     setIsAddExamModalOpen(false);
-    setPage('analytics');
+    setPage('all-exams');
   };
 
   const pages: Record<typeof page, React.ReactNode> = {
-    analytics: <Analytics data={data} />,
     'important-subjects': <ImportantSubjects data={data} />,
     'all-exams': <AllExams />,
     'text-editor': <TextEditor />,
@@ -68,7 +66,7 @@ function App() {
           fontSize: '2rem',
           fontWeight: '600'
         }}>
-          Sınav Analiz Merkezi
+          Sınav Yönetim Merkezi
         </h1>
         
         <div style={{
@@ -78,10 +76,10 @@ function App() {
           flexWrap: 'wrap',
         }}>
           <Button 
-            onClick={() => setPage('analytics')}
+            onClick={() => setPage('all-exams')}
             style={{
-              backgroundColor: page === 'analytics' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-              color: page === 'analytics' ? '#667eea' : 'white',
+              backgroundColor: page === 'all-exams' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
+              color: page === 'all-exams' ? '#667eea' : 'white',
               border: 'none',
               padding: '0.75rem 1.5rem',
               borderRadius: '8px',
@@ -89,10 +87,10 @@ function App() {
               fontWeight: '500',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              boxShadow: page === 'analytics' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
+              boxShadow: page === 'all-exams' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
             }}
           >
-            📊 Analiz
+            📋 Tüm Sınavlar
           </Button>
           
           <Button 
@@ -111,24 +109,6 @@ function App() {
             }}
           >
             🎯 Önemli Konular
-          </Button>
-          
-          <Button 
-            onClick={() => setPage('all-exams')}
-            style={{
-              backgroundColor: page === 'all-exams' ? '#ffffff' : 'rgba(255, 255, 255, 0.2)',
-              color: page === 'all-exams' ? '#667eea' : 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: page === 'all-exams' ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none'
-            }}
-          >
-            📋 Tüm Sınavlar
           </Button>
           
           <Button 
@@ -169,8 +149,8 @@ function App() {
         </div>
       </div>
 
-      {/* Time Slider for Analytics and Important Subjects */}
-      {(page === 'analytics' || page === 'important-subjects') && exams.length > 0 && (
+      {/* Time Slider for Important Subjects */}
+      {page === 'important-subjects' && exams.length > 0 && (
         <div style={{ 
           marginBottom: '2rem',
           padding: '1.5rem',
