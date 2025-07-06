@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react';
-import { UserAnswer } from '../modules/helpers';
+import { UserAnswer, dersler } from '../modules/helpers';
 import { parseExam } from '../modules/parseExam';
 import { Button } from '@/components/ui/button';
-import { X, Save, Edit3, FileText, Hash } from 'lucide-react';
+import { X, Save, Edit3, FileText, Hash, Plus, Trash2 } from 'lucide-react';
 
 interface EditExamModalProps {
   exam: ReturnType<typeof parseExam> | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedExam: ReturnType<typeof parseExam>) => void;
+}
+
+interface QuestionData {
+  question: string;
+  rightAnswer: string;
+  givenAnswer: string;
+  answer: UserAnswer;
 }
 
 export function EditExamModal({ 
@@ -18,52 +25,59 @@ export function EditExamModal({
   onSave 
 }: EditExamModalProps) {
   const [examId, setExamId] = useState('');
-  const [examContent, setExamContent] = useState('');
+  const [lessonsData, setLessonsData] = useState<Record<string, Record<string, QuestionData>>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (exam) {
       setExamId(exam.id);
-      // Convert exam data back to text format for editing
-      const content = generateExamContent(exam);
-      setExamContent(content);
+      setLessonsData(exam.sinav);
       setError('');
     }
   }, [exam]);
 
-  const generateExamContent = (exam: ReturnType<typeof parseExam>) => {
-    let content = '';
-    
-    // Handle lessons in the correct order, combining Math and Geometry
-    const lessonsOrder = ['Türkçe', 'Matematik', 'Tarih', 'Coğrafya', 'Felsefe', 'Din Kültürü', 'Fizik', 'Kimya', 'Biyoloji'];
-    
-    lessonsOrder.forEach(lesson => {
-      if (exam.sinav[lesson]) {
-        content += `${lesson}\n`;
-        
-        // For Math, include both Math and Geometry questions
-        let questions = exam.sinav[lesson];
-        if (lesson === 'Matematik' && exam.sinav['Geometri']) {
-          questions = { ...questions, ...exam.sinav['Geometri'] };
+  const updateQuestion = (lessonName: string, questionNumber: string, field: keyof QuestionData, value: string | UserAnswer) => {
+    setLessonsData(prev => ({
+      ...prev,
+      [lessonName]: {
+        ...prev[lessonName],
+        [questionNumber]: {
+          ...prev[lessonName][questionNumber],
+          [field]: value
         }
-        
-        // Sort questions by number
-        const sortedQuestions = Object.entries(questions).sort(([a], [b]) => parseInt(a) - parseInt(b));
-        
-        sortedQuestions.forEach(([questionNumber, questionData]) => {
-          content += `${questionNumber} ${questionData.question} ${questionData.rightAnswer} ${questionData.givenAnswer} `;
-          const userAnswer = questionData.answer;
-          if (userAnswer === UserAnswer.True) content += '+ ';
-          else if (userAnswer === UserAnswer.False) content += '- ';
-          else if (userAnswer === UserAnswer.Skip) content += ' ';
-          else if (userAnswer === UserAnswer.Cancel) content += 'IPT ';
-          content += '\n';
-        });
       }
-    });
+    }));
+  };
+
+  const addQuestion = (lessonName: string) => {
+    const existingQuestions = Object.keys(lessonsData[lessonName] || {});
+    const questionNumbers = existingQuestions.map(q => parseInt(q)).sort((a, b) => a - b);
+    const nextQuestionNumber = questionNumbers.length > 0 ? Math.max(...questionNumbers) + 1 : 1;
     
-    return content;
+    setLessonsData(prev => ({
+      ...prev,
+      [lessonName]: {
+        ...prev[lessonName],
+        [nextQuestionNumber]: {
+          question: '',
+          rightAnswer: '',
+          givenAnswer: '',
+          answer: UserAnswer.Skip
+        }
+      }
+    }));
+  };
+
+  const removeQuestion = (lessonName: string, questionNumber: string) => {
+    setLessonsData(prev => {
+      const newLessonData = { ...prev[lessonName] };
+      delete newLessonData[questionNumber];
+      return {
+        ...prev,
+        [lessonName]: newLessonData
+      };
+    });
   };
 
   const handleSave = async () => {
@@ -72,20 +86,42 @@ export function EditExamModal({
       return;
     }
 
-    if (!examContent.trim()) {
-      setError('Sınav içeriği boş olamaz.');
-      return;
-    }
-
     setIsLoading(true);
     setError('');
 
     try {
-      const updatedExam = parseExam(examId, examContent);
+      const updatedExam = {
+        id: examId,
+        sinav: lessonsData,
+        examResponse: {}
+      };
+
+      const examResponse: {
+        [lesson: string]: {
+          [subject: string]: UserAnswer[];
+        };
+      } = {};
+
+      Object.entries(lessonsData).forEach(([ders, dersResult]) => {
+        examResponse[ders] = examResponse[ders] || {};
+        Object.values(dersResult).forEach((soruResult) => {
+          const { answer, question } = soruResult;
+
+          if (answer === UserAnswer.Cancel) {
+            return;
+          }
+
+          examResponse[ders][question] = examResponse[ders][question] || [];
+          examResponse[ders][question].push(answer);
+        });
+      });
+
+      updatedExam.examResponse = examResponse;
+
       onSave(updatedExam);
       onClose();
     } catch (error) {
-      setError('Sınav formatı hatalı. Lütfen format kurallarını kontrol edin.');
+      setError('Sınav kaydedilirken hata oluştu.');
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +132,24 @@ export function EditExamModal({
     onClose();
   };
 
+  const getStatusSymbol = (answer: UserAnswer) => {
+    switch (answer) {
+      case UserAnswer.True:
+        return '✓';
+      case UserAnswer.False:
+        return '✗';
+      case UserAnswer.Skip:
+        return '—';
+      case UserAnswer.Cancel:
+        return '⊗';
+      default:
+        return '?';
+    }
+  };
+
   if (!isOpen || !exam) return null;
+
+  const lessonsOrder = ['Türkçe', 'Matematik', 'Geometri', 'Tarih', 'Coğrafya', 'Felsefe', 'Din Kültürü', 'Fizik', 'Kimya', 'Biyoloji'];
 
   return (
     <div className="modal-overlay" style={{
@@ -105,247 +158,381 @@ export function EditExamModal({
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      backdropFilter: 'blur(4px)',
-      animation: 'fadeIn 0.2s ease-out',
     }}>
       <div className="modal-content" style={{
         backgroundColor: 'white',
-        borderRadius: '16px',
+        borderRadius: '8px',
         width: '95%',
-        maxWidth: '900px',
-        maxHeight: '95vh',
+        maxWidth: '1400px',
+        maxHeight: '90vh',
         overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        animation: 'slideIn 0.3s ease-out',
-        border: '1px solid #e5e7eb',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+        border: '1px solid #ddd',
       }}>
         {/* Header */}
         <div style={{
-          padding: '1.5rem 2rem',
-          borderBottom: '1px solid #e5e7eb',
+          padding: '1rem 1.5rem',
+          borderBottom: '1px solid #ddd',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          backgroundColor: '#f8fafc',
+          backgroundColor: '#f8f9fa',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{
-              backgroundColor: '#3b82f6',
-              padding: '0.5rem',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <Edit3 size={20} color="white" />
-            </div>
-            <div>
-              <h2 style={{ 
-                margin: 0, 
-                fontSize: '1.25rem', 
-                fontWeight: '600',
-                color: '#1f2937',
-              }}>
-                Sınav Düzenle
-              </h2>
-              <p style={{ 
-                margin: 0, 
-                fontSize: '0.875rem', 
-                color: '#6b7280',
-              }}>
-                Sınav bilgilerini düzenleyin ve kaydedin
-              </p>
-            </div>
-          </div>
+          <h2 style={{ 
+            margin: 0, 
+            fontSize: '1.1rem', 
+            fontWeight: '600',
+            color: '#333',
+          }}>
+            Sınav Düzenle
+          </h2>
           <button
             onClick={handleClose}
             style={{
               padding: '0.5rem',
-              borderRadius: '8px',
+              borderRadius: '4px',
               border: 'none',
               backgroundColor: 'transparent',
-              color: '#6b7280',
+              color: '#666',
               cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#f3f4f6';
-              e.currentTarget.style.color = '#374151';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#6b7280';
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Content */}
         <div style={{
-          padding: '2rem',
-          maxHeight: 'calc(95vh - 140px)',
+          padding: '1.5rem',
+          maxHeight: 'calc(90vh - 120px)',
           overflowY: 'auto',
         }}>
           {error && (
             <div style={{
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: '8px',
-              padding: '1rem',
-              marginBottom: '1.5rem',
-              color: '#dc2626',
-              fontSize: '0.875rem',
+              backgroundColor: '#fee',
+              border: '1px solid #fcc',
+              borderRadius: '4px',
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              color: '#c33',
+              fontSize: '0.9rem',
             }}>
               {error}
             </div>
           )}
 
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            {/* Exam ID Field */}
-            <div>
-              <label style={{ 
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginBottom: '0.75rem', 
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151',
-              }}>
-                <Hash size={16} />
-                Sınav ID
-              </label>
-              <input
-                type="text"
-                value={examId}
-                onChange={(e) => setExamId(e.target.value)}
-                placeholder="Sınav ID'sini girin"
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  transition: 'all 0.2s',
-                  backgroundColor: '#ffffff',
-                  outline: 'none',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#d1d5db';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
+          {/* Exam ID */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ 
+              display: 'block',
+              marginBottom: '0.5rem', 
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              color: '#333',
+            }}>
+              Sınav ID
+            </label>
+            <input
+              type="text"
+              value={examId}
+              onChange={(e) => setExamId(e.target.value)}
+              style={{
+                width: '300px',
+                padding: '0.5rem',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '0.9rem',
+                outline: 'none',
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#007bff'}
+              onBlur={(e) => e.target.style.borderColor = '#ddd'}
+            />
+          </div>
 
-            {/* Exam Content Field */}
-            <div>
-              <label style={{ 
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                marginBottom: '0.75rem', 
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: '#374151',
-              }}>
-                <FileText size={16} />
-                Sınav İçeriği
-              </label>
-              <div style={{
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                transition: 'all 0.2s',
-              }}>
-                <textarea
-                  value={examContent}
-                  onChange={(e) => setExamContent(e.target.value)}
-                  placeholder="Sınav içeriğini buraya yapıştırın..."
-                  style={{
+          {/* Lessons Tables */}
+          <div style={{ display: 'grid', gap: '2rem' }}>
+            {lessonsOrder.map(lessonName => {
+              const lessonData = lessonsData[lessonName];
+              
+              if (!lessonData || Object.keys(lessonData).length === 0) {
+                return null;
+              }
+
+              const questions = Object.entries(lessonData).sort(([a], [b]) => parseInt(a) - parseInt(b));
+
+              return (
+                <div key={lessonName} style={{ pageBreakInside: 'avoid' }}>
+                  {/* Lesson Header */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '0.75rem',
+                    paddingBottom: '0.5rem',
+                    borderBottom: '2px solid #333',
+                  }}>
+                    <h3 style={{ 
+                      margin: 0, 
+                      fontSize: '1rem', 
+                      fontWeight: '600',
+                      color: '#333',
+                    }}>
+                      {lessonName}
+                    </h3>
+                    <button
+                      onClick={() => addQuestion(lessonName)}
+                      style={{
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '4px',
+                        border: '1px solid #ddd',
+                        backgroundColor: '#f8f9fa',
+                        color: '#666',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                      }}
+                      title="Soru Ekle"
+                    >
+                      <Plus size={14} />
+                      Soru Ekle
+                    </button>
+                  </div>
+
+                  {/* Questions Table */}
+                  <table style={{
                     width: '100%',
-                    height: '450px',
-                    padding: '1rem',
-                    border: 'none',
-                    fontSize: '0.875rem',
-                    fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
-                    lineHeight: '1.5',
-                    resize: 'vertical',
-                    outline: 'none',
-                    backgroundColor: '#fafafa',
-                  }}
-                  onFocus={(e) => {
-                    e.target.parentElement!.style.borderColor = '#3b82f6';
-                    e.target.parentElement!.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.parentElement!.style.borderColor = '#d1d5db';
-                    e.target.parentElement!.style.boxShadow = 'none';
-                  }}
-                />
-              </div>
-              <p style={{
-                margin: '0.5rem 0 0 0',
-                fontSize: '0.75rem',
-                color: '#6b7280',
-              }}>
-                Format: Ders adı, ardından sorular (soru numarası, doğru cevap, verilen cevap, durum)
-              </p>
-            </div>
+                    borderCollapse: 'collapse',
+                    fontSize: '0.85rem',
+                    backgroundColor: 'white',
+                    border: '1px solid #ddd',
+                  }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f8f9fa' }}>
+                        <th style={{ 
+                          padding: '0.5rem', 
+                          textAlign: 'left', 
+                          borderRight: '1px solid #ddd',
+                          width: '60px',
+                          fontWeight: '500',
+                        }}>
+                          No
+                        </th>
+                        <th style={{ 
+                          padding: '0.5rem', 
+                          textAlign: 'left', 
+                          borderRight: '1px solid #ddd',
+                          fontWeight: '500',
+                        }}>
+                          Soru
+                        </th>
+                        <th style={{ 
+                          padding: '0.5rem', 
+                          textAlign: 'center', 
+                          borderRight: '1px solid #ddd',
+                          width: '80px',
+                          fontWeight: '500',
+                        }}>
+                          Doğru
+                        </th>
+                        <th style={{ 
+                          padding: '0.5rem', 
+                          textAlign: 'center', 
+                          borderRight: '1px solid #ddd',
+                          width: '80px',
+                          fontWeight: '500',
+                        }}>
+                          Verilen
+                        </th>
+                        <th style={{ 
+                          padding: '0.5rem', 
+                          textAlign: 'center', 
+                          borderRight: '1px solid #ddd',
+                          width: '80px',
+                          fontWeight: '500',
+                        }}>
+                          Durum
+                        </th>
+                        <th style={{ 
+                          padding: '0.5rem', 
+                          textAlign: 'center',
+                          width: '40px',
+                          fontWeight: '500',
+                        }}>
+                          ⚙️
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {questions.map(([questionNumber, questionData]) => (
+                        <tr key={questionNumber} style={{ borderBottom: '1px solid #eee' }}>
+                          <td style={{ 
+                            padding: '0.5rem', 
+                            borderRight: '1px solid #eee',
+                            fontWeight: '500',
+                            color: '#666',
+                          }}>
+                            {questionNumber}
+                          </td>
+                          <td style={{ 
+                            padding: '0.5rem', 
+                            borderRight: '1px solid #eee',
+                          }}>
+                            <input
+                              type="text"
+                              value={questionData.question}
+                              onChange={(e) => updateQuestion(lessonName, questionNumber, 'question', e.target.value)}
+                              placeholder="Soru metnini girin..."
+                              style={{
+                                width: '100%',
+                                padding: '0.25rem',
+                                border: 'none',
+                                outline: 'none',
+                                fontSize: '0.85rem',
+                                backgroundColor: 'transparent',
+                              }}
+                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                            />
+                          </td>
+                          <td style={{ 
+                            padding: '0.5rem', 
+                            textAlign: 'center',
+                            borderRight: '1px solid #eee',
+                          }}>
+                            <select
+                              value={questionData.rightAnswer}
+                              onChange={(e) => updateQuestion(lessonName, questionNumber, 'rightAnswer', e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '0.25rem',
+                                border: 'none',
+                                outline: 'none',
+                                fontSize: '0.85rem',
+                                backgroundColor: 'transparent',
+                                textAlign: 'center',
+                              }}
+                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                            >
+                              <option value="">-</option>
+                              <option value="A">A</option>
+                              <option value="B">B</option>
+                              <option value="C">C</option>
+                              <option value="D">D</option>
+                              <option value="E">E</option>
+                            </select>
+                          </td>
+                          <td style={{ 
+                            padding: '0.5rem', 
+                            textAlign: 'center',
+                            borderRight: '1px solid #eee',
+                          }}>
+                            <select
+                              value={questionData.givenAnswer}
+                              onChange={(e) => updateQuestion(lessonName, questionNumber, 'givenAnswer', e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '0.25rem',
+                                border: 'none',
+                                outline: 'none',
+                                fontSize: '0.85rem',
+                                backgroundColor: 'transparent',
+                                textAlign: 'center',
+                              }}
+                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                            >
+                              <option value="">-</option>
+                              <option value="A">A</option>
+                              <option value="B">B</option>
+                              <option value="C">C</option>
+                              <option value="D">D</option>
+                              <option value="E">E</option>
+                            </select>
+                          </td>
+                          <td style={{ 
+                            padding: '0.5rem', 
+                            textAlign: 'center',
+                            borderRight: '1px solid #eee',
+                          }}>
+                            <select
+                              value={questionData.answer}
+                              onChange={(e) => updateQuestion(lessonName, questionNumber, 'answer', e.target.value as UserAnswer)}
+                              style={{
+                                width: '100%',
+                                padding: '0.25rem',
+                                border: 'none',
+                                outline: 'none',
+                                fontSize: '0.85rem',
+                                backgroundColor: 'transparent',
+                                textAlign: 'center',
+                              }}
+                              onFocus={(e) => e.target.style.backgroundColor = '#f8f9fa'}
+                              onBlur={(e) => e.target.style.backgroundColor = 'transparent'}
+                            >
+                              <option value={UserAnswer.True}>✓ Doğru</option>
+                              <option value={UserAnswer.False}>✗ Yanlış</option>
+                              <option value={UserAnswer.Skip}>— Boş</option>
+                              <option value={UserAnswer.Cancel}>⊗ İptal</option>
+                            </select>
+                          </td>
+                          <td style={{ 
+                            padding: '0.5rem', 
+                            textAlign: 'center',
+                          }}>
+                            <button
+                              onClick={() => removeQuestion(lessonName, questionNumber)}
+                              style={{
+                                padding: '0.25rem',
+                                borderRadius: '3px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                color: '#dc3545',
+                                cursor: 'pointer',
+                                fontSize: '0.75rem',
+                              }}
+                              title="Soru Sil"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Footer */}
         <div style={{
-          padding: '1.5rem 2rem',
-          borderTop: '1px solid #e5e7eb',
+          padding: '1rem 1.5rem',
+          borderTop: '1px solid #ddd',
           display: 'flex',
-          gap: '1rem',
+          gap: '0.75rem',
           justifyContent: 'flex-end',
-          backgroundColor: '#f8fafc',
+          backgroundColor: '#f8f9fa',
         }}>
           <Button
             onClick={handleClose}
             disabled={isLoading}
             style={{
               backgroundColor: 'transparent',
-              color: '#6b7280',
-              border: '1px solid #d1d5db',
-              padding: '0.625rem 1.5rem',
-              borderRadius: '8px',
+              color: '#666',
+              border: '1px solid #ddd',
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
               cursor: isLoading ? 'not-allowed' : 'pointer',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-            }}
-            onMouseOver={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.backgroundColor = '#f3f4f6';
-                e.currentTarget.style.borderColor = '#9ca3af';
-                e.currentTarget.style.color = '#374151';
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = '#d1d5db';
-                e.currentTarget.style.color = '#6b7280';
-              }
+              fontSize: '0.9rem',
             }}
           >
             İptal
@@ -354,88 +541,23 @@ export function EditExamModal({
             onClick={handleSave}
             disabled={isLoading}
             style={{
-              backgroundColor: isLoading ? '#9ca3af' : '#3b82f6',
+              backgroundColor: isLoading ? '#999' : '#007bff',
               color: 'white',
               border: 'none',
-              padding: '0.625rem 1.5rem',
-              borderRadius: '8px',
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
               cursor: isLoading ? 'not-allowed' : 'pointer',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
+              fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
             }}
-            onMouseOver={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.backgroundColor = '#2563eb';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.backgroundColor = '#3b82f6';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }
-            }}
           >
-            <Save size={16} />
+            <Save size={14} />
             {isLoading ? 'Kaydediliyor...' : 'Kaydet'}
           </Button>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        .modal-overlay {
-          animation: fadeIn 0.2s ease-out;
-        }
-
-        .modal-content {
-          animation: slideIn 0.3s ease-out;
-        }
-
-        /* Custom scrollbar */
-        *::-webkit-scrollbar {
-          width: 8px;
-        }
-
-        *::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 4px;
-        }
-
-        *::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 4px;
-        }
-
-        *::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-      `}</style>
     </div>
   );
 } 
