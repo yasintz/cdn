@@ -79,50 +79,72 @@ export const calculateGroupData = (
   analytics: any,
   examCount: number
 ): SubjectData | null => {
-  const groupSubjects = group.subjects;
+  const { subjects: groupSubjects, name: groupName, lesson: groupLesson, id: groupId } = group;
   
+  // Common base properties for the return object
+  const baseGroupData = {
+    subject: groupName,
+    className: groupLesson,
+    isGroup: true,
+    groupId,
+    groupSubjects
+  };
+
   if (selectedView === 'frequency') {
-    const lessonData = importantSubjects.subjectCounts.byClass[group.lesson] || [];
-    const relevantSubjects = lessonData.filter((item: any) => groupSubjects.includes(item.subject));
-    
-    const totalQuestions = relevantSubjects.reduce((sum: number, item: any) => sum + item.total, 0);
-    const avgPerExam = totalQuestions / examCount;
-    
-    return {
-      subject: group.name,
-      className: group.lesson,
-      total: totalQuestions,
-      rate: avgPerExam,
-      displayValue: Math.round(avgPerExam),
-      progressValue: totalQuestions,
-      isGroup: true,
-      groupId: group.id,
-      groupSubjects: group.subjects
-    };
-  } else {
-    const analyticsData = selectedView === 'mistakes' 
-      ? analytics.subjectBasedData[UserAnswer.False]
-      : analytics.subjectBasedData[UserAnswer.Skip];
-    
-    const relevantSubjects = analyticsData?.filter((item: any) => 
-      item.className === group.lesson && groupSubjects.includes(item.subject)
-    ) || [];
-    
-    if (relevantSubjects.length === 0) return null;
-    
-    const avgRate = relevantSubjects.reduce((sum: number, item: any) => sum + item.rate, 0) / relevantSubjects.length;
-    
-    return {
-      subject: group.name,
-      className: group.lesson,
-      rate: avgRate,
-      displayValue: avgRate,
-      progressValue: avgRate,
-      isGroup: true,
-      groupId: group.id,
-      groupSubjects: group.subjects
-    };
+    return calculateFrequencyGroupData(groupSubjects, groupLesson, examCount, importantSubjects, baseGroupData);
   }
+
+  return calculateAnalyticsGroupData(groupSubjects, groupLesson, selectedView, analytics, baseGroupData);
+};
+
+const calculateFrequencyGroupData = (
+  groupSubjects: string[],
+  groupLesson: string,
+  examCount: number,
+  importantSubjects: any,
+  baseGroupData: Partial<SubjectData>
+): SubjectData => {
+  const lessonData = importantSubjects.subjectCounts.byClass[groupLesson] || [];
+  const relevantSubjects = lessonData.filter((item: any) => groupSubjects.includes(item.subject));
+  
+  const totalQuestions = relevantSubjects.reduce((sum: number, item: any) => sum + item.total, 0);
+  const avgPerExam = totalQuestions / examCount;
+  
+  return {
+    ...baseGroupData,
+    total: totalQuestions,
+    rate: avgPerExam,
+    displayValue: Math.round(avgPerExam),
+    progressValue: totalQuestions
+  } as SubjectData;
+};
+
+const calculateAnalyticsGroupData = (
+  groupSubjects: string[],
+  groupLesson: string,
+  selectedView: ViewType,
+  analytics: any,
+  baseGroupData: Partial<SubjectData>
+): SubjectData | null => {
+  const analyticsKey = selectedView === 'mistakes' ? UserAnswer.False : UserAnswer.Skip;
+  const analyticsData = analytics.subjectBasedData?.[analyticsKey] || [];
+  
+  const relevantSubjects = analyticsData.filter((item: any) => 
+    item.className === groupLesson && groupSubjects.includes(item.subject)
+  );
+  
+  if (relevantSubjects.length === 0) {
+    return null;
+  }
+  
+  const avgRate = relevantSubjects.reduce((sum: number, item: any) => sum + item.rate, 0) / relevantSubjects.length;
+  
+  return {
+    ...baseGroupData,
+    rate: avgRate,
+    displayValue: avgRate,
+    progressValue: avgRate
+  } as SubjectData;
 };
 
 export const getViewData = (
