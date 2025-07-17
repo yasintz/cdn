@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SubjectGroup } from '../types';
+import { SubjectGroup } from '../../../useStore';
 
 export const useModalState = () => {
   // Group modal state

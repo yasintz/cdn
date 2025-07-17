@@ -1,8 +1,7 @@
 import React from 'react';
-import { useStore } from '../../useStore';
-import { ImportantSubjectsProps, SubjectGroup } from './types';
+import { useStore, SubjectGroup } from '../../useStore';
+import { ImportantSubjectsProps } from './types';
 import { 
-  useSubjectGroups, 
   useSubjectData, 
   useModalState 
 } from './hooks';
@@ -19,11 +18,10 @@ import {
 export function ImportantSubjects({
   data: { importantSubjects, examCount, analytics },
 }: ImportantSubjectsProps) {
-  // Get exams from the store
-  const { exams } = useStore();
+  // Get exams and subject groups from the store
+  const { exams, subjectGroups } = useStore();
 
   // Custom hooks for state management
-  const { subjectGroups } = useSubjectGroups();
   const modalState = useModalState();
   
   const {

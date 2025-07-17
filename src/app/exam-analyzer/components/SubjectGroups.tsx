@@ -1,20 +1,17 @@
 import React, { useState, useMemo } from 'react';
-import { useStore } from '../useStore';
+import { useStore, SubjectGroup } from '../useStore';
 import { newImpl } from '../new';
 import { Button } from '@/components/ui/button';
-import { SubjectGroup } from './ImportantSubjects/types';
-import { useSubjectGroups } from './ImportantSubjects/hooks/useSubjectGroups';
 import { getAvailableSubjects } from './ImportantSubjects/utils/subjectDataUtils';
 import { SubjectGroupModal } from './ImportantSubjects/components/SubjectGroupModal';
 import { useModalState } from './ImportantSubjects/hooks/useModalState';
 
 export function SubjectGroups() {
-  const { exams } = useStore();
+  const { exams, subjectGroups, saveSubjectGroup, deleteSubjectGroup } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLesson, setSelectedLesson] = useState('all');
   
-  // Get subject groups management
-  const { subjectGroups, saveGroup, deleteGroup } = useSubjectGroups();
+  // Modal state management
   const modalState = useModalState();
   
   // Get data from the store to show available subjects
@@ -64,7 +61,7 @@ export function SubjectGroups() {
 
   const handleDeleteGroup = (groupId: string) => {
     if (confirm('Bu konu grubunu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-      deleteGroup(groupId);
+      deleteSubjectGroup(groupId);
     }
   };
 
@@ -74,7 +71,7 @@ export function SubjectGroups() {
 
   const handleSaveGroup = (groupData: Omit<SubjectGroup, 'id' | 'createdAt'>, editingGroup?: SubjectGroup | null) => {
     try {
-      saveGroup(groupData, editingGroup);
+      saveSubjectGroup(groupData, editingGroup);
       modalState.closeGroupModal();
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Grup kaydedilirken bir hata oluştu.');

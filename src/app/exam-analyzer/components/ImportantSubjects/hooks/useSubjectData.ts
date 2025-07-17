@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { ViewType, SubjectGroup, SubjectData, ViewData } from '../types';
+import { ViewType, SubjectData, ViewData } from '../types';
+import { SubjectGroup } from '../../../useStore';
 import { 
   getViewData, 
   getSubjectsByLesson, 

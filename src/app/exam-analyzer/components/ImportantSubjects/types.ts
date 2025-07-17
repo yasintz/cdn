@@ -1,20 +1,13 @@
 import { UserAnswer } from '../../modules/helpers';
 import { newImpl } from '../../new';
 import { parseExam } from '../../modules/parseExam';
+import { SubjectGroup } from '../../useStore';
 
 export interface ImportantSubjectsProps {
   data: ReturnType<typeof newImpl>;
 }
 
 export type ViewType = 'frequency' | 'mistakes' | 'empty';
-
-export interface SubjectGroup {
-  id: string;
-  name: string;
-  lesson: string;
-  subjects: string[];
-  createdAt: number;
-}
 
 export interface SubjectData {
   subject: string;

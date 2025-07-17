@@ -1,5 +1,5 @@
 import React from 'react';
-import { SubjectGroup } from '../types';
+import { SubjectGroup } from '../../../useStore';
 
 interface SubjectGroupsManagementProps {
   subjectGroups: SubjectGroup[];

@@ -1,4 +1,5 @@
-import { SubjectGroup, SubjectData } from '../types';
+import { SubjectData } from '../types';
+import { SubjectGroup } from '../../../useStore';
 
 /**
  * Utility functions for subject group management

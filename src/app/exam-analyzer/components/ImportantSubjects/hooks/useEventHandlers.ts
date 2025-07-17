@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { SubjectGroup } from '../types';
+import { SubjectGroup } from '../../../useStore';
 
 interface UseEventHandlersProps {
   saveGroup: (groupData: Omit<SubjectGroup, 'id' | 'createdAt'>, editingGroup?: SubjectGroup | null) => void;
