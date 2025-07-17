@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import './App.css';
 import { newImpl } from './new';
@@ -14,18 +14,26 @@ import { TextEditor } from './components/TextEditor';
 function App() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
-  const currentPage = searchParams.get('page') as 'important-subjects' | 'all-exams' | 'text-editor' | null;
+
+  const currentPage = searchParams.get('page') as
+    | 'important-subjects'
+    | 'all-exams'
+    | 'text-editor'
+    | null;
   const page = currentPage || 'all-exams';
-  
+
   const { exams } = useStore();
   const [time, setTime] = useState(Math.max(0, exams.length - 1).toString());
   const [isAddExamModalOpen, setIsAddExamModalOpen] = useState(false);
-  
+
   const data = useMemo(
     () => newImpl(exams.slice(0, parseInt(time, 10) + 1)),
     [exams, time]
   );
+
+  useEffect(() => {
+    setTime(Math.max(0, exams.length - 1).toString());
+  }, [exams]);
 
   const setPage = (newPage: typeof page) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -51,42 +59,42 @@ function App() {
         <h1 className="text-center text-white text-3xl font-semibold mb-6">
           Sınav Yönetim Merkezi
         </h1>
-        
+
         <div className="flex gap-4 justify-center flex-wrap">
-          <Button 
+          <Button
             onClick={() => setPage('all-exams')}
             className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
-              page === 'all-exams' 
-                ? 'bg-white text-indigo-600 shadow-md' 
+              page === 'all-exams'
+                ? 'bg-white text-indigo-600 shadow-md'
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
             📋 Tüm Sınavlar
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={() => setPage('important-subjects')}
             className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
-              page === 'important-subjects' 
-                ? 'bg-white text-indigo-600 shadow-md' 
+              page === 'important-subjects'
+                ? 'bg-white text-indigo-600 shadow-md'
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
             🎯 Önemli Konular
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={() => setPage('text-editor')}
             className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
-              page === 'text-editor' 
-                ? 'bg-white text-indigo-600 shadow-md' 
+              page === 'text-editor'
+                ? 'bg-white text-indigo-600 shadow-md'
                 : 'bg-white/20 text-white hover:bg-white/30'
             }`}
           >
             ✏️ Metin Editörü
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={() => setIsAddExamModalOpen(true)}
             className="bg-green-600 text-white px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 shadow-md hover:bg-green-700 border-none"
           >
@@ -99,7 +107,8 @@ function App() {
       {page === 'important-subjects' && exams.length > 0 && (
         <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200">
           <h3 className="text-center text-gray-700 text-lg font-medium mb-4">
-            Sınav Zaman Aralığı ({parseInt(time, 10) + 1} / {exams.length} sınav)
+            Sınav Zaman Aralığı ({parseInt(time, 10) + 1} / {exams.length}{' '}
+            sınav)
           </h3>
           <input
             id="input"
@@ -122,7 +131,7 @@ function App() {
       <div className="bg-white rounded-xl p-8 shadow-sm min-h-[600px]">
         {pages[page]}
       </div>
-      
+
       <AddExamModal
         isOpen={isAddExamModalOpen}
         onClose={() => setIsAddExamModalOpen(false)}
