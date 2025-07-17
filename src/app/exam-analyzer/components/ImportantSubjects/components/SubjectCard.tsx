@@ -14,7 +14,6 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
   onEditGroup,
   onDeleteGroup
 }) => {
-  const progressPercentage = (subject.progressValue / maxValue) * 100;
   const averageQuestions = subject.total ? subject.total / examCount : 0;
 
   const handleClick = () => {
@@ -39,14 +38,6 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
       }`}
       onClick={handleClick}
     >
-      {/* Progress Background */}
-      <div 
-        className={`absolute top-0 left-0 h-full ${
-          subject.isGroup ? 'bg-green-500/20' : `${viewData.colorClass}/20`
-        } rounded-xl transition-all duration-500`}
-        style={{ width: `${progressPercentage}%` }}
-      />
-
       {/* Content */}
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-2">
@@ -82,10 +73,6 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
                 </button>
               </div>
             )}
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <span>📊</span>
-              <span>{progressPercentage.toFixed(1)}%</span>
-            </div>
           </div>
         </div>
         
