@@ -21,7 +21,7 @@ export const useSubjectData = ({
   subjectGroups 
 }: UseSubjectDataProps) => {
   const [selectedView, setSelectedView] = useState<ViewType>('frequency');
-  const [subjectCount, setSubjectCount] = useState<number>(5);
+  const [subjectCount, setSubjectCount] = useState<number>(6);
 
   // Get available subjects for each lesson
   const availableSubjects = useMemo(() => {
