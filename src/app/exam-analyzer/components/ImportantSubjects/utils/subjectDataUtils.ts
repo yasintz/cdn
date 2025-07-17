@@ -2,7 +2,6 @@ import { UserAnswer } from '../../../modules/helpers';
 import { dersler } from '../../../modules/helpers';
 import { parseExam } from '../../../modules/parseExam';
 import { 
-  SubjectGroup, 
   SubjectData, 
   ViewType, 
   ViewData, 
@@ -10,6 +9,7 @@ import {
   ExamDetail 
 } from '../types';
 import { viewTypeConfig, borderColors } from '../constants';
+import { SubjectGroup } from '@/app/exam-analyzer/useStore';
 
 export const getLessons = () => [...dersler.map((i) => i.name), 'Tum Dersler'];
 

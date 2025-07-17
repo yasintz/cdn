@@ -24,12 +24,25 @@ type StoreType = {
   addSubjectGroup: (group: Omit<SubjectGroup, 'id' | 'createdAt'>) => void;
   updateSubjectGroup: (id: string, group: Omit<SubjectGroup, 'id' | 'createdAt'>) => void;
   deleteSubjectGroup: (id: string) => void;
-  getSubjectGroupById: (id: string) => SubjectGroup | null;
-  getSubjectsInGroups: () => string[];
-  getGroupForSubject: (subjectName: string) => SubjectGroup | null;
-  isSubjectInGroup: (subjectName: string) => boolean;
   validateSubjectGroupData: (groupData: Omit<SubjectGroup, 'id' | 'createdAt'>, editingGroupId?: string) => string[];
   saveSubjectGroup: (groupData: Omit<SubjectGroup, 'id' | 'createdAt'>, editingGroup?: SubjectGroup | null) => void;
+};
+
+// Selectors
+export const subjectGroupByIdSelector = (state: StoreType) => (id: string): SubjectGroup | null => {
+  return state.subjectGroups.find(group => group.id === id) || null;
+};
+
+export const subjectsInGroupsSelector = (state: StoreType): string[] => {
+  return state.subjectGroups.flatMap(group => group.subjects);
+};
+
+export const groupForSubjectSelector = (state: StoreType) => (subjectName: string): SubjectGroup | null => {
+  return state.subjectGroups.find(group => group.subjects.includes(subjectName)) || null;
+};
+
+export const isSubjectInGroupSelector = (state: StoreType) => (subjectName: string): boolean => {
+  return subjectsInGroupsSelector(state).includes(subjectName);
 };
 
 export const useStore = create(
@@ -74,26 +87,6 @@ export const useStore = create(
         set((prev) => ({
           subjectGroups: prev.subjectGroups.filter((group) => group.id !== id)
         }));
-      },
-      
-      getSubjectGroupById: (id) => {
-        const { subjectGroups } = get();
-        return subjectGroups.find(group => group.id === id) || null;
-      },
-      
-      getSubjectsInGroups: () => {
-        const { subjectGroups } = get();
-        return subjectGroups.flatMap(group => group.subjects);
-      },
-      
-      getGroupForSubject: (subjectName) => {
-        const { subjectGroups } = get();
-        return subjectGroups.find(group => group.subjects.includes(subjectName)) || null;
-      },
-      
-      isSubjectInGroup: (subjectName) => {
-        const { getSubjectsInGroups } = get();
-        return getSubjectsInGroups().includes(subjectName);
       },
       
       validateSubjectGroupData: (groupData, editingGroupId) => {
