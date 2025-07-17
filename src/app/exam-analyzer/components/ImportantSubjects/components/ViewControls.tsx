@@ -21,17 +21,35 @@ export function ViewControls({
     onSubjectCountChange(value);
   };
 
+  const tabs = [
+    { value: 'frequency', label: '📊 En Sık Karşılaşılan Konular' },
+    { value: 'mistakes', label: '❌ En Çok Hata Yapılan Konular' },
+    { value: 'empty', label: '⭕ En Çok Boş Bırakılan Konular' }
+  ];
+
   return (
-    <div className="flex justify-center items-center gap-4 mt-4 flex-wrap">
-      <select
-        value={selectedView}
-        onChange={(e) => onViewChange(e.target.value as ViewType)}
-        className="px-4 py-3 rounded-lg border-none bg-white/90 text-gray-800 text-base font-semibold cursor-pointer min-w-[250px] shadow-lg"
-      >
-        <option value="frequency">📊 En Sık Karşılaşılan Konular</option>
-        <option value="mistakes">❌ En Çok Hata Yapılan Konular</option>
-        <option value="empty">⭕ En Çok Boş Bırakılan Konular</option>
-      </select>
+    <div className="flex flex-col items-center gap-4 mt-4">
+      {/* Tab Navigation */}
+      <div className="flex bg-gray-100 rounded-t-xl p-1 shadow-lg">
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => onViewChange(tab.value as ViewType)}
+            className={`
+              px-6 py-3 rounded-lg font-semibold text-sm transition-all duration-200 relative
+              ${selectedView === tab.value
+                ? 'bg-white text-gray-800 shadow-md border-b-2 border-blue-500 z-10'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
+              }
+            `}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Controls */}
+      <div className="flex justify-center items-center gap-4 flex-wrap">
       
       <div className="flex items-center gap-2 bg-white/90 px-3 py-3 rounded-lg shadow-lg">
         <span className="text-base font-semibold text-gray-800 whitespace-nowrap">
@@ -54,6 +72,7 @@ export function ViewControls({
         <span>🔗</span>
         <span>Grup Oluştur</span>
       </button>
+      </div>
     </div>
   );
-} 
+}
