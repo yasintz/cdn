@@ -45,7 +45,8 @@ export const useSubjectData = ({
       importantSubjects, 
       subjectGroups, 
       examCount, 
-      subjectCount
+      subjectCount,
+      analytics
     );
   };
 

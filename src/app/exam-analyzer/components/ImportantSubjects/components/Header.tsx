@@ -9,7 +9,6 @@ interface HeaderProps {
   onViewChange: (view: ViewType) => void;
   subjectCount: number;
   onSubjectCountChange: (count: number) => void;
-  onCreateGroup: () => void;
 }
 
 export function Header({
@@ -18,8 +17,7 @@ export function Header({
   selectedView,
   onViewChange,
   subjectCount,
-  onSubjectCountChange,
-  onCreateGroup
+  onSubjectCountChange
 }: HeaderProps) {
   return (
     <div className="text-center mb-8 p-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl text-white shadow-2xl">
@@ -36,7 +34,6 @@ export function Header({
         onViewChange={onViewChange}
         subjectCount={subjectCount}
         onSubjectCountChange={onSubjectCountChange}
-        onCreateGroup={onCreateGroup}
       />
     </div>
   );

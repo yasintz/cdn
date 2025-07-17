@@ -4,16 +4,13 @@ import { ImportantSubjectsProps, SubjectGroup } from './types';
 import { 
   useSubjectGroups, 
   useSubjectData, 
-  useModalState, 
-  useEventHandlers 
+  useModalState 
 } from './hooks';
 import { 
   EmptyState,
   Header,
-  SubjectGroupsManagement,
   StatisticsCards,
   LessonCard,
-  SubjectGroupModal,
   SubjectDetailModal,
   AnalysisInfo,
   ErrorBoundary
@@ -26,7 +23,7 @@ export function ImportantSubjects({
   const { exams } = useStore();
 
   // Custom hooks for state management
-  const { subjectGroups, saveGroup, deleteGroup } = useSubjectGroups();
+  const { subjectGroups } = useSubjectGroups();
   const modalState = useModalState();
   
   const {
@@ -46,14 +43,10 @@ export function ImportantSubjects({
     subjectGroups
   });
 
-  // Event handlers
-  const eventHandlers = useEventHandlers({
-    saveGroup,
-    deleteGroup,
-    openGroupModal: modalState.openGroupModal,
-    closeGroupModal: modalState.closeGroupModal,
-    openSubjectDetailModal: modalState.openSubjectDetailModal
-  });
+  // Event handler for subject details
+  const handleSubjectClick = (subjectName: string, lessonName: string) => {
+    modalState.openSubjectDetailModal(subjectName, lessonName);
+  };
 
   // Early return for empty state
   if (examCount === 0) {
@@ -71,14 +64,6 @@ export function ImportantSubjects({
         onViewChange={setSelectedView}
         subjectCount={subjectCount}
         onSubjectCountChange={setSubjectCount}
-        onCreateGroup={eventHandlers.handleCreateGroup}
-      />
-
-      {/* Subject Groups Management */}
-      <SubjectGroupsManagement
-        subjectGroups={subjectGroups}
-        onEditGroup={eventHandlers.handleEditGroup}
-        onDeleteGroup={eventHandlers.handleDeleteGroup}
       />
 
       {/* Statistics Cards */}
@@ -99,26 +84,13 @@ export function ImportantSubjects({
             viewData={viewData}
             examCount={examCount}
             subjectGroups={subjectGroups}
-            onSubjectClick={eventHandlers.handleSubjectClick}
-            onEditGroup={eventHandlers.handleEditGroup}
-            onDeleteGroup={eventHandlers.handleDeleteGroup}
+            onSubjectClick={handleSubjectClick}
           />
         ))}
       </div>
 
       {/* Analysis Information */}
       <AnalysisInfo selectedView={selectedView} />
-
-      {/* Subject Group Modal */}
-      <SubjectGroupModal
-        isOpen={modalState.isGroupModalOpen}
-        onClose={modalState.closeGroupModal}
-        onSave={(groupData: Omit<SubjectGroup, 'id' | 'createdAt'>) => 
-          eventHandlers.handleSaveGroup(groupData, modalState.editingGroup)
-        }
-        editingGroup={modalState.editingGroup}
-        availableSubjects={availableSubjects}
-      />
 
       {/* Subject Detail Modal */}
       {modalState.selectedSubject && modalState.selectedLesson && (

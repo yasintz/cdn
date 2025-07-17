@@ -190,17 +190,21 @@ export const getSubjectsByLesson = (
   importantSubjects: any,
   subjectGroups: SubjectGroup[],
   examCount: number,
-  subjectCount: number
+  subjectCount: number,
+  analytics?: any
 ): SubjectData[] => {
   let regularSubjects: SubjectData[] = [];
   let groupSubjects: SubjectData[] = [];
 
-  // Get regular subjects
+  // Get all subjects that are included in groups
+  const subjectsInGroups = subjectGroups.flatMap(group => group.subjects);
+
+  // Get regular subjects (excluding those that are in groups)
   if (selectedView === 'frequency') {
     const subjects = (lesson === 'Tum Dersler'
       ? importantSubjects.subjectCounts.inAllClass
       : importantSubjects.subjectCounts.byClass[lesson]
-    )?.filter((i: any) => i.subject) || [];
+    )?.filter((i: any) => i.subject && !subjectsInGroups.includes(i.subject)) || [];
     
     regularSubjects = subjects.map((subject: any) => ({
       ...subject,
@@ -211,7 +215,8 @@ export const getSubjectsByLesson = (
     }));
   } else {
     const allSubjects = viewData.data.filter((subject: any) => 
-      lesson === 'Tum Dersler' || subject.className === lesson
+      (lesson === 'Tum Dersler' || subject.className === lesson) &&
+      !subjectsInGroups.includes(subject.subject)
     );
     
     regularSubjects = allSubjects.map((subject: any) => {
@@ -232,18 +237,23 @@ export const getSubjectsByLesson = (
     : subjectGroups.filter(group => group.lesson === lesson);
 
   groupSubjects = lessonGroups
-    .map(group => calculateGroupData(group, selectedView, importantSubjects, {}, examCount))
+    .map(group => calculateGroupData(group, selectedView, importantSubjects, analytics, examCount))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
-  // Combine and sort
+  // Combine regular subjects and group subjects
   const allSubjects = [...regularSubjects, ...groupSubjects];
   
-  // Sort by average question count (total / examCount)
+  // Sort by the appropriate metric based on selected view
   const sortedSubjects = allSubjects
     .sort((a, b) => {
-      const avgA = (a.total || 0) / examCount;
-      const avgB = (b.total || 0) / examCount;
-      return avgB - avgA;
+      if (selectedView === 'frequency') {
+        const avgA = (a.total || 0) / examCount;
+        const avgB = (b.total || 0) / examCount;
+        return avgB - avgA;
+      } else {
+        // For mistakes and empty views, sort by rate
+        return (b.rate || 0) - (a.rate || 0);
+      }
     })
     .slice(0, subjectCount);
 

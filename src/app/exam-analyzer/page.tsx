@@ -10,6 +10,7 @@ import { ImportantSubjects } from './components/ImportantSubjects';
 import { AddExamModal } from './components/AddExamModal';
 import { AllExams } from './components/AllExams';
 import { AllSubjects } from './components/AllSubjects';
+import { SubjectGroups } from './components/SubjectGroups';
 import { TextEditor } from './components/TextEditor';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
     | 'important-subjects'
     | 'all-exams'
     | 'all-subjects'
+    | 'subject-groups'
     | 'text-editor'
     | null;
   const page = currentPage || 'all-exams';
@@ -52,6 +54,7 @@ function App() {
     'important-subjects': <ImportantSubjects data={data} />,
     'all-exams': <AllExams />,
     'all-subjects': <AllSubjects />,
+    'subject-groups': <SubjectGroups />,
     'text-editor': <TextEditor />,
   };
 
@@ -95,6 +98,17 @@ function App() {
             }`}
           >
             📚 Tüm Konular
+          </Button>
+
+          <Button
+            onClick={() => setPage('subject-groups')}
+            className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
+              page === 'subject-groups'
+                ? 'bg-white text-indigo-600 shadow-md'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            🔗 Konu Grupları
           </Button>
 
           <Button

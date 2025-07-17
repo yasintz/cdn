@@ -12,8 +12,6 @@ export const LessonCard: React.FC<LessonCardProps> = ({
   examCount,
   subjectGroups,
   onSubjectClick,
-  onEditGroup,
-  onDeleteGroup,
 }) => {
   if (subjects.length === 0) return null;
 
@@ -58,8 +56,6 @@ export const LessonCard: React.FC<LessonCardProps> = ({
               examCount={examCount}
               subjectGroups={subjectGroups}
               onSubjectClick={onSubjectClick}
-              onEditGroup={onEditGroup}
-              onDeleteGroup={onDeleteGroup}
             />
           ))}
         </div>

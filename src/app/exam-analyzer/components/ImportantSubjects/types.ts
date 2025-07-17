@@ -85,8 +85,6 @@ export interface SubjectCardProps {
   examCount: number;
   subjectGroups: SubjectGroup[];
   onSubjectClick: (subjectName: string, lessonName: string) => void;
-  onEditGroup: (group: SubjectGroup) => void;
-  onDeleteGroup: (groupId: string) => void;
 }
 
 export interface LessonCardProps {
@@ -97,8 +95,6 @@ export interface LessonCardProps {
   examCount: number;
   subjectGroups: SubjectGroup[];
   onSubjectClick: (subjectName: string, lessonName: string) => void;
-  onEditGroup: (group: SubjectGroup) => void;
-  onDeleteGroup: (groupId: string) => void;
 }
 
 export interface StatisticsCardsProps {

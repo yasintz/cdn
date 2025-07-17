@@ -7,7 +7,6 @@ interface ViewControlsProps {
   onViewChange: (view: ViewType) => void;
   subjectCount: number;
   onSubjectCountChange: (count: number) => void;
-  onCreateGroup: () => void;
 }
 
 export function ViewControls({
@@ -15,7 +14,6 @@ export function ViewControls({
   onViewChange,
   subjectCount,
   onSubjectCountChange,
-  onCreateGroup,
 }: ViewControlsProps) {
   const handleSubjectCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(1, Math.min(20, parseInt(e.target.value) || 1));
@@ -63,14 +61,6 @@ export function ViewControls({
             className="px-2 py-1 rounded border border-gray-300 w-15 text-center text-base font-semibold text-gray-800 bg-white"
           />
         </div>
-
-        <button
-          onClick={onCreateGroup}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-semibold shadow-lg transition-colors flex items-center gap-2"
-        >
-          <span>🔗</span>
-          <span>Grup Oluştur</span>
-        </button>
       </div>
     </div>
   );

@@ -10,9 +10,7 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
   lesson,
   examCount,
   subjectGroups,
-  onSubjectClick,
-  onEditGroup,
-  onDeleteGroup
+  onSubjectClick
 }) => {
   const averageQuestions = subject.total ? subject.total / examCount : 0;
 
@@ -20,16 +18,7 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
     onSubjectClick(subject.subject, subject.className);
   };
 
-  const handleEditGroup = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const group = subjectGroups.find(g => g.id === subject.groupId);
-    if (group) onEditGroup(group);
-  };
 
-  const handleDeleteGroup = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (subject.groupId) onDeleteGroup(subject.groupId);
-  };
 
   return (
     <div 
@@ -55,24 +44,7 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {subject.isGroup && subject.groupId && (
-              <div className="flex gap-1">
-                <button
-                  onClick={handleEditGroup}
-                  className="text-blue-500 hover:text-blue-700 text-xs p-1"
-                  title="Grubu Düzenle"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={handleDeleteGroup}
-                  className="text-red-500 hover:text-red-700 text-xs p-1"
-                  title="Grubu Sil"
-                >
-                  🗑️
-                </button>
-              </div>
-            )}
+            {/* Group actions removed - managed on separate page */}
           </div>
         </div>
         
