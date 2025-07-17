@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ImportantSubjects } from './components/ImportantSubjects';
 import { AddExamModal } from './components/AddExamModal';
 import { AllExams } from './components/AllExams';
+import { AllSubjects } from './components/AllSubjects';
 import { TextEditor } from './components/TextEditor';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
   const currentPage = searchParams.get('page') as
     | 'important-subjects'
     | 'all-exams'
+    | 'all-subjects'
     | 'text-editor'
     | null;
   const page = currentPage || 'all-exams';
@@ -49,6 +51,7 @@ function App() {
   const pages: Record<typeof page, React.ReactNode> = {
     'important-subjects': <ImportantSubjects data={data} />,
     'all-exams': <AllExams />,
+    'all-subjects': <AllSubjects />,
     'text-editor': <TextEditor />,
   };
 
@@ -81,6 +84,17 @@ function App() {
             }`}
           >
             🎯 Önemli Konular
+          </Button>
+
+          <Button
+            onClick={() => setPage('all-subjects')}
+            className={`px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 border-none ${
+              page === 'all-subjects'
+                ? 'bg-white text-indigo-600 shadow-md'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            📚 Tüm Konular
           </Button>
 
           <Button
