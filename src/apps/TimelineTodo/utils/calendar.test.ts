@@ -38,7 +38,7 @@ describe('convertItemToDate', () => {
   it('should work for a real case', () => {
     const key = 'DTSTART';
     const dateString = '20240722T213000Z';
-    const expectedDate = new Date('2024-07-21T23:30:00.000Z');
+    const expectedDate = new Date('2024-07-23T04:30:00.000Z');
 
     const result = convertItemToDate(key, dateString, 'America/Los_Angeles');
     expect(result.toISOString()).toBe(expectedDate.toISOString());

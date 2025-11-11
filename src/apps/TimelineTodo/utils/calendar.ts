@@ -6,7 +6,7 @@ import { EntryType, SessionType, useStore } from '../store';
 import _ from 'lodash';
 
 const allCalendarsJson: Array<{ name: string; url: string }> = JSON.parse(
-  import.meta.env.VITE_EXTERNAL_CALENDARS || '['
+  import.meta.env.VITE_EXTERNAL_CALENDARS || '[]'
 );
 
 export async function getAllCalendars() {
@@ -89,6 +89,15 @@ export function convertItemToDate(
   key = key.replace(';VALUE=DATE', '');
 
   const timezone = getTimezoneFromKey(key) || defaultTimezone;
+  
+  // If dateString ends with 'Z', it's UTC time
+  // Parse as UTC, then treat it as local time in target timezone and convert back to UTC
+  if (dateString.endsWith('Z')) {
+    const date = formatIcalDateString(dateString);
+    // The second parameter 'true' means keepLocalTime - treats UTC time as local time in target timezone
+    return dayjs.utc(date).tz(timezone, true).toDate();
+  }
+  
   const date = formatIcalDateString(dateString);
 
   try {
