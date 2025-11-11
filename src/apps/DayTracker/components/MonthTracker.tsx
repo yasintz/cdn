@@ -5,7 +5,7 @@ import { Settings } from './Settings';
 import { ActivitySelector } from './ActivitySelector';
 import { Button } from '@/components/ui/button';
 import { Settings as SettingsIcon, BarChart3 } from 'lucide-react';
-import { useStore } from '../store';
+import { useStore } from '@/apps/Calendar/store';
 import { useNavigate } from 'react-router-dom';
 
 export function MonthTracker() {
@@ -17,8 +17,6 @@ export function MonthTracker() {
   const trackerRefs = useRef<Map<string, DailyTrackerHandle>>(new Map());
   const todayRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
-  const { settings } = useStore();
 
   // Generate 30 days: 14 previous, today, 14 next
   const days = useMemo(() => {
@@ -154,7 +152,7 @@ export function MonthTracker() {
         </div>
       )}
 
-      {showActivitySelector && settings && (
+      {showActivitySelector && (
         <ActivitySelector
           open={showActivitySelector}
           onOpenChange={setShowActivitySelector}
@@ -169,7 +167,6 @@ export function MonthTracker() {
             setShowActivitySelector(false);
             setActiveDays(new Map());
           }}
-          activities={settings.activities}
         />
       )}
 

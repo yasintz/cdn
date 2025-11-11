@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import dayjs from '@/helpers/dayjs';
 import { useSearchParams } from 'react-router-dom';
@@ -7,6 +7,10 @@ import CalendarDay from './Day';
 import Form from './Form';
 import Hours from './Hours';
 import { cn } from '@/lib/utils';
+import { LabelsSettings } from './LabelsSettings';
+import { Button } from '@/components/ui/button';
+import { Settings as SettingsIcon } from 'lucide-react';
+import { selectVisibleEvents } from './store';
 
 const CreateModal = () => {
   const { createEvent } = useStore();
@@ -51,8 +55,10 @@ const UpdateModal = ({
 
 const CalendarPage = () => {
   const today = new Date();
-  const [viewDays, setViewDays] = React.useState(4);
-  const { events, createEvent } = useStore();
+  const [viewDays, setViewDays] = useState(4);
+  const [showSettings, setShowSettings] = useState(false);
+  const events = useStore(selectVisibleEvents);
+  const createEvent = useStore((state) => state.createEvent);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const selectedEventId = searchParams.get('selectedEventId') || undefined;
@@ -102,14 +108,24 @@ const CalendarPage = () => {
     <div className="h-full flex flex-col">
       <div className="flex justify-between px-4">
         <CreateModal />
-        <select
-          value={viewDays.toString()}
-          onChange={(e) => setViewDays(Number(e.target.value))}
-        >
-          <option value="7">Week</option>
-          <option value="1">Day</option>
-          <option value="4">4 Days</option>
-        </select>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowSettings(true)}
+            title="Settings"
+          >
+            <SettingsIcon className="h-4 w-4" />
+          </Button>
+          <select
+            value={viewDays.toString()}
+            onChange={(e) => setViewDays(Number(e.target.value))}
+          >
+            <option value="7">Week</option>
+            <option value="1">Day</option>
+            <option value="4">4 Days</option>
+          </select>
+        </div>
       </div>
       <div
         className="syncscroll syncscroll:scroll-pane flex justify-between border-b overflow-x-scroll h-10 scrollbar-hidden ml-auto"
@@ -185,6 +201,12 @@ const CalendarPage = () => {
           open={!updateModalClosed}
           onClose={() => setParams({ updateModalClosed: true })}
           event={activeEvent}
+        />
+      )}
+      {showSettings && (
+        <LabelsSettings
+          open={showSettings}
+          onOpenChange={setShowSettings}
         />
       )}
     </div>

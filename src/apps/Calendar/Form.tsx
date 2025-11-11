@@ -9,7 +9,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { EventType } from './store';
+import { EventType, useStore } from './store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
@@ -28,6 +28,7 @@ const Form = ({
   onSubmit,
   onDelete,
 }: FormProps) => {
+  const { labels } = useStore();
   const defaultValues: FormInputs = {
     title: '',
     allDay: false,
@@ -35,6 +36,7 @@ const Form = ({
     end: new Date().toISOString(),
     isGroup: false,
     color: '#8f8f8f',
+    labels: [],
     ...defaultValuesProp,
   };
 
@@ -102,6 +104,58 @@ const Form = ({
                 '#ffc107',
               ]}
             />
+          </div>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="labels"
+        render={({ field }) => (
+          <div className="flex flex-col gap-2">
+            <Label>Labels</Label>
+            <div className="flex flex-wrap gap-2">
+              {labels.map((label) => {
+                const isSelected = field.value?.includes(label.id) || false;
+                return (
+                  <div
+                    key={label.id}
+                    className="flex items-center gap-2 px-3 py-1 rounded-full border cursor-pointer"
+                    style={{
+                      backgroundColor: isSelected ? label.color : 'transparent',
+                      borderColor: label.color,
+                      color: isSelected ? '#fff' : 'inherit',
+                    }}
+                    onClick={() => {
+                      const currentLabels = field.value || [];
+                      if (isSelected) {
+                        field.onChange(currentLabels.filter((id: string) => id !== label.id));
+                      } else {
+                        field.onChange([...currentLabels, label.id]);
+                      }
+                    }}
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={(checked) => {
+                        const currentLabels = field.value || [];
+                        if (checked) {
+                          field.onChange([...currentLabels, label.id]);
+                        } else {
+                          field.onChange(currentLabels.filter((id: string) => id !== label.id));
+                        }
+                      }}
+                    />
+                    <span className="text-sm">{label.name}</span>
+                  </div>
+                );
+              })}
+              {labels.length === 0 && (
+                <div className="text-sm text-muted-foreground">
+                  No labels available. Create labels in Settings.
+                </div>
+              )}
+            </div>
           </div>
         )}
       />

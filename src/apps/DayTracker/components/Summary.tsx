@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import {
   Card,
@@ -13,8 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { AlertCircle } from 'lucide-react';
-import { useStore } from '../store';
+import { useStore, selectSummary } from '@/apps/Calendar/store';
 
 type Period = 'daily' | 'weekly' | 'monthly' | '3months' | '6months' | 'year';
 
@@ -29,9 +28,7 @@ const periodLabels: Record<Period, string> = {
 
 export function Summary() {
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('daily');
-  const { entries, getSummary } = useStore();
-
-  const summary = useMemo(() => getSummary(selectedPeriod), [getSummary, selectedPeriod, entries]);
+  const summary = useStore(selectSummary(selectedPeriod));
 
   const dateRange =
     summary && summary.startDate !== summary.endDate
