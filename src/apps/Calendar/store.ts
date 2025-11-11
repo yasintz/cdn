@@ -52,38 +52,17 @@ function eventToHourBlocks(start: string, end: string): string[] {
   const endDate = dayjs(end);
   const hours: string[] = [];
   
-  // If event spans multiple days, handle each day separately
-  if (startDate.isSame(endDate, 'day')) {
-    // Same day: get all hours between start and end (end is exclusive)
-    let current = startDate.startOf('hour');
-    const endHourDate = endDate.startOf('hour');
-    
-    while (current.isBefore(endHourDate, 'hour')) {
-      hours.push(current.format('HH:mm'));
-      current = current.add(1, 'hour');
-    }
-  } else {
-    // Multi-day: for the start day, get hours from start hour to end of day
-    let current = startDate.startOf('hour');
-    const endOfStartDay = startDate.endOf('day');
-    
-    while (current.isBefore(endOfStartDay, 'hour') || current.isSame(endOfStartDay, 'hour')) {
-      hours.push(current.format('HH:mm'));
-      current = current.add(1, 'hour');
-    }
-    
-    // For the end day, get hours from start of day to end hour (end is exclusive)
-    const startOfEndDay = endDate.startOf('day');
-    current = startOfEndDay;
-    const endHourDate = endDate.startOf('hour');
-    
-    while (current.isBefore(endHourDate, 'hour')) {
-      const hourStr = current.format('HH:mm');
-      if (!hours.includes(hourStr)) {
-        hours.push(hourStr);
-      }
-      current = current.add(1, 'hour');
-    }
+  // Get all hours between start and end (end is exclusive, but we need to handle end-of-day properly)
+  let current = startDate.startOf('hour');
+  const endHourDate = endDate.startOf('hour');
+  
+  // If end time is at the start of an hour, it's exclusive
+  // If end time has minutes/seconds, we need to include that hour
+  const shouldIncludeEndHour = endDate.minute() > 0 || endDate.second() > 0 || endDate.millisecond() > 0;
+  
+  while (current.isBefore(endHourDate, 'hour') || (shouldIncludeEndHour && current.isSame(endHourDate, 'hour'))) {
+    hours.push(current.format('HH:mm'));
+    current = current.add(1, 'hour');
   }
   
   return hours;
@@ -263,7 +242,6 @@ export const useStore = create<StoreType>()(
                   const existingEventOnOtherDate = prev.events.find((e) => e.title === group.activity);
                   const colorToUse = preservedColor || existingEventOnOtherDate?.color || '#808080';
 
-                  const [startHour, startMin] = group.startHour.split(':').map(Number);
                   const [endHour, endMin] = group.endHour.split(':').map(Number);
                   
                   // Calculate end time (add 1 hour to endHour to make it exclusive)
