@@ -1,1 +1,1 @@
-pnpm tsc
+pnpm tsc && pnpm test
