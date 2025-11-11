@@ -30,7 +30,6 @@ type StoreType = {
   events: Array<EventType>;
   labels: Array<Label>;
   hiddenLabelIds: string[]; // Stored as array for persistence, converted to Set when needed
-  dayTrackerStartTime: string;
 
   // Event methods
   createEvent: (event: Omit<EventType, 'id'>) => string;
@@ -45,7 +44,6 @@ type StoreType = {
 
   // DayTracker methods
   createDayTrackerEvent: (date: string, hours: Array<{ hour: string; activity: string | null }>) => void;
-  updateDayTrackerStartTime: (startTime: string) => void;
 };
 
 // Helper function to convert calendar event times to hour blocks
@@ -99,7 +97,6 @@ export const useStore = create<StoreType>()(
           events: [],
           labels: [],
           hiddenLabelIds: [],
-          dayTrackerStartTime: '08:00',
 
           createEvent: (event) => {
             const id = uid();
@@ -173,12 +170,6 @@ export const useStore = create<StoreType>()(
               } else {
                 prev.hiddenLabelIds.splice(index, 1);
               }
-            });
-          },
-
-          updateDayTrackerStartTime: (startTime) => {
-            set((prev) => {
-              prev.dayTrackerStartTime = startTime;
             });
           },
 
@@ -335,7 +326,7 @@ export const selectDayTrackerEvents = (state: StoreType) => {
 
 // Selector functions for parameterized queries
 export const selectDayData = (date: string) => (state: StoreType) => {
-  const allHourBlocks = generateHourBlocks(state.dayTrackerStartTime);
+  const allHourBlocks = generateHourBlocks();
   const dayTrackerEvents = selectDayTrackerEvents(state);
   const hourMap = new Map<string, { activity: string; color: string }>();
   const targetDate = dayjs(date);

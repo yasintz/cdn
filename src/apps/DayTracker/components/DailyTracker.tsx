@@ -22,7 +22,6 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
     const dateString = format(date, 'yyyy-MM-dd');
     const [selectedHours, setSelectedHours] = useState<Set<string>>(new Set());
 
-    const dayTrackerStartTime = useStore((state) => state.dayTrackerStartTime);
     const dayData = useStore(selectDayData(dateString));
     const createDayTrackerEvent = useStore(
       (state) => state.createDayTrackerEvent
@@ -30,9 +29,8 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
     const dayTrackerEvents = useStore(selectDayTrackerEvents);
 
     const hourBlocks = useMemo(() => {
-      if (!dayTrackerStartTime) return [];
-      return generateHourBlocks(dayTrackerStartTime);
-    }, [dayTrackerStartTime]);
+      return generateHourBlocks();
+    }, []);
 
     const handleHourClick = (hour: string) => {
       setSelectedHours((prev) => {
@@ -115,7 +113,7 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
       return Color(color).mix(Color('white'), 0.8).hex();
     };
 
-    if (!dayTrackerStartTime || !dayData) {
+    if (!dayData) {
       return <div>Loading...</div>;
     }
 
