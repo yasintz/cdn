@@ -91,7 +91,7 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     lazy: () => import('../apps/DayTracker'),
     title: 'Day Tracker',
     image:
-      'https://cdn.dribbble.com/users/5840087/screenshots/14061542/media/d3e37dc3707cede8f9d1fe9d3f6ad001.jpg?resize=400x0',
+      'https://img.freepik.com/free-vector/school-child-schedule_74855-6645.jpg?semt=ais_hybrid&w=740&q=80',
   },
 ];
 
