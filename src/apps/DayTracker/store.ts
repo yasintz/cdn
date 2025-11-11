@@ -96,21 +96,38 @@ export const useStore = create<StoreType>()(
 
           updateDayHours: (date, hours) => {
             set((prev) => {
+              // Create a map of existing entries for this date
+              const existingHourMap = new Map<string, TimeEntry>();
+              prev.entries.forEach((entry) => {
+                const [entryDate, entryHour] = entry.time.split(' ');
+                if (entryDate === date) {
+                  existingHourMap.set(entryHour, entry);
+                }
+              });
+
+              // Update the map with new hours
+              hours.forEach((hour) => {
+                if (hour.activity !== null) {
+                  existingHourMap.set(hour.hour, {
+                    id: `${date}-${hour.hour}`,
+                    time: `${date} ${hour.hour}`,
+                    activity: hour.activity,
+                  });
+                } else {
+                  // Remove entry if activity is null
+                  existingHourMap.delete(hour.hour);
+                }
+              });
+
               // Remove all existing entries for this date
               prev.entries = prev.entries.filter((entry) => {
                 const [entryDate] = entry.time.split(' ');
                 return entryDate !== date;
               });
 
-              // Add new entries for non-null activities
-              hours.forEach((hour) => {
-                if (hour.activity !== null) {
-                  prev.entries.push({
-                    id: `${date}-${hour.hour}`,
-                    time: `${date} ${hour.hour}`,
-                    activity: hour.activity,
-                  });
-                }
+              // Add back all entries (existing + updated)
+              existingHourMap.forEach((entry) => {
+                prev.entries.push(entry);
               });
             });
           },
