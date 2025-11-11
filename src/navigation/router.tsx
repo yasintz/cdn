@@ -86,6 +86,13 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     image:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxSv7E4cJz1rLPR9yXv3K-IDlUmrl8clfgboMTYS_L4lToKVd-TPpCBZ05VIBYLnhKTbo&usqp=CAU',
   },
+  {
+    path: 'day-tracker/*',
+    lazy: () => import('../apps/DayTracker'),
+    title: 'Day Tracker',
+    image:
+      'https://cdn.dribbble.com/users/5840087/screenshots/14061542/media/d3e37dc3707cede8f9d1fe9d3f6ad001.jpg?resize=400x0',
+  },
 ];
 
 const router = createBrowserRouter([
