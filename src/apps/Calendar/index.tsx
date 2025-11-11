@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import dayjs from '@/helpers/dayjs';
+import { useSearchParams } from 'react-router-dom';
 import { EventType, useStore } from './store';
 import CalendarDay from './Day';
 import Form from './Form';
-import { useUrlQ } from './useUrlQ';
 import Hours from './Hours';
 import { cn } from '@/lib/utils';
 
@@ -53,7 +53,30 @@ const CalendarPage = () => {
   const today = new Date();
   const [viewDays, setViewDays] = React.useState(4);
   const { events, createEvent } = useStore();
-  const { selectedEventId, updateModalClosed, setParams } = useUrlQ();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedEventId = searchParams.get('selectedEventId') || undefined;
+  const updateModalClosed = searchParams.get('updateModalClosed') !== 'false';
+
+  const setParams = (params: {
+    selectedEventId?: string;
+    updateModalClosed?: boolean;
+  }) => {
+    setSearchParams(
+      (prev) => {
+        const newParams = new URLSearchParams(prev);
+        if (params.selectedEventId !== undefined) {
+          newParams.set('selectedEventId', params.selectedEventId);
+        }
+        if (params.updateModalClosed !== undefined) {
+          newParams.set('updateModalClosed', String(params.updateModalClosed));
+        }
+        return newParams;
+      },
+      { replace: true }
+    );
+  };
+
   const activeEvent = events.find((event) => event.id === selectedEventId);
   const [daysRef, setDaysRef] = React.useState<HTMLDivElement | null>(null);
   const [frameWidth, setFrameWidth] = React.useState(0);
