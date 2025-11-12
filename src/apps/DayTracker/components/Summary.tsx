@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
 import {
   Card,
   CardContent,
@@ -14,6 +13,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { useStore, selectSummary } from '@/apps/Calendar/store';
+import dayjs from '@/helpers/dayjs';
 
 type Period = 'daily' | 'weekly' | 'monthly' | '3months' | '6months' | 'year';
 
@@ -32,12 +32,11 @@ export function Summary() {
 
   const dateRange =
     summary && summary.startDate !== summary.endDate
-      ? `${format(new Date(summary.startDate), 'MMM d, yyyy')} - ${format(
-          new Date(summary.endDate),
-          'MMM d, yyyy'
-        )}`
+      ? `${dayjs(summary.startDate).format('MMM D, YYYY')} - ${dayjs(
+          summary.endDate
+        ).format('MMM D, YYYY')}`
       : summary
-        ? format(new Date(summary.endDate), 'MMMM d, yyyy')
+        ? dayjs(summary.endDate).format('MMMM D, YYYY')
         : '';
 
   return (

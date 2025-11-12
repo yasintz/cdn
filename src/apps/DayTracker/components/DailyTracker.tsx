@@ -1,5 +1,4 @@
 import { useState, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { format } from 'date-fns';
 import Color from 'color';
 import { generateHourBlocks } from '../lib/hour-utils';
 import {
@@ -7,6 +6,9 @@ import {
   selectDayData,
   selectDayTrackerEvents,
 } from '@/apps/Calendar/store';
+import useNow from '@/hooks/useNow';
+import dayjs from '@/helpers/dayjs';
+import { cn } from '@/lib/utils';
 
 interface DailyTrackerProps {
   date: Date;
@@ -19,8 +21,9 @@ export interface DailyTrackerHandle {
 
 export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
   ({ date, onSelectionChange }, ref) => {
-    const dateString = format(date, 'yyyy-MM-dd');
+    const dateString = dayjs(date).format('YYYY-MM-DD');
     const [selectedHours, setSelectedHours] = useState<Set<string>>(new Set());
+    const now = useNow({ interval: '1 minute' });
 
     const dayData = useStore(selectDayData(dateString));
     const createDayTrackerEvent = useStore(
@@ -31,6 +34,16 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
     const hourBlocks = useMemo(() => {
       return generateHourBlocks();
     }, []);
+
+    // Calculate current active hour
+    const isToday = useMemo(() => {
+      return dayjs(date).isSame(dayjs(now), 'day');
+    }, [date, now]);
+    const currentHour = useMemo(() => {
+      if (!isToday) return null;
+      const hour = dayjs(now).hour();
+      return `${hour.toString().padStart(2, '0')}:00`;
+    }, [now, isToday]);
 
     const handleHourClick = (hour: string) => {
       setSelectedHours((prev) => {
@@ -113,6 +126,23 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
       return Color(color).mix(Color('white'), 0.8).hex();
     };
 
+    const getShadowClass = (hour: string) => {
+      const isSelected = selectedHours.has(hour);
+      const isActiveHour = isToday && currentHour === hour;
+      const activity = getActivityForHour(hour);
+      if (isSelected) {
+        return 'ring-2 ring-blue-500 ring-offset-2';
+      }
+      if (isActiveHour) {
+        return 'ring-2 ring-green-500 ring-offset-2';
+      }
+
+      if (activity) {
+        return 'ring-0 ring-offset-0';
+      }
+      return 'ring-1 ring-gray-300 ring-offset-1';
+    };
+
     if (!dayData) {
       return <div>Loading...</div>;
     }
@@ -120,36 +150,22 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
     return (
       <div className="flex gap-2">
         {hourBlocks.map((hour) => {
-          const isSelected = selectedHours.has(hour);
           const activity = getActivityForHour(hour);
           const color = getActivityColor(activity);
-
+          const shadowClass = getShadowClass(hour);
           const backgroundColor = activity
             ? getLightBackgroundColor(color)
             : '#ffffff';
-
-          // Determine shadow based on state
-          let boxShadow = 'none';
-          if (isSelected) {
-            boxShadow = '0 0 0 2px #3b82f6'; // Blue shadow if selected
-          } else if (activity) {
-            boxShadow = 'none'; // No shadow if activity
-          } else {
-            boxShadow = '0 0 0 1px #d1d5db'; // Gray shadow if no activity and not selected
-          }
 
           return (
             <button
               key={hour}
               onClick={() => handleHourClick(hour)}
-              className={`
-                relative w-16 h-16 rounded-lg transition-all shrink-0 overflow-hidden
-                ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-              `}
-              style={{
-                backgroundColor,
-                boxShadow,
-              }}
+              className={cn(
+                'relative w-16 h-16 rounded-lg transition-all shrink-0 overflow-hidden',
+                shadowClass
+              )}
+              style={{ backgroundColor }}
               title={activity ? `${hour} - ${activity}` : hour}
             >
               {activity && (

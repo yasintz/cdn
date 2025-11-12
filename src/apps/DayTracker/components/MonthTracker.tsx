@@ -1,16 +1,15 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { format, addDays, startOfDay } from 'date-fns';
 import { DailyTracker, type DailyTrackerHandle } from './DailyTracker';
 import { Settings } from './Settings';
 import { ActivitySelector } from './ActivitySelector';
 import { Button } from '@/components/ui/button';
 import { Settings as SettingsIcon, BarChart3 } from 'lucide-react';
-import { useStore } from '@/apps/Calendar/store';
 import { useNavigate } from 'react-router-dom';
+import dayjs from '@/helpers/dayjs';
 
 export function MonthTracker() {
   const navigate = useNavigate();
-  const today = startOfDay(new Date());
+  const today = dayjs().startOf('day').toDate();
   const [showSettings, setShowSettings] = useState(false);
   const [showActivitySelector, setShowActivitySelector] = useState(false);
   const [activeDays, setActiveDays] = useState<Map<string, Set<string>>>(new Map());
@@ -23,13 +22,13 @@ export function MonthTracker() {
     const daysList: Date[] = [];
     // 14 days before today
     for (let i = 14; i > 0; i--) {
-      daysList.push(addDays(today, -i));
+      daysList.push(dayjs(today).subtract(i, 'day').toDate());
     }
     // Today
     daysList.push(today);
     // 14 days after today
     for (let i = 1; i <= 14; i++) {
-      daysList.push(addDays(today, i));
+      daysList.push(dayjs(today).add(i, 'day').toDate());
     }
     return daysList;
   }, [today]);
@@ -98,8 +97,8 @@ export function MonthTracker() {
       <div className="overflow-x-auto pr-4" ref={scrollContainerRef}>
         <div className="inline-block min-w-full">
           {days.map((date) => {
-            const dateString = format(date, 'yyyy-MM-dd');
-            const isToday = format(date, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
+            const dateString = dayjs(date).format('YYYY-MM-DD');
+            const isToday = dayjs(date).isSame(dayjs(today), 'day');
             
             return (
               <div 
@@ -109,7 +108,7 @@ export function MonthTracker() {
               >
                 <div className="sticky left-2 bg-background z-10 min-w-[70px] text-sm font-medium pr-2 h-[64px] flex items-center justify-center border border-gray-200 rounded-lg text-center">
                   <span className={isToday ? 'text-blue-600 font-semibold' : ''}>
-                    {format(date, 'MMM d')}
+                    {dayjs(date).format('MMM D')}
                     {isToday && ' (Today)'}
                   </span>
                 </div>

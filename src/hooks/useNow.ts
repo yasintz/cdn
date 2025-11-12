@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react';
+import ms from 'ms';
 
-export default function useNow(interval: number = 1000) {
+type Params =
+  | {
+      interval: number | string;
+    }
+  | number;
+export default function useNow(params?: Params) {
+  const interval =
+    typeof params === 'number' ? params : params?.interval ?? 1000;
+
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    const intervalInstance = setInterval(() => setNow(Date.now()), interval);
+    const intervalMs = typeof interval === 'string' ? ms(interval) : interval;
+    const intervalInstance = setInterval(() => setNow(Date.now()), intervalMs);
 
     return () => clearInterval(intervalInstance);
   }, [interval]);
