@@ -10,10 +10,21 @@ export default function MarkdownReviewer() {
     top: number;
     left: number;
   } | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(
+    null
+  );
+  const [replyText, setReplyText] = useState('');
+
+  const store = useMarkdownReviewerStore();
 
   const {
     markdownContent,
-    comments,
+    comments: rawComments,
+    commentHistory,
+    selectedHistoryId,
     selectedText,
     showCommentDialog,
     showExportDialog,
@@ -21,15 +32,34 @@ export default function MarkdownReviewer() {
     selectionPosition,
     setMarkdownContent,
     addComment,
+    addReplyToComment,
     deleteComment,
+    deleteReply,
+    updateComment,
+    updateReply,
     setSelectedText,
     setShowCommentDialog,
     setShowExportDialog,
     setCommentText,
     setSelectionPosition,
-    resetComments,
+    setSelectedHistoryId,
     clearCommentDialog,
-  } = useMarkdownReviewerStore();
+  } = store;
+
+  // Ensure all comments have replies array (migration for old data)
+  const comments = useMemo(() => {
+    // If viewing history, show history comments, otherwise show current comments
+    const commentsToShow = selectedHistoryId
+      ? commentHistory.find(h => h.id === selectedHistoryId)?.comments || []
+      : rawComments;
+      
+    return commentsToShow.map((comment) => ({
+      ...comment,
+      replies: comment.replies || [],
+    }));
+  }, [rawComments, commentHistory, selectedHistoryId]);
+  
+  const isViewingHistory = selectedHistoryId !== null;
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -37,8 +67,7 @@ export default function MarkdownReviewer() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
-        setMarkdownContent(content);
-        resetComments(); // Reset comments when new file is uploaded
+        setMarkdownContent(content, file.name);
       };
       reader.readAsText(file);
     } else {
@@ -93,32 +122,119 @@ export default function MarkdownReviewer() {
 
   const handleAddComment = () => {
     if (commentText.trim() && selectedText && selectionPosition) {
-      const newComment = {
-        id: Date.now().toString(),
-        text: commentText,
-        selectedText: selectedText,
-        line: selectionPosition.line,
-        column: selectionPosition.column,
-        timestamp: Date.now(),
-      };
+      // Check if there's already a comment for this exact selection
+      const existingComment = comments.find(
+        (c) =>
+          c.selectedText === selectedText &&
+          c.line === selectionPosition.line &&
+          c.column === selectionPosition.column
+      );
 
-      addComment(newComment);
+      if (existingComment) {
+        // Add as a reply to existing comment
+        const reply = {
+          id: Date.now().toString(),
+          text: commentText,
+          timestamp: Date.now(),
+        };
+        addReplyToComment(existingComment.id, reply);
+      } else {
+        // Create new comment
+        const newComment = {
+          id: Date.now().toString(),
+          text: commentText,
+          selectedText: selectedText,
+          line: selectionPosition.line,
+          column: selectionPosition.column,
+          timestamp: Date.now(),
+          replies: [],
+        };
+        addComment(newComment);
+      }
+
       clearCommentDialog();
     }
   };
 
+  const handleStartEdit = (commentId: string, text: string) => {
+    setEditingCommentId(commentId);
+    setEditText(text);
+  };
+
+  const handleStartEditReply = (
+    commentId: string,
+    replyId: string,
+    text: string
+  ) => {
+    setEditingCommentId(commentId);
+    setEditingReplyId(replyId);
+    setEditText(text);
+  };
+
+  const handleSaveEdit = () => {
+    if (editText.trim()) {
+      if (editingReplyId) {
+        updateReply(editingCommentId!, editingReplyId, editText);
+      } else {
+        updateComment(editingCommentId!, editText);
+      }
+    }
+    setEditingCommentId(null);
+    setEditingReplyId(null);
+    setEditText('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditingReplyId(null);
+    setEditText('');
+  };
+
+  const handleStartReply = (commentId: string) => {
+    setReplyingToCommentId(commentId);
+    setReplyText('');
+  };
+
+  const handleSaveReply = (commentId: string) => {
+    console.log('handleSaveReply called', { commentId, replyText });
+    if (replyText.trim()) {
+      const reply = {
+        id: Date.now().toString(),
+        text: replyText,
+        timestamp: Date.now(),
+      };
+      console.log('Adding reply:', reply);
+      addReplyToComment(commentId, reply);
+      setReplyingToCommentId(null);
+      setReplyText('');
+    } else {
+      console.log('Reply text is empty');
+    }
+  };
+
+  const handleCancelReply = () => {
+    setReplyingToCommentId(null);
+    setReplyText('');
+  };
+
   const generateMarkdownExport = () => {
     let markdown = '# Comments\n\n';
-    
+
     comments.forEach((comment, index) => {
-      markdown += `## Comment ${index + 1}\n\n`;
-      markdown += `**Selected Text:**\n> ${comment.selectedText}\n\n`;
-      markdown += `**Position:** Line ${comment.line}, Column ${comment.column}\n\n`;
-      markdown += `**Comment:**\n${comment.text}\n\n`;
-      markdown += `**Date:** ${new Date(comment.timestamp).toLocaleString()}\n\n`;
+      markdown += `## Comment ${index + 1}\n`;
+      markdown += `**Selected Text:**\n> ${comment.selectedText}\n`;
+      markdown += `**Position:** Line ${comment.line}, Column ${comment.column}\n`;
+      markdown += `**Comment:**\n${comment.text}\n`;
+
+      if (comment.replies.length > 0) {
+        comment.replies.forEach((reply) => {
+          markdown += `${reply.text}\n`;
+        });
+      }
+
       markdown += '---\n\n';
     });
-    
+
     return markdown;
   };
 
@@ -214,11 +330,45 @@ export default function MarkdownReviewer() {
         </div>
 
         <div className="markdown-reviewer__comments-section">
-          <h2>Comments</h2>
+          <div className="markdown-reviewer__comments-header">
+            <h2>Comments</h2>
+            {commentHistory.length > 0 && (
+              <select
+                className="markdown-reviewer__history-select"
+                value={selectedHistoryId || 'current'}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === 'current') {
+                    setSelectedHistoryId(null);
+                  } else {
+                    setSelectedHistoryId(value);
+                  }
+                }}
+              >
+                <option value="current">Current ({rawComments.length})</option>
+                {commentHistory
+                  .sort((a, b) => b.savedAt - a.savedAt)
+                  .map((history) => (
+                    <option key={history.id} value={history.id}>
+                      {new Date(history.savedAt).toLocaleString()} ({history.comments.length})
+                    </option>
+                  ))}
+              </select>
+            )}
+          </div>
+          
+          {isViewingHistory && (
+            <div className="markdown-reviewer__history-banner">
+              📜 Viewing history - Comments are read-only
+            </div>
+          )}
+          
           {comments.length === 0 ? (
             <div className="markdown-reviewer__empty">
               <p>
-                No comments yet. Select text in the preview to add comments.
+                {isViewingHistory 
+                  ? 'No comments in this history.'
+                  : 'No comments yet. Select text in the preview to add comments.'}
               </p>
             </div>
           ) : (
@@ -229,22 +379,153 @@ export default function MarkdownReviewer() {
                     <span className="markdown-reviewer__comment-position">
                       Line {comment.line}, Col {comment.column}
                     </span>
-                    <button
-                      className="markdown-reviewer__comment-delete"
-                      onClick={() => handleDeleteComment(comment.id)}
-                    >
-                      ×
-                    </button>
+                    {!isViewingHistory && (
+                      <button
+                        className="markdown-reviewer__comment-delete"
+                        onClick={() => handleDeleteComment(comment.id)}
+                        title="Delete comment"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                   <div className="markdown-reviewer__comment-selected">
                     "{comment.selectedText}"
                   </div>
-                  <div className="markdown-reviewer__comment-text">
-                    {comment.text}
-                  </div>
-                  <div className="markdown-reviewer__comment-timestamp">
-                    {new Date(comment.timestamp).toLocaleString()}
-                  </div>
+
+                  {editingCommentId === comment.id && !editingReplyId ? (
+                    <div className="markdown-reviewer__comment-edit">
+                      <textarea
+                        className="markdown-reviewer__comment-edit-textarea"
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        autoFocus
+                      />
+                      <div className="markdown-reviewer__comment-edit-actions">
+                        <button onClick={handleCancelEdit}>Cancel</button>
+                        <button
+                          onClick={handleSaveEdit}
+                          disabled={!editText.trim()}
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="markdown-reviewer__comment-text">
+                        {comment.text}
+                      </div>
+                      <div className="markdown-reviewer__comment-footer">
+                        <span className="markdown-reviewer__comment-timestamp">
+                          {new Date(comment.timestamp).toLocaleString()}
+                        </span>
+                        {!isViewingHistory && (
+                          <div className="markdown-reviewer__comment-actions">
+                            <button
+                              className="markdown-reviewer__comment-action-btn"
+                              onClick={() =>
+                                handleStartEdit(comment.id, comment.text)
+                              }
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              className="markdown-reviewer__comment-action-btn"
+                              onClick={() => handleStartReply(comment.id)}
+                            >
+                              💬 Reply
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {comment.replies.length > 0 && (
+                    <div className="markdown-reviewer__comment-replies">
+                      {comment.replies.map((reply) => (
+                        <div
+                          key={reply.id}
+                          className="markdown-reviewer__comment-reply"
+                        >
+                          {editingCommentId === comment.id &&
+                          editingReplyId === reply.id ? (
+                            <div className="markdown-reviewer__comment-edit">
+                              <textarea
+                                className="markdown-reviewer__comment-edit-textarea"
+                                value={editText}
+                                onChange={(e) => setEditText(e.target.value)}
+                                autoFocus
+                              />
+                              <div className="markdown-reviewer__comment-edit-actions">
+                                <button onClick={handleCancelEdit}>
+                                  Cancel
+                                </button>
+                                <button onClick={handleSaveEdit}>Save</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="markdown-reviewer__comment-reply-text">
+                                {reply.text}
+                              </div>
+                              <div className="markdown-reviewer__comment-reply-footer">
+                                <span className="markdown-reviewer__comment-timestamp">
+                                  {new Date(reply.timestamp).toLocaleString()}
+                                </span>
+                                {!isViewingHistory && (
+                                  <div className="markdown-reviewer__comment-reply-actions">
+                                    <button
+                                      className="markdown-reviewer__comment-action-btn"
+                                      onClick={() =>
+                                        handleStartEditReply(
+                                          comment.id,
+                                          reply.id,
+                                          reply.text
+                                        )
+                                      }
+                                    >
+                                      ✏️
+                                    </button>
+                                    <button
+                                      className="markdown-reviewer__comment-action-btn"
+                                      onClick={() =>
+                                        deleteReply(comment.id, reply.id)
+                                      }
+                                    >
+                                      🗑️
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {!isViewingHistory && replyingToCommentId === comment.id && (
+                    <div className="markdown-reviewer__comment-reply-input">
+                      <textarea
+                        className="markdown-reviewer__comment-edit-textarea"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Write a reply..."
+                        autoFocus
+                      />
+                      <div className="markdown-reviewer__comment-edit-actions">
+                        <button onClick={handleCancelReply}>Cancel</button>
+                        <button
+                          onClick={() => handleSaveReply(comment.id)}
+                          disabled={!replyText.trim()}
+                        >
+                          Reply
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
