@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useStore, selectDayData, selectDayTrackerEvents } from '.';
+import { useStore, selectDayData, selectDayTrackerEvents, selectSummary } from '.';
 import dayjs from '@/helpers/dayjs';
 
 describe('Calendar Store - DayTracker', () => {
@@ -401,6 +401,171 @@ describe('Calendar Store - DayTracker', () => {
       const day2Data = selectDayData('2024-01-02')(state);
       expect(day2Data.hours.find((h) => h.hour === '00:00')?.activity).toBe('Sleep');
       expect(day2Data.hours.find((h) => h.hour === '01:00')?.activity).toBe('Sleep');
+    });
+  });
+
+  describe('selectSummary', () => {
+    beforeEach(() => {
+      // Reset store before each test
+      const state = useStore.getState();
+      state.events = [];
+      state.labels = [];
+      state.hiddenLabelIds = [];
+    });
+
+    it('should calculate daily summary correctly', () => {
+      const today = dayjs().format('YYYY-MM-DD');
+      
+      // Create events for today
+      useStore.getState().createDayTrackerEvent(today, [
+        { hour: '09:00', activity: 'Work' },
+        { hour: '10:00', activity: 'Work' },
+        { hour: '11:00', activity: 'Work' },
+        { hour: '12:00', activity: 'Lunch' },
+        { hour: '13:00', activity: 'Work' },
+        { hour: '14:00', activity: 'Work' },
+      ]);
+
+      const state = useStore.getState();
+      
+      // Debug
+      const dayTrackerEvents = selectDayTrackerEvents(state);
+      console.log('Today:', today);
+      console.log('Day tracker events:', dayTrackerEvents.length);
+      dayTrackerEvents.forEach(e => {
+        const eventStart = dayjs(e.start);
+        const eventDate = eventStart.format('YYYY-MM-DD');
+        console.log('Event:', e.title, 'Start:', e.start, 'Date:', eventDate, 'Match:', eventDate === today, 'Comparison:', eventDate >= today && eventDate <= today);
+      });
+      
+      console.log('About to call selectSummary');
+      console.log('State events:', state.events.length);
+      console.log('State labels:', state.labels);
+      const summarySelector = selectSummary('daily');
+      console.log('Got summary selector');
+      const summary = summarySelector(state);
+      console.log('Summary:', summary);
+
+      expect(summary.totalHours).toBe(6);
+      expect(summary.activities.length).toBe(2);
+      
+      const workActivity = summary.activities.find(a => a.activity === 'Work');
+      expect(workActivity?.hours).toBe(5);
+      expect(workActivity?.percentage).toBeCloseTo(83.33, 1);
+      
+      const lunchActivity = summary.activities.find(a => a.activity === 'Lunch');
+      expect(lunchActivity?.hours).toBe(1);
+      expect(lunchActivity?.percentage).toBeCloseTo(16.67, 1);
+    });
+
+    it('should calculate weekly summary correctly', () => {
+      const today = dayjs();
+      
+      // Create events for multiple days in the past week
+      for (let i = 0; i < 7; i++) {
+        const date = today.subtract(i, 'day').format('YYYY-MM-DD');
+        useStore.getState().createDayTrackerEvent(date, [
+          { hour: '09:00', activity: 'Work' },
+          { hour: '10:00', activity: 'Work' },
+        ]);
+      }
+
+      const state = useStore.getState();
+      const summary = selectSummary('weekly')(state);
+
+      expect(summary.totalHours).toBe(14); // 2 hours * 7 days
+      expect(summary.activities.length).toBe(1);
+      expect(summary.activities[0].activity).toBe('Work');
+      expect(summary.activities[0].hours).toBe(14);
+    });
+
+    it('should handle events that span across midnight', () => {
+      const today = dayjs().format('YYYY-MM-DD');
+      
+      // Create a sleep event from 23:00 to 07:00 next day
+      useStore.getState().createDayTrackerEvent(today, [
+        { hour: '23:00', activity: 'Sleep' },
+      ]);
+      
+      const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD');
+      useStore.getState().createDayTrackerEvent(tomorrow, [
+        { hour: '00:00', activity: 'Sleep' },
+        { hour: '01:00', activity: 'Sleep' },
+        { hour: '02:00', activity: 'Sleep' },
+        { hour: '03:00', activity: 'Sleep' },
+        { hour: '04:00', activity: 'Sleep' },
+        { hour: '05:00', activity: 'Sleep' },
+        { hour: '06:00', activity: 'Sleep' },
+      ]);
+
+      const state = useStore.getState();
+      const summary = selectSummary('daily')(state);
+
+      // Should only count today's hours
+      expect(summary.totalHours).toBe(1);
+      expect(summary.activities[0].activity).toBe('Sleep');
+      expect(summary.activities[0].hours).toBe(1);
+    });
+
+    it('should return empty summary when no events exist', () => {
+      const state = useStore.getState();
+      const summary = selectSummary('daily')(state);
+
+      expect(summary.totalHours).toBe(0);
+      expect(summary.activities.length).toBe(0);
+    });
+
+    it('should filter events outside the date range', () => {
+      const today = dayjs();
+      const yesterday = today.subtract(1, 'day').format('YYYY-MM-DD');
+      const todayStr = today.format('YYYY-MM-DD');
+      
+      // Create event for yesterday
+      useStore.getState().createDayTrackerEvent(yesterday, [
+        { hour: '09:00', activity: 'Work' },
+        { hour: '10:00', activity: 'Work' },
+      ]);
+      
+      // Create event for today
+      useStore.getState().createDayTrackerEvent(todayStr, [
+        { hour: '14:00', activity: 'Meeting' },
+      ]);
+
+      const state = useStore.getState();
+      const dailySummary = selectSummary('daily')(state);
+
+      // Daily summary should only include today's events
+      expect(dailySummary.totalHours).toBe(1);
+      expect(dailySummary.activities[0].activity).toBe('Meeting');
+      
+      // Weekly summary should include both
+      const weeklySummary = selectSummary('weekly')(state);
+      expect(weeklySummary.totalHours).toBe(3);
+    });
+
+    it('should sort activities by hours in descending order', () => {
+      const today = dayjs().format('YYYY-MM-DD');
+      
+      useStore.getState().createDayTrackerEvent(today, [
+        { hour: '09:00', activity: 'Work' },
+        { hour: '10:00', activity: 'Work' },
+        { hour: '11:00', activity: 'Work' },
+        { hour: '12:00', activity: 'Lunch' },
+        { hour: '13:00', activity: 'Meeting' },
+        { hour: '14:00', activity: 'Meeting' },
+        { hour: '15:00', activity: 'Meeting' },
+        { hour: '16:00', activity: 'Meeting' },
+      ]);
+
+      const state = useStore.getState();
+      const summary = selectSummary('daily')(state);
+
+      expect(summary.activities[0].activity).toBe('Meeting');
+      expect(summary.activities[0].hours).toBe(4);
+      expect(summary.activities[1].activity).toBe('Work');
+      expect(summary.activities[1].hours).toBe(3);
+      expect(summary.activities[2].activity).toBe('Lunch');
+      expect(summary.activities[2].hours).toBe(1);
     });
   });
 });

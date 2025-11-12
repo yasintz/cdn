@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import dayjs from '@/helpers/dayjs';
 import { useSearchParams } from 'react-router-dom';
-import { EventType, useStore } from './store';
+import { EventType, useStore, selectVisibleEvents } from './store';
 import CalendarDay from './Day';
 import Form from './Form';
 import Hours from './Hours';
@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { LabelsSettings } from './LabelsSettings';
 import { Button } from '@/components/ui/button';
 import { Settings as SettingsIcon } from 'lucide-react';
-import { selectVisibleEvents } from './store';
 
 const CreateModal = () => {
   const { createEvent } = useStore();

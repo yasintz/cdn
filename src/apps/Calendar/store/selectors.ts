@@ -101,35 +101,30 @@ export const selectDayData = (date: string) => (state: StoreType) => {
 
 export const selectSummary = (period: 'daily' | 'weekly' | 'monthly' | '3months' | '6months' | 'year') => 
   (state: StoreType) => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const now = dayjs();
+    const today = now.format('YYYY-MM-DD');
 
-    let startDate: Date;
-    const endDate: Date = today;
+    let startDate: string;
+    let endDate: string = today;
 
     switch (period) {
       case 'daily':
         startDate = today;
         break;
       case 'weekly':
-        startDate = new Date(today);
-        startDate.setDate(startDate.getDate() - 6);
+        startDate = now.subtract(6, 'day').format('YYYY-MM-DD');
         break;
       case 'monthly':
-        startDate = new Date(today);
-        startDate.setMonth(startDate.getMonth() - 1);
+        startDate = now.subtract(1, 'month').format('YYYY-MM-DD');
         break;
       case '3months':
-        startDate = new Date(today);
-        startDate.setMonth(startDate.getMonth() - 3);
+        startDate = now.subtract(3, 'month').format('YYYY-MM-DD');
         break;
       case '6months':
-        startDate = new Date(today);
-        startDate.setMonth(startDate.getMonth() - 6);
+        startDate = now.subtract(6, 'month').format('YYYY-MM-DD');
         break;
       case 'year':
-        startDate = new Date(today);
-        startDate.setMonth(startDate.getMonth() - 12);
+        startDate = now.subtract(1, 'year').format('YYYY-MM-DD');
         break;
     }
 
@@ -138,7 +133,7 @@ export const selectSummary = (period: 'daily' | 'weekly' | 'monthly' | '3months'
     // Filter events within the date range
     const filteredEvents = dayTrackerEvents.filter((event) => {
       const eventStart = dayjs(event.start);
-      const eventDate = new Date(eventStart.format('YYYY-MM-DD'));
+      const eventDate = eventStart.format('YYYY-MM-DD');
       return eventDate >= startDate && eventDate <= endDate;
     });
 
@@ -170,17 +165,10 @@ export const selectSummary = (period: 'daily' | 'weekly' | 'monthly' | '3months'
       }))
       .sort((a, b) => b.hours - a.hours);
 
-    const formatDate = (date: Date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
     return {
       period,
-      startDate: formatDate(startDate),
-      endDate: formatDate(endDate),
+      startDate,
+      endDate,
       totalHours,
       activities: summary,
     };

@@ -6,12 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useStore, selectSummary } from '@/apps/Calendar/store';
 import dayjs from '@/helpers/dayjs';
 
@@ -36,8 +31,8 @@ export function Summary() {
           summary.endDate
         ).format('MMM D, YYYY')}`
       : summary
-        ? dayjs(summary.endDate).format('MMMM D, YYYY')
-        : '';
+      ? dayjs(summary.endDate).format('MMMM D, YYYY')
+      : '';
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
@@ -104,7 +99,8 @@ export function Summary() {
                                 {item.percentage.toFixed(1)}%
                               </span>
                               <span className="font-semibold w-16 text-right">
-                                {item.hours} {item.hours === 1 ? 'hour' : 'hours'}
+                                {item.hours}{' '}
+                                {item.hours === 1 ? 'hour' : 'hours'}
                               </span>
                             </div>
                           </div>
@@ -130,4 +126,3 @@ export function Summary() {
     </div>
   );
 }
-
