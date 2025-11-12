@@ -93,6 +93,13 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     image:
       'https://img.freepik.com/free-vector/school-child-schedule_74855-6645.jpg?semt=ais_hybrid&w=740&q=80',
   },
+  {
+    path: 'markdown-reviewer',
+    lazy: () => import('../apps/MarkdownReviewer'),
+    title: 'Markdown Reviewer',
+    image:
+      'https://static.vecteezy.com/system/resources/thumbnails/068/804/014/small/digital_notebooks_on_computer_screen_illustration-vector.jpg',
+  },
 ];
 
 const router = createBrowserRouter([
