@@ -8,21 +8,109 @@
     background: white;
     padding: 1.5rem 2rem;
     border-bottom: 1px solid #e0e0e0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
     h1 {
-      margin: 0;
+      margin: 0 0 1rem 0;
       font-size: 1.5rem;
       color: #333;
+    }
+  }
+
+  &__header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  &__mode-selector {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  &__mode-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #666;
+
+    input[type="radio"] {
+      cursor: pointer;
+    }
+
+    &:hover {
+      color: #333;
+    }
+
+    input[type="radio"]:checked + span {
+      color: #4a90e2;
+      font-weight: 500;
     }
   }
 
   &__actions {
     display: flex;
     gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__watch-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  &__watch-btn {
+    padding: 0.625rem 1.25rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #059669;
+    }
+  }
+
+  &__watching-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__watching-indicator {
+    font-size: 0.875rem;
+    color: #10b981;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__stop-btn {
+    padding: 0.625rem 1.25rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #dc2626;
+    }
   }
 
   &__upload-btn,

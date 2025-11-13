@@ -1,35 +1,28 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useEffect } from 'react';
 import { marked } from 'marked';
 import { useMarkdownReviewerStore } from './store';
+import { useFileWatcher } from './hooks/useFileWatcher';
+import { useFileMode } from './hooks/useFileMode';
+import { useTextSelection } from './hooks/useTextSelection';
+import { useComments } from './hooks/useComments';
+import { generateMarkdownExport, copyMarkdownToClipboard, downloadMarkdown } from './utils/exportUtils';
 import './style.scss';
 
 export default function MarkdownReviewer() {
   console.log('MarkdownReviewer');
-  const previewRef = useRef<HTMLDivElement>(null);
-  const [commentIconPosition, setCommentIconPosition] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
-  const [editText, setEditText] = useState('');
-  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(
-    null
-  );
-  const [replyText, setReplyText] = useState('');
-
+  
   const store = useMarkdownReviewerStore();
-
   const {
     markdownContent,
+    currentFileName,
     comments: rawComments,
     commentHistory,
     selectedHistoryId,
-    selectedText,
+    selectedText: storeSelectedText,
     showCommentDialog,
     showExportDialog,
     commentText,
-    selectionPosition,
+    selectionPosition: storeSelectionPosition,
     setMarkdownContent,
     addComment,
     addReplyToComment,
@@ -46,9 +39,62 @@ export default function MarkdownReviewer() {
     clearCommentDialog,
   } = store;
 
+  // File watching hook
+  const { isWatching, startWatching, stopWatching } = useFileWatcher(setMarkdownContent);
+
+  // File mode hook
+  const { fileMode, setFileMode, handleFileUpload, handleSelectFileForWatch } = useFileMode(
+    setMarkdownContent,
+    startWatching,
+    isWatching,
+    stopWatching
+  );
+
+  // Sync file mode when watching state changes (e.g., when saved handle loads)
+  useEffect(() => {
+    if (isWatching && fileMode !== 'watch') {
+      setFileMode('watch');
+    }
+  }, [isWatching, fileMode, setFileMode]);
+
+  // Text selection hook
+  const {
+    previewRef,
+    commentIconPosition,
+    selectedText: hookSelectedText,
+    selectionPosition: hookSelectionPosition,
+    handleTextSelection,
+    handleCommentIconClick,
+    clearSelection,
+  } = useTextSelection((text, position) => {
+    setSelectedText(text);
+    setSelectionPosition(position);
+  });
+
+  // Use hook values, fallback to store values for compatibility
+  const selectedText = hookSelectedText || storeSelectedText;
+  const selectionPosition = hookSelectionPosition || storeSelectionPosition;
+
+  // Comments hook
+  const {
+    editingCommentId,
+    editingReplyId,
+    editText,
+    replyingToCommentId,
+    replyText,
+    setEditText,
+    setReplyText,
+    handleStartEdit,
+    handleStartEditReply,
+    handleSaveEdit,
+    handleCancelEdit,
+    handleStartReply,
+    handleSaveReply,
+    handleCancelReply,
+  } = useComments();
+
   // Ensure all comments have replies array (migration for old data)
   const comments = useMemo(() => {
-    // If viewing history, show history comments, otherwise show current comments
     const commentsToShow = selectedHistoryId
       ? commentHistory.find(h => h.id === selectedHistoryId)?.comments || []
       : rawComments;
@@ -61,68 +107,13 @@ export default function MarkdownReviewer() {
   
   const isViewingHistory = selectedHistoryId !== null;
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.name.endsWith('.md')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        setMarkdownContent(content, file.name);
-      };
-      reader.readAsText(file);
-    } else {
-      alert('Please upload a valid markdown (.md) file');
-    }
-  };
-
-  const handleTextSelection = () => {
-    // Use setTimeout to ensure selection is stable after mouseup
-    setTimeout(() => {
-      const selection = window.getSelection();
-      if (selection && selection.toString().trim().length > 0) {
-        const text = selection.toString();
-        const range = selection.getRangeAt(0);
-
-        // Calculate line and column from the selection
-        const preCaretRange = range.cloneRange();
-        preCaretRange.selectNodeContents(previewRef.current!);
-        preCaretRange.setEnd(range.startContainer, range.startOffset);
-        const textBeforeSelection = preCaretRange.toString();
-
-        const lines = textBeforeSelection.split('\n');
-        const line = lines.length;
-        const column = lines[lines.length - 1].length + 1;
-
-        // Get the position of the selection to show the comment icon
-        const rect = range.getBoundingClientRect();
-        const previewRect = previewRef.current!.getBoundingClientRect();
-
-        // Batch state updates to prevent multiple re-renders
-        setSelectedText(text);
-        setSelectionPosition({ line, column });
-        setCommentIconPosition({
-          top: rect.top - previewRect.top - 40, // Position above the selection
-          left: rect.right - previewRect.left,
-        });
-      } else {
-        // Clear the icon if no text is selected
-        setCommentIconPosition(null);
-        setSelectedText('');
-        setSelectionPosition(null);
-      }
-    }, 10);
-  };
-
-  const handleCommentIconClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleCommentIconClickWithDialog = (e: React.MouseEvent) => {
+    handleCommentIconClick(e);
     setShowCommentDialog(true);
-    setCommentIconPosition(null);
   };
 
   const handleAddComment = () => {
     if (commentText.trim() && selectedText && selectionPosition) {
-      // Check if there's already a comment for this exact selection
       const existingComment = comments.find(
         (c) =>
           c.selectedText === selectedText &&
@@ -131,7 +122,6 @@ export default function MarkdownReviewer() {
       );
 
       if (existingComment) {
-        // Add as a reply to existing comment
         const reply = {
           id: Date.now().toString(),
           text: commentText,
@@ -139,7 +129,6 @@ export default function MarkdownReviewer() {
         };
         addReplyToComment(existingComment.id, reply);
       } else {
-        // Create new comment
         const newComment = {
           id: Date.now().toString(),
           text: commentText,
@@ -153,89 +142,8 @@ export default function MarkdownReviewer() {
       }
 
       clearCommentDialog();
+      clearSelection();
     }
-  };
-
-  const handleStartEdit = (commentId: string, text: string) => {
-    setEditingCommentId(commentId);
-    setEditText(text);
-  };
-
-  const handleStartEditReply = (
-    commentId: string,
-    replyId: string,
-    text: string
-  ) => {
-    setEditingCommentId(commentId);
-    setEditingReplyId(replyId);
-    setEditText(text);
-  };
-
-  const handleSaveEdit = () => {
-    if (editText.trim()) {
-      if (editingReplyId) {
-        updateReply(editingCommentId!, editingReplyId, editText);
-      } else {
-        updateComment(editingCommentId!, editText);
-      }
-    }
-    setEditingCommentId(null);
-    setEditingReplyId(null);
-    setEditText('');
-  };
-
-  const handleCancelEdit = () => {
-    setEditingCommentId(null);
-    setEditingReplyId(null);
-    setEditText('');
-  };
-
-  const handleStartReply = (commentId: string) => {
-    setReplyingToCommentId(commentId);
-    setReplyText('');
-  };
-
-  const handleSaveReply = (commentId: string) => {
-    console.log('handleSaveReply called', { commentId, replyText });
-    if (replyText.trim()) {
-      const reply = {
-        id: Date.now().toString(),
-        text: replyText,
-        timestamp: Date.now(),
-      };
-      console.log('Adding reply:', reply);
-      addReplyToComment(commentId, reply);
-      setReplyingToCommentId(null);
-      setReplyText('');
-    } else {
-      console.log('Reply text is empty');
-    }
-  };
-
-  const handleCancelReply = () => {
-    setReplyingToCommentId(null);
-    setReplyText('');
-  };
-
-  const generateMarkdownExport = () => {
-    let markdown = '# Comments\n\n';
-
-    comments.forEach((comment, index) => {
-      markdown += `## Comment ${index + 1}\n`;
-      markdown += `**Selected Text:**\n> ${comment.selectedText}\n`;
-      markdown += `**Position:** Line ${comment.line}, Column ${comment.column}\n`;
-      markdown += `**Comment:**\n${comment.text}\n`;
-
-      if (comment.replies.length > 0) {
-        comment.replies.forEach((reply) => {
-          markdown += `${reply.text}\n`;
-        });
-      }
-
-      markdown += '---\n\n';
-    });
-
-    return markdown;
   };
 
   const handleExportComments = () => {
@@ -243,23 +151,13 @@ export default function MarkdownReviewer() {
   };
 
   const handleCopyMarkdown = () => {
-    const markdown = generateMarkdownExport();
-    navigator.clipboard.writeText(markdown).then(() => {
-      alert('Markdown copied to clipboard!');
-    });
+    const markdown = generateMarkdownExport(comments);
+    copyMarkdownToClipboard(markdown);
   };
 
   const handleDownloadMarkdown = () => {
-    const markdown = generateMarkdownExport();
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `markdown-review-${Date.now()}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const markdown = generateMarkdownExport(comments);
+    downloadMarkdown(markdown);
   };
 
   const handleDeleteComment = (id: string) => {
@@ -275,24 +173,73 @@ export default function MarkdownReviewer() {
     <div className="markdown-reviewer">
       <div className="markdown-reviewer__header">
         <h1>Markdown Reviewer</h1>
-        <div className="markdown-reviewer__actions">
-          <label className="markdown-reviewer__upload-btn">
-            <input
-              type="file"
-              accept=".md"
-              onChange={handleFileUpload}
-              style={{ display: 'none' }}
-            />
-            Upload Markdown File
-          </label>
-          {comments.length > 0 && (
-            <button
-              className="markdown-reviewer__export-btn"
-              onClick={handleExportComments}
-            >
-              Export Comments ({comments.length})
-            </button>
-          )}
+        <div className="markdown-reviewer__header-content">
+          <div className="markdown-reviewer__mode-selector">
+            <label className="markdown-reviewer__mode-option">
+              <input
+                type="radio"
+                name="fileMode"
+                value="upload"
+                checked={fileMode === 'upload'}
+                onChange={(e) => setFileMode(e.target.value as 'upload' | 'watch')}
+              />
+              <span>Upload File</span>
+            </label>
+            <label className="markdown-reviewer__mode-option">
+              <input
+                type="radio"
+                name="fileMode"
+                value="watch"
+                checked={fileMode === 'watch'}
+                onChange={(e) => setFileMode(e.target.value as 'upload' | 'watch')}
+              />
+              <span>Watch File</span>
+            </label>
+          </div>
+          <div className="markdown-reviewer__actions">
+            {fileMode === 'upload' ? (
+              <label className="markdown-reviewer__upload-btn">
+                <input
+                  type="file"
+                  accept=".md"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+                Upload Markdown File
+              </label>
+            ) : (
+              <div className="markdown-reviewer__watch-actions">
+                {!isWatching ? (
+                  <button
+                    className="markdown-reviewer__watch-btn"
+                    onClick={handleSelectFileForWatch}
+                  >
+                    Select File to Watch
+                  </button>
+                ) : (
+                  <div className="markdown-reviewer__watching-info">
+                    <span className="markdown-reviewer__watching-indicator">
+                      🔄 Watching {markdownContent ? currentFileName : 'file'}...
+                    </span>
+                    <button
+                      className="markdown-reviewer__stop-btn"
+                      onClick={stopWatching}
+                    >
+                      Stop Watching
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            {comments.length > 0 && (
+              <button
+                className="markdown-reviewer__export-btn"
+                onClick={handleExportComments}
+              >
+                Export Comments ({comments.length})
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -314,7 +261,7 @@ export default function MarkdownReviewer() {
                     top: `${commentIconPosition.top}px`,
                     left: `${commentIconPosition.left}px`,
                   }}
-                  onClick={handleCommentIconClick}
+                  onClick={handleCommentIconClickWithDialog}
                   onMouseDown={(e) => e.preventDefault()}
                   title="Add comment"
                 >
@@ -404,7 +351,7 @@ export default function MarkdownReviewer() {
                       <div className="markdown-reviewer__comment-edit-actions">
                         <button onClick={handleCancelEdit}>Cancel</button>
                         <button
-                          onClick={handleSaveEdit}
+                          onClick={() => handleSaveEdit(updateComment, updateReply)}
                           disabled={!editText.trim()}
                         >
                           Save
@@ -462,7 +409,7 @@ export default function MarkdownReviewer() {
                                 <button onClick={handleCancelEdit}>
                                   Cancel
                                 </button>
-                                <button onClick={handleSaveEdit}>Save</button>
+                                <button onClick={() => handleSaveEdit(updateComment, updateReply)}>Save</button>
                               </div>
                             </div>
                           ) : (
@@ -518,7 +465,7 @@ export default function MarkdownReviewer() {
                       <div className="markdown-reviewer__comment-edit-actions">
                         <button onClick={handleCancelReply}>Cancel</button>
                         <button
-                          onClick={() => handleSaveReply(comment.id)}
+                          onClick={() => handleSaveReply(comment.id, addReplyToComment)}
                           disabled={!replyText.trim()}
                         >
                           Reply
@@ -596,7 +543,7 @@ export default function MarkdownReviewer() {
               </button>
             </div>
             <div className="markdown-reviewer__export-content">
-              <pre>{generateMarkdownExport()}</pre>
+              <pre>{generateMarkdownExport(comments)}</pre>
             </div>
             <div className="markdown-reviewer__export-actions">
               <button
