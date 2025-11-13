@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ColorPicker } from '@/components/ui/color-picker';
 import { useStore, selectDayTrackerEvents } from '@/apps/Calendar/store';
 
 interface ActivitySelectorProps {
@@ -22,6 +23,7 @@ export function ActivitySelector({
   onSelect,
 }: ActivitySelectorProps) {
   const dayTrackerEvents = useStore(selectDayTrackerEvents);
+  const updateEvent = useStore((state) => state.updateEvent);
   const [newActivityName, setNewActivityName] = useState('');
   
   // Get unique activity names from day-tracker events only (by title uniqueness)
@@ -35,6 +37,18 @@ export function ActivitySelector({
       };
     }).sort((a, b) => a.name.localeCompare(b.name));
   }, [dayTrackerEvents]);
+
+  const handleColorChange = (activityName: string, newColor: string) => {
+    // Update all events with this activity name to the new color
+    dayTrackerEvents
+      .filter(event => event.title === activityName)
+      .forEach(event => {
+        updateEvent(event.id, {
+          ...event,
+          color: newColor,
+        });
+      });
+  };
 
   const handleCreateAndSelect = () => {
     if (newActivityName.trim()) {
@@ -98,18 +112,44 @@ export function ActivitySelector({
               Clear / No Activity
             </Button>
             {activities.map((activity) => (
-              <Button
-                key={activity.name}
-                variant="outline"
-                onClick={() => handleSelectExisting(activity.name)}
-                className="w-full justify-start"
-              >
-                <div
-                  className="mr-2 h-4 w-4 rounded"
-                  style={{ backgroundColor: activity.color }}
+              <div key={activity.name} className="flex gap-2 items-center">
+                <Button
+                  variant="outline"
+                  onClick={() => handleSelectExisting(activity.name)}
+                  className="flex-1 justify-start"
+                >
+                  <div
+                    className="mr-2 h-4 w-4 rounded"
+                    style={{ backgroundColor: activity.color }}
+                  />
+                  {activity.name}
+                </Button>
+                <ColorPicker
+                  value={activity.color}
+                  onChange={(newColor) => handleColorChange(activity.name, newColor)}
+                  quickColors={[
+                    '#8f8f8f',
+                    '#f44336',
+                    '#e91e63',
+                    '#9c27b0',
+                    '#673ab7',
+                    '#3f51b5',
+                    '#2196f3',
+                    '#03a9f4',
+                    '#00bcd4',
+                    '#009688',
+                    '#4caf50',
+                    '#8bc34a',
+                    '#cddc39',
+                    '#ffeb3b',
+                    '#ffc107',
+                    '#ff9800',
+                    '#ff5722',
+                    '#795548',
+                    '#607d8b',
+                  ]}
                 />
-                {activity.name}
-              </Button>
+              </div>
             ))}
             {activities.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-4">
