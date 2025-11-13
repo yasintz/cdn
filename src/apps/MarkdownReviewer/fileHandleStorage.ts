@@ -2,7 +2,6 @@
 const DB_NAME = 'markdown-reviewer-db';
 const STORE_NAME = 'file-handles';
 const CONFIG_KEY = 'config';
-const FILES_KEY = 'files';
 
 export interface SavedFileHandle {
   handle: FileSystemFileHandle;
