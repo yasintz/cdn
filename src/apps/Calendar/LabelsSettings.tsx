@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,21 +7,25 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Plus, X, Eye, EyeOff } from 'lucide-react';
-import { useStore, type Label as LabelType } from './store';
+import { useStore } from './store';
 import { ColorPicker } from '@/components/ui/color-picker';
+import { QUICK_COLORS } from '@/constants/colors';
 
 interface LabelsSettingsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function LabelsSettings({
-  open,
-  onOpenChange,
-}: LabelsSettingsProps) {
-  const { labels, hiddenLabelIds, createLabel, updateLabel, deleteLabel, toggleLabelVisibility } = useStore();
+export function LabelsSettings({ open, onOpenChange }: LabelsSettingsProps) {
+  const {
+    labels,
+    hiddenLabelIds,
+    createLabel,
+    updateLabel,
+    deleteLabel,
+    toggleLabelVisibility,
+  } = useStore();
 
   const handleAddLabel = () => {
     createLabel({
@@ -78,7 +81,9 @@ export function LabelsSettings({
                     variant="ghost"
                     size="icon"
                     onClick={() => toggleLabelVisibility(label.id)}
-                    title={isLabelHidden(label.id) ? 'Show label' : 'Hide label'}
+                    title={
+                      isLabelHidden(label.id) ? 'Show label' : 'Hide label'
+                    }
                   >
                     {isLabelHidden(label.id) ? (
                       <EyeOff className="h-4 w-4" />
@@ -88,24 +93,10 @@ export function LabelsSettings({
                   </Button>
                   <ColorPicker
                     value={label.color}
-                    onChange={(color) => handleLabelChange(label.id, 'color', color)}
-                    quickColors={[
-                      '#8f8f8f',
-                      '#f44336',
-                      '#e91e63',
-                      '#9c27b0',
-                      '#673ab7',
-                      '#3f51b5',
-                      '#2196f3',
-                      '#03a9f4',
-                      '#00bcd4',
-                      '#009688',
-                      '#4caf50',
-                      '#8bc34a',
-                      '#cddc39',
-                      '#ffeb3b',
-                      '#ffc107',
-                    ]}
+                    onChange={(color) =>
+                      handleLabelChange(label.id, 'color', color)
+                    }
+                    quickColors={QUICK_COLORS}
                   />
                   <Input
                     type="text"
@@ -143,4 +134,3 @@ export function LabelsSettings({
     </Dialog>
   );
 }
-

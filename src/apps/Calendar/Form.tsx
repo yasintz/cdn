@@ -15,6 +15,7 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import dayjs from '@/helpers/dayjs';
 import { showDiff } from '../TimelineTodo/Entry/utils';
+import { QUICK_COLORS } from '@/constants/colors';
 
 export type FormInputs = Omit<EventType, 'id'>;
 type FormProps = {
@@ -86,23 +87,7 @@ const Form = ({
             <ColorPicker
               value={field.value || ''}
               onChange={field.onChange}
-              quickColors={[
-                '#8f8f8f',
-                '#f44336',
-                '#e91e63',
-                '#9c27b0',
-                '#673ab7',
-                '#3f51b5',
-                '#2196f3',
-                '#03a9f4',
-                '#00bcd4',
-                '#009688',
-                '#4caf50',
-                '#8bc34a',
-                '#cddc39',
-                '#ffeb3b',
-                '#ffc107',
-              ]}
+              quickColors={QUICK_COLORS}
             />
           </div>
         )}
