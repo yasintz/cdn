@@ -69,7 +69,7 @@ export default function MarkdownReviewer() {
   } = useTextSelection((text, position) => {
     setSelectedText(text);
     setSelectionPosition(position);
-  });
+  }, markdownContent);
 
   // Use hook values, fallback to store values for compatibility
   const selectedText = hookSelectedText || storeSelectedText;
