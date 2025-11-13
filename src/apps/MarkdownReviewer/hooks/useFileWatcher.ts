@@ -21,7 +21,7 @@ const hashContent = (content: string): string => {
 
 export function useFileWatcher(
   onContentChange: (content: string, fileName: string) => void,
-  onWatchStateChange?: (isWatching: boolean) => void
+  _onWatchStateChange?: (isWatching: boolean) => void
 ): UseFileWatcherResult {
   const [watchHandle, setWatchHandle] = useState<FileSystemFileHandle | null>(null);
   const [isWatching, setIsWatching] = useState(false);
