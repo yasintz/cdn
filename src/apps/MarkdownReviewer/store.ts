@@ -75,20 +75,22 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
       setMarkdownContent: (content, fileName) => {
         const state = get();
 
-        // Always save current state to history before loading new file/version
+        // Only save to history if there are comments for the current version
+        // When content changes and comments exist, save them to history and clear comments
         let updatedHistory = state.commentHistory;
-        if (state.currentFileName && state.comments.length > 0) {
+        if (state.comments.length > 0) {
+          // Save current comments to history before updating content
           const historyEntry: CommentHistory = {
             id: Date.now().toString(),
-            fileName: state.currentFileName,
+            fileName: state.currentFileName || fileName,
             comments: state.comments,
             savedAt: Date.now(),
           };
           updatedHistory = [...state.commentHistory, historyEntry];
         }
 
-        // Always start with fresh comments for new upload
-        // (User can view previous versions via history dropdown)
+        // Update content and clear comments
+        // New version will only be saved when user adds comments
         set({
           markdownContent: content,
           currentFileName: fileName,
