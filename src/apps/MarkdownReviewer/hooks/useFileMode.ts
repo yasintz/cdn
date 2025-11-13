@@ -7,6 +7,9 @@ interface UseFileModeResult {
   setFileMode: (mode: FileMode) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectFileForWatch: () => Promise<void>;
+  showFileList: boolean;
+  setShowFileList: (show: boolean) => void;
+  handleSelectNewFile: () => Promise<void>;
 }
 
 export function useFileMode(
@@ -16,6 +19,7 @@ export function useFileMode(
   stopWatching: () => Promise<void>
 ): UseFileModeResult {
   const [fileMode, setFileMode] = useState<FileMode>('upload');
+  const [showFileList, setShowFileList] = useState(false);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,6 +36,11 @@ export function useFileMode(
   }, [onFileSelected]);
 
   const handleSelectFileForWatch = useCallback(async () => {
+    // Show file list dialog instead of file picker
+    setShowFileList(true);
+  }, []);
+
+  const handleSelectNewFile = useCallback(async () => {
     try {
       if (!('showOpenFilePicker' in window)) {
         alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or another Chromium-based browser.');
@@ -50,10 +59,12 @@ export function useFileMode(
 
       setFileMode('watch');
       await onWatchStart(handle);
+      setShowFileList(false);
     } catch (error: any) {
       if (error.name !== 'AbortError') {
         console.error('Error selecting file:', error);
-        alert('Failed to select file. Please try again.');
+        const errorMessage = error.message || 'Failed to select file. Please try again.';
+        alert(errorMessage);
       }
     }
   }, [onWatchStart, setFileMode]);
@@ -70,6 +81,8 @@ export function useFileMode(
     setFileMode: handleModeChange,
     handleFileUpload,
     handleSelectFileForWatch,
+    showFileList,
+    setShowFileList,
+    handleSelectNewFile,
   };
 }
-

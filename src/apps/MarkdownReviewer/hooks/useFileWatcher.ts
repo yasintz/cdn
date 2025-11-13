@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { saveFileHandle, getFileHandle, removeFileHandle } from '../fileHandleStorage';
+import { saveFileHandle, getCurrentFileHandle, removeFileHandle, clearCurrentFile } from '../fileHandleStorage';
 
 interface UseFileWatcherResult {
   watchHandle: FileSystemFileHandle | null;
@@ -27,8 +27,41 @@ export function useFileWatcher(
   const watchIntervalRef = useRef<number | null>(null);
   const lastContentHashRef = useRef<string>('');
 
+  const verifyPermission = useCallback(async (handle: FileSystemFileHandle, readWrite: boolean = false): Promise<boolean> => {
+    // Type assertion for File System Access API methods
+    const fileHandle = handle as any;
+    const options: any = {};
+    if (readWrite) {
+      options.mode = 'readwrite';
+    }
+    
+    // Check if we already have permission
+    if (fileHandle.queryPermission && (await fileHandle.queryPermission(options)) === 'granted') {
+      return true;
+    }
+    
+    // Request permission if we don't have it
+    if (fileHandle.requestPermission && (await fileHandle.requestPermission(options)) === 'granted') {
+      return true;
+    }
+    
+    // If methods don't exist, try to read the file directly (some browsers auto-grant)
+    try {
+      await handle.getFile();
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const readFileContent = useCallback(async (handle: FileSystemFileHandle): Promise<{ content: string | null; error: string | null }> => {
     try {
+      // Verify we have permission to read the file
+      const hasPermission = await verifyPermission(handle, false);
+      if (!hasPermission) {
+        return { content: null, error: 'PermissionDenied' };
+      }
+
       const file = await handle.getFile();
       const content = await file.text();
       return { content, error: null };
@@ -39,7 +72,7 @@ export function useFileWatcher(
       }
       return { content: null, error: 'UnknownError' };
     }
-  }, []);
+  }, [verifyPermission]);
 
   const stopWatching = useCallback(async () => {
     if (watchIntervalRef.current) {
@@ -48,11 +81,18 @@ export function useFileWatcher(
     }
     setIsWatching(false);
     setWatchHandle(null);
-    await removeFileHandle();
+    // Clear current file selection but keep file in history
+    await clearCurrentFile();
     lastContentHashRef.current = '';
   }, []);
 
   const startWatching = useCallback(async (handle: FileSystemFileHandle) => {
+    // Verify permission before saving
+    const hasPermission = await verifyPermission(handle, false);
+    if (!hasPermission) {
+      throw new Error('Permission denied. Please grant access to the file.');
+    }
+
     await saveFileHandle(handle);
     setWatchHandle(handle);
     setIsWatching(true);
@@ -63,13 +103,23 @@ export function useFileWatcher(
     const hash = hashContent(content);
     lastContentHashRef.current = hash;
     onContentChange(content, file.name);
-  }, [onContentChange]);
+  }, [onContentChange, verifyPermission]);
 
-  // Effect to load saved file handle on mount
+  // Effect to load saved file handle on mount and auto-start watching
   useEffect(() => {
     const loadSavedHandle = async () => {
-      const handle = await getFileHandle();
+      const handle = await getCurrentFileHandle();
       if (handle) {
+        // Verify permission first
+        const hasPermission = await verifyPermission(handle, false);
+        if (!hasPermission) {
+          // Permission was revoked, remove the handle and let user select again
+          await removeFileHandle();
+          console.log('File permission was revoked. Please select the file again.');
+          return;
+        }
+
+        // Permission granted, start watching automatically
         setWatchHandle(handle);
         setIsWatching(true);
         const result = await readFileContent(handle);
@@ -83,14 +133,18 @@ export function useFileWatcher(
             console.error('Error getting file name:', error);
             onContentChange(result.content, 'watched-file.md');
           }
+        } else if (result.error === 'PermissionDenied') {
+          // Permission denied, clean up
+          await stopWatching();
+          console.log('File access was denied. Please select the file again.');
         } else if (result.error) {
           await stopWatching();
-          alert('File access was denied or file not found. Watching has been stopped.');
+          console.error('Error loading file:', result.error);
         }
       }
     };
     loadSavedHandle();
-  }, [readFileContent, stopWatching, onContentChange]);
+  }, [readFileContent, stopWatching, onContentChange, verifyPermission]);
 
   // Effect to poll file when watching
   useEffect(() => {
