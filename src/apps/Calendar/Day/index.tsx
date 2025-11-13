@@ -2,11 +2,10 @@ import React, { useLayoutEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { EventType } from '../store';
 import _ from 'lodash';
-import EventCreatePreview, {
-  useEventCreatePreview,
-} from './EventCreatePreview';
+import EventCreatePreview from './EventCreatePreview';
 import GroupedEvent from './GroupedEvent';
 import NonGroupedEvent from './NonGroupedEvent';
+import { useEventCreatePreview } from './useEventCreatePreview';
 
 type CalendarDayProps = {
   events: Array<EventType>;

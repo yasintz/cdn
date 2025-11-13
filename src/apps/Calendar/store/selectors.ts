@@ -105,7 +105,7 @@ export const selectSummary = (period: 'daily' | 'weekly' | 'monthly' | '3months'
     const today = now.format('YYYY-MM-DD');
 
     let startDate: string;
-    let endDate: string = today;
+    const endDate: string = today;
 
     switch (period) {
       case 'daily':

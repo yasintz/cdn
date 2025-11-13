@@ -55,7 +55,7 @@ export default function SimpleTodoTracker() {
     };
     window.addEventListener('paste', pasteListener);
     return () => window.removeEventListener('paste', pasteListener);
-  }, []);
+  }, [createTodos, selectedDate, timeTrackerProjects]);
 
   const filteredTodos = useMemo(
     () =>

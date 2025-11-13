@@ -97,7 +97,6 @@ const allPlugins = ({
   headingsPlugin(),
   linkPlugin(),
   linkDialogPlugin(),
-  // eslint-disable-next-line @typescript-eslint/require-await
   imagePlugin({ imageUploadHandler: async () => '/sample-image.png' }),
   tablePlugin(),
   thematicBreakPlugin(),
