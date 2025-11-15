@@ -3,7 +3,7 @@ import { DailyTracker, type DailyTrackerHandle } from './DailyTracker';
 import { Settings } from './Settings';
 import { ActivitySelector } from './ActivitySelector';
 import { Button } from '@/components/ui/button';
-import { Settings as SettingsIcon, BarChart3 } from 'lucide-react';
+import { Settings as SettingsIcon, BarChart3, Grid3x3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from '@/helpers/dayjs';
 
@@ -82,6 +82,14 @@ export function MonthTracker() {
             title="View Summary"
           >
             <BarChart3 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate('frequency')}
+            title="View Frequency Patterns"
+          >
+            <Grid3x3 className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
