@@ -86,7 +86,7 @@ export function FrequencyView() {
     let currentDate = dayjs(startDate);
     const end = dayjs(endDate);
 
-    while (currentDate.isSameOrBefore(end, 'day')) {
+    while (!currentDate.isAfter(end, 'day')) {
       const dateString = currentDate.format('YYYY-MM-DD');
       const dayData = selectDayData(dateString)(useStore.getState());
 
@@ -165,79 +165,73 @@ export function FrequencyView() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto pr-4">
                 <div className="inline-block min-w-full">
-                  {/* Header row with period labels */}
-                  <div className="flex gap-2 mb-2">
-                    <div className="w-16 shrink-0" /> {/* Empty space for hour labels */}
-                    {periods.map((period) => (
-                      <div
-                        key={period.label}
-                        className="w-20 shrink-0 text-center text-sm font-semibold"
-                      >
+                  {/* Period rows (each period is a row) */}
+                  {periods.map((period) => (
+                    <div key={period.label} className="flex items-center gap-2 py-2 pl-2">
+                      {/* Period label */}
+                      <div className="sticky left-2 bg-background z-10 min-w-[90px] text-sm font-medium pr-2 h-[64px] flex items-center justify-center border border-gray-200 rounded-lg text-center">
                         {period.label}
                       </div>
-                    ))}
-                  </div>
 
-                  {/* Hour rows */}
-                  {hourBlocks.map((hour) => (
-                    <div key={hour} className="flex gap-2 mb-2">
-                      {/* Hour label */}
-                      <div className="w-16 shrink-0 text-sm font-medium flex items-center justify-end pr-2">
-                        {hour}
-                      </div>
+                      {/* Hour cells */}
+                      <div className="flex gap-2">
+                        {hourBlocks.map((hour) => {
+                          const frequencyData = calculateFrequency(
+                            period.startDate,
+                            period.endDate,
+                            hour
+                          );
+                          const backgroundColor = frequencyData.activity
+                            ? getLightBackgroundColor(frequencyData.color)
+                            : '#ffffff';
 
-                      {/* Period cells */}
-                      {periods.map((period) => {
-                        const frequencyData = calculateFrequency(
-                          period.startDate,
-                          period.endDate,
-                          hour
-                        );
-                        const backgroundColor = frequencyData.activity
-                          ? getLightBackgroundColor(frequencyData.color)
-                          : '#ffffff';
-
-                        return (
-                          <div
-                            key={period.label}
-                            className={cn(
-                              'w-20 h-16 shrink-0 rounded-lg transition-all overflow-hidden relative',
-                              frequencyData.activity
-                                ? 'ring-0 ring-offset-0'
-                                : 'ring-1 ring-gray-300'
-                            )}
-                            style={{ backgroundColor }}
-                            title={
-                              frequencyData.activity
-                                ? `${hour} - ${frequencyData.activity} (${frequencyData.count}x)`
-                                : `${hour} - No data`
-                            }
-                          >
-                            {frequencyData.activity && (
-                              <>
+                          return (
+                            <button
+                              key={hour}
+                              className={cn(
+                                'relative w-16 h-16 rounded-lg transition-all shrink-0 overflow-hidden',
+                                frequencyData.activity
+                                  ? 'ring-0 ring-offset-0'
+                                  : 'ring-1 ring-gray-300 ring-offset-1'
+                              )}
+                              style={{ backgroundColor }}
+                              title={
+                                frequencyData.activity
+                                  ? `${hour} - ${frequencyData.activity} (${frequencyData.count}x)`
+                                  : `${hour} - No data`
+                              }
+                            >
+                              {frequencyData.activity && (
                                 <div
                                   style={{
                                     backgroundColor: frequencyData.color,
                                     width: 4,
                                     height: '100%',
                                     position: 'absolute',
+                                    left: 0,
+                                    top: 0,
                                   }}
                                 />
-                                <div className="flex h-full flex-col items-center justify-center p-1 pl-2">
-                                  <div className="text-[10px] opacity-80 truncate w-full text-center">
-                                    {frequencyData.activity}
-                                  </div>
-                                  <div className="text-[9px] opacity-60 mt-0.5">
-                                    {frequencyData.count}x
-                                  </div>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        );
-                      })}
+                              )}
+                              <div className="flex h-full flex-col items-center justify-center p-1">
+                                <div className="text-xs font-medium">{hour}</div>
+                                {frequencyData.activity && (
+                                  <>
+                                    <div className="mt-0.5 text-[10px] opacity-80 truncate w-full text-center">
+                                      {frequencyData.activity}
+                                    </div>
+                                    <div className="text-[9px] opacity-60">
+                                      {frequencyData.count}x
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   ))}
                 </div>
