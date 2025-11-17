@@ -7,6 +7,7 @@ import { useTextSelection } from './hooks/useTextSelection';
 import { useComments } from './hooks/useComments';
 import { generateMarkdownExport, copyMarkdownToClipboard, downloadMarkdown } from './utils/exportUtils';
 import { FileListDialog } from './components/FileListDialog';
+import { TableOfContents } from './components/TableOfContents';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -267,7 +268,13 @@ export default function MarkdownReviewer() {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-[1fr_400px] gap-6 p-6 overflow-hidden">
+      <div className={`flex-1 grid ${markdownContent ? 'grid-cols-[250px_1fr_400px]' : 'grid-cols-[1fr_400px]'} gap-6 p-6 overflow-hidden`}>
+        {markdownContent && (
+          <div className="overflow-hidden">
+            <TableOfContents htmlContent={htmlContent} previewRef={previewRef} />
+          </div>
+        )}
+
         <Card className="bg-white rounded-lg p-6 shadow-sm flex flex-col overflow-hidden">
           <CardHeader className="p-0 pb-4">
             <CardTitle className="text-lg text-gray-800 border-b-2 border-blue-600 pb-2">Preview</CardTitle>
