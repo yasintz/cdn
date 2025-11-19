@@ -9,13 +9,11 @@ interface Heading {
 
 interface TableOfContentsProps {
   htmlContent: string;
-  previewRef: React.RefObject<HTMLDivElement>;
+  previewRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function TableOfContents({ htmlContent, previewRef }: TableOfContentsProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const headings = useMemo(() => {
+  const headings = useMemo<Heading[]>(() => {
     if (!htmlContent) return [];
 
     const parser = new DOMParser();

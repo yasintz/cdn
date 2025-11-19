@@ -180,7 +180,7 @@ export default function MarkdownReviewer() {
 
   const htmlContent = useMemo(() => {
     if (!markdownContent) return '';
-    return marked(markdownContent);
+    return marked.parse(markdownContent) as string;
   }, [markdownContent]);
 
   return (
