@@ -15,7 +15,7 @@ interface TableOfContentsProps {
 export function TableOfContents({ htmlContent, previewRef }: TableOfContentsProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const headings = useMemo(() => {
+  const headings = useMemo<Heading[]>(() => {
     if (!htmlContent) return [];
 
     const parser = new DOMParser();
