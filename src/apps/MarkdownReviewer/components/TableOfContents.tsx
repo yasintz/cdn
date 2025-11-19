@@ -9,7 +9,7 @@ interface Heading {
 
 interface TableOfContentsProps {
   htmlContent: string;
-  previewRef: React.RefObject<HTMLDivElement>;
+  previewRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function TableOfContents({ htmlContent, previewRef }: TableOfContentsProps) {
