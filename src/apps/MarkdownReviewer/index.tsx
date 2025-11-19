@@ -1,5 +1,6 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { marked } from 'marked';
+import { PanelLeftOpen, PanelLeftClose } from 'lucide-react';
 import { useMarkdownReviewerStore } from './store';
 import { useFileWatcher } from './hooks/useFileWatcher';
 import { useFileMode } from './hooks/useFileMode';
@@ -16,7 +17,9 @@ import { Label } from '@/components/ui/label';
 
 export default function MarkdownReviewer() {
   console.log('MarkdownReviewer');
-  
+
+  const [isTocExpanded, setIsTocExpanded] = useState(true);
+
   const store = useMarkdownReviewerStore();
   const {
     markdownContent,
@@ -268,8 +271,8 @@ export default function MarkdownReviewer() {
         </div>
       </div>
 
-      <div className={`flex-1 grid ${markdownContent ? 'grid-cols-[250px_1fr_400px]' : 'grid-cols-[1fr_400px]'} gap-6 p-6 overflow-hidden`}>
-        {markdownContent && (
+      <div className={`flex-1 grid ${markdownContent && isTocExpanded ? 'grid-cols-[250px_1fr_400px]' : 'grid-cols-[1fr_400px]'} gap-6 p-6 overflow-hidden`}>
+        {markdownContent && isTocExpanded && (
           <div className="overflow-hidden">
             <TableOfContents htmlContent={htmlContent} previewRef={previewRef} />
           </div>
@@ -277,7 +280,22 @@ export default function MarkdownReviewer() {
 
         <Card className="bg-white rounded-lg p-6 shadow-sm flex flex-col overflow-hidden">
           <CardHeader className="p-0 pb-4">
-            <CardTitle className="text-lg text-gray-800 border-b-2 border-blue-600 pb-2">Preview</CardTitle>
+            <div className="flex items-center gap-2 border-b-2 border-blue-600 pb-2">
+              {markdownContent && (
+                <button
+                  onClick={() => setIsTocExpanded(!isTocExpanded)}
+                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  title={isTocExpanded ? 'Hide table of contents' : 'Show table of contents'}
+                >
+                  {isTocExpanded ? (
+                    <PanelLeftClose className="w-5 h-5 text-gray-600" />
+                  ) : (
+                    <PanelLeftOpen className="w-5 h-5 text-gray-600" />
+                  )}
+                </button>
+              )}
+              <CardTitle className="text-lg text-gray-800">Preview</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="flex-1 overflow-auto p-0">
             {markdownContent ? (
