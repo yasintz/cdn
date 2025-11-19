@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface Heading {
   id: string;
@@ -44,40 +43,26 @@ export function TableOfContents({ htmlContent, previewRef }: TableOfContentsProp
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
         <h3 className="text-sm font-semibold text-gray-700">Table of Contents</h3>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1 hover:bg-gray-200 rounded transition-colors"
-          title={isCollapsed ? 'Expand' : 'Collapse'}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="w-4 h-4 text-gray-600" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-gray-600" />
-          )}
-        </button>
       </div>
-
-      {!isCollapsed && (
-        <div className="flex-1 overflow-y-auto p-4">
-          <nav className="space-y-1">
-            {headings.map((heading, index) => (
-              <button
-                key={heading.id}
-                onClick={() => handleHeadingClick(index)}
-                className="w-full text-left py-1.5 px-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded transition-colors block"
-                style={{
-                  paddingLeft: `${(heading.level - 1) * 12 + 8}px`,
-                }}
-                title={heading.text}
-              >
-                <span className="block truncate">{heading.text}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
+      <div className="flex-1 overflow-y-auto p-4">
+        <nav className="space-y-1">
+          {headings.map((heading, index) => (
+            <button
+              key={heading.id}
+              onClick={() => handleHeadingClick(index)}
+              className="w-full text-left py-1.5 px-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded transition-colors block"
+              style={{
+                paddingLeft: `${(heading.level - 1) * 12 + 8}px`,
+              }}
+              title={heading.text}
+            >
+              <span className="block truncate">{heading.text}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }
