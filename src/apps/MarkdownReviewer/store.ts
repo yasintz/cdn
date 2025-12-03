@@ -35,6 +35,7 @@ interface MarkdownReviewerState {
   showExportDialog: boolean;
   commentText: string;
   selectionPosition: { line: number; column: number } | null;
+  commentsSidebarCollapsed: boolean;
 
   // Actions
   setMarkdownContent: (content: string, fileName: string) => void;
@@ -56,6 +57,7 @@ interface MarkdownReviewerState {
   setSelectedHistoryId: (id: string | null) => void;
   resetComments: () => void;
   clearCommentDialog: () => void;
+  setCommentsSidebarCollapsed: (collapsed: boolean) => void;
 }
 
 export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
@@ -71,6 +73,7 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
       showExportDialog: false,
       commentText: '',
       selectionPosition: null,
+      commentsSidebarCollapsed: false,
 
       setMarkdownContent: (content, fileName) => {
         const state = get();
@@ -197,6 +200,9 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
           selectedText: '',
           selectionPosition: null,
         }),
+
+      setCommentsSidebarCollapsed: (collapsed) =>
+        set({ commentsSidebarCollapsed: collapsed }),
     }),
     {
       name: 'markdown-reviewer-storage',

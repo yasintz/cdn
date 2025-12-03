@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { JsonEditor } from 'json-edit-react';
 import * as timeTrackerModule from '@/apps/TimeTracker/store';
 import * as timelineTodoModule from '@/apps/TimelineTodo/store';
+import * as codeSnippetsModule from '@/apps/CodeSnippets/store';
+import * as calendarModule from '@/apps/Calendar/store';
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { googleSheetDB } from '@/utils/googleSheetDb';
@@ -14,7 +16,12 @@ type DatabaseItem = {
   tabId?: string;
 };
 
-const modules = [timeTrackerModule, timelineTodoModule];
+const modules = [
+  timeTrackerModule,
+  timelineTodoModule,
+  codeSnippetsModule,
+  calendarModule,
+];
 
 const databases: Array<DatabaseItem> = modules
   .map((db) => (db as any).useStore.__dbModule || db)
@@ -93,7 +100,7 @@ const DatabaseEditor = () => {
         </Button>
       </div>
       {selectedDatabase && (
-        <div className="json-form mt-2 flex-1">
+        <div className="json-form mt-2 flex-1 overflow-auto">
           {mode === 'textarea' ? (
             <textarea
               className="flex-1 w-full"

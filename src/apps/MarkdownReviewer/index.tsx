@@ -1,5 +1,6 @@
 import { useMemo, useEffect } from 'react';
 import { marked } from 'marked';
+import { MessageSquare } from 'lucide-react';
 import { useMarkdownReviewerStore } from './store';
 import { useFileWatcher } from './hooks/useFileWatcher';
 import { useFileMode } from './hooks/useFileMode';
@@ -28,6 +29,7 @@ export default function MarkdownReviewer() {
     showExportDialog,
     commentText,
     selectionPosition: storeSelectionPosition,
+    commentsSidebarCollapsed,
     setMarkdownContent,
     addComment,
     addReplyToComment,
@@ -42,6 +44,7 @@ export default function MarkdownReviewer() {
     setSelectionPosition,
     setSelectedHistoryId,
     clearCommentDialog,
+    setCommentsSidebarCollapsed,
   } = store;
 
   // File watching hook
@@ -264,10 +267,22 @@ export default function MarkdownReviewer() {
               </Button>
             )}
           </div>
+          <Button
+            onClick={() => setCommentsSidebarCollapsed(!commentsSidebarCollapsed)}
+            variant="ghost"
+            size="icon"
+            title={commentsSidebarCollapsed ? 'Show comments sidebar' : 'Hide comments sidebar'}
+          >
+            {commentsSidebarCollapsed ? (
+              <MessageSquare className="h-5 w-5" />
+            ) : (
+              <MessageSquare className="h-5 w-5" fill="currentColor" />
+            )}
+          </Button>
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-[1fr_400px] gap-6 p-6 overflow-hidden">
+      <div className={`flex-1 grid gap-6 p-6 overflow-hidden ${commentsSidebarCollapsed ? 'grid-cols-1' : 'grid-cols-[1fr_400px]'}`}>
         <Card className="bg-white rounded-lg p-6 shadow-sm flex flex-col overflow-hidden">
           <CardHeader className="p-0 pb-4">
             <CardTitle className="text-lg text-gray-800 border-b-2 border-blue-600 pb-2">Preview</CardTitle>
@@ -304,7 +319,8 @@ export default function MarkdownReviewer() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white rounded-lg p-6 shadow-sm flex flex-col overflow-hidden">
+        {!commentsSidebarCollapsed && (
+          <Card className="bg-white rounded-lg p-6 shadow-sm flex flex-col overflow-hidden">
           <CardHeader className="p-0 pb-4">
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg text-gray-800 border-b-2 border-blue-600 pb-2 m-0">Comments</CardTitle>
@@ -515,6 +531,7 @@ export default function MarkdownReviewer() {
             )}
           </CardContent>
         </Card>
+        )}
       </div>
 
       <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
