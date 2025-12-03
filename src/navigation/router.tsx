@@ -100,6 +100,13 @@ export const routes: Array<RouteObject & HomePageAppType> = [
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/068/804/014/small/digital_notebooks_on_computer_screen_illustration-vector.jpg',
   },
+  {
+    path: 'finance-tracker',
+    lazy: () => import('../apps/FinanceTracker'),
+    title: 'Finance Tracker',
+    image:
+      'https://img.freepik.com/free-vector/financial-planning-concept-illustration_114360-8472.jpg?w=740',
+  },
 ];
 
 const router = createBrowserRouter([
