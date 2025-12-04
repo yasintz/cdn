@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { computed } from 'zustand-computed-state';
+import { gSheetStorage } from '@/utils/zustand/gsheet-storage';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 import type { StoreState, Account, Transaction, RecurringTransaction, GeneratedTransaction } from './types';
@@ -412,3 +413,8 @@ export const useStore = create<StoreState>()(
     computeState
   )
 );
+
+gSheetStorage(
+  'Finance Tracker',
+  '1lyqDQFS40EQ7ObVkrJAx6NUs04Kq_LnslXbIa1pXVzU'
+).handleStore(useStore);
