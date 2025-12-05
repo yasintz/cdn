@@ -16,8 +16,11 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
         { hour: '11:00', activity: 'Work' },
+        { hour: '11:30', activity: 'Work' },
         { hour: '12:00', activity: 'Work' },
+        { hour: '12:30', activity: 'Work' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -26,9 +29,12 @@ describe('Calendar Store - DayTracker', () => {
       const dayData = selectDayData(date)(state);
 
       expect(dayData.hours.find((h) => h.hour === '10:00')?.activity).toBe('Work');
+      expect(dayData.hours.find((h) => h.hour === '10:30')?.activity).toBe('Work');
       expect(dayData.hours.find((h) => h.hour === '11:00')?.activity).toBe('Work');
+      expect(dayData.hours.find((h) => h.hour === '11:30')?.activity).toBe('Work');
       expect(dayData.hours.find((h) => h.hour === '12:00')?.activity).toBe('Work');
-      expect(dayData.hours.find((h) => h.hour === '09:00')?.activity).toBe(null);
+      expect(dayData.hours.find((h) => h.hour === '12:30')?.activity).toBe('Work');
+      expect(dayData.hours.find((h) => h.hour === '09:30')?.activity).toBe(null);
       expect(dayData.hours.find((h) => h.hour === '13:00')?.activity).toBe(null);
     });
 
@@ -36,7 +42,9 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '22:00', activity: 'Sleep' },
+        { hour: '22:30', activity: 'Sleep' },
         { hour: '23:00', activity: 'Sleep' },
+        { hour: '23:30', activity: 'Sleep' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -44,10 +52,12 @@ describe('Calendar Store - DayTracker', () => {
       const state = useStore.getState();
       const dayData = selectDayData(date)(state);
 
-      // Both 22:00 and 23:00 should be filled on the first day
+      // All blocks should be filled on the first day
       expect(dayData.hours.find((h) => h.hour === '22:00')?.activity).toBe('Sleep');
+      expect(dayData.hours.find((h) => h.hour === '22:30')?.activity).toBe('Sleep');
       expect(dayData.hours.find((h) => h.hour === '23:00')?.activity).toBe('Sleep');
-      expect(dayData.hours.find((h) => h.hour === '21:00')?.activity).toBe(null);
+      expect(dayData.hours.find((h) => h.hour === '23:30')?.activity).toBe('Sleep');
+      expect(dayData.hours.find((h) => h.hour === '21:30')?.activity).toBe(null);
 
       // Check that the event was created correctly
       const events = selectDayTrackerEvents(state);
@@ -58,7 +68,7 @@ describe('Calendar Store - DayTracker', () => {
       const eventStart = dayjs(events[0].start);
       expect(eventStart.format('YYYY-MM-DD HH:mm')).toBe('2024-01-01 22:00');
       
-      // The event should end at 00:00 on day 2
+      // The event should end at 00:00 on day 2 (23:30 + 30 minutes)
       const eventEnd = dayjs(events[0].end);
       expect(eventEnd.format('YYYY-MM-DD HH:mm')).toBe('2024-01-02 00:00');
     });
@@ -84,9 +94,13 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '20:00', activity: 'Party' },
+        { hour: '20:30', activity: 'Party' },
         { hour: '21:00', activity: 'Party' },
+        { hour: '21:30', activity: 'Party' },
         { hour: '22:00', activity: 'Party' },
+        { hour: '22:30', activity: 'Party' },
         { hour: '23:00', activity: 'Party' },
+        { hour: '23:30', activity: 'Party' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -94,18 +108,24 @@ describe('Calendar Store - DayTracker', () => {
       const state = useStore.getState();
       const dayData = selectDayData(date)(state);
 
-      // All hours should be filled
+      // All blocks should be filled
       expect(dayData.hours.find((h) => h.hour === '20:00')?.activity).toBe('Party');
+      expect(dayData.hours.find((h) => h.hour === '20:30')?.activity).toBe('Party');
       expect(dayData.hours.find((h) => h.hour === '21:00')?.activity).toBe('Party');
+      expect(dayData.hours.find((h) => h.hour === '21:30')?.activity).toBe('Party');
       expect(dayData.hours.find((h) => h.hour === '22:00')?.activity).toBe('Party');
+      expect(dayData.hours.find((h) => h.hour === '22:30')?.activity).toBe('Party');
       expect(dayData.hours.find((h) => h.hour === '23:00')?.activity).toBe('Party');
+      expect(dayData.hours.find((h) => h.hour === '23:30')?.activity).toBe('Party');
     });
 
     it('should handle event ending at end of day (23:59)', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '22:00', activity: 'Work' },
+        { hour: '22:30', activity: 'Work' },
         { hour: '23:00', activity: 'Work' },
+        { hour: '23:30', activity: 'Work' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -115,7 +135,7 @@ describe('Calendar Store - DayTracker', () => {
       
       expect(events.length).toBe(1);
       
-      // Event should end at 00:00 next day (23:00 + 1 hour)
+      // Event should end at 00:00 next day (23:30 + 30 minutes)
       const eventEnd = dayjs(events[0].end);
       expect(eventEnd.format('YYYY-MM-DD HH:mm')).toBe('2024-01-02 00:00');
     });
@@ -124,13 +144,21 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '09:00', activity: 'Work' },
+        { hour: '09:30', activity: 'Work' },
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
         { hour: '11:00', activity: 'Work' },
+        { hour: '11:30', activity: 'Work' },
         { hour: '12:00', activity: 'Lunch' },
+        { hour: '12:30', activity: 'Lunch' },
         { hour: '13:00', activity: 'Work' },
+        { hour: '13:30', activity: 'Work' },
         { hour: '14:00', activity: 'Work' },
+        { hour: '14:30', activity: 'Work' },
         { hour: '15:00', activity: null },
+        { hour: '15:30', activity: null },
         { hour: '16:00', activity: 'Meeting' },
+        { hour: '16:30', activity: 'Meeting' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -156,6 +184,7 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '14:00', activity: 'Meeting' },
+        { hour: '14:30', activity: 'Meeting' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -164,13 +193,14 @@ describe('Calendar Store - DayTracker', () => {
       const dayData = selectDayData(date)(state);
 
       expect(dayData.hours.find((h) => h.hour === '14:00')?.activity).toBe('Meeting');
-      expect(dayData.hours.find((h) => h.hour === '13:00')?.activity).toBe(null);
+      expect(dayData.hours.find((h) => h.hour === '14:30')?.activity).toBe('Meeting');
+      expect(dayData.hours.find((h) => h.hour === '13:30')?.activity).toBe(null);
       expect(dayData.hours.find((h) => h.hour === '15:00')?.activity).toBe(null);
 
       const events = selectDayTrackerEvents(state);
       expect(events.length).toBe(1);
       
-      // Event should span from 14:00 to 15:00
+      // Event should span from 14:00 to 15:00 (14:30 + 30 minutes)
       const event = events[0];
       expect(dayjs(event.start).format('HH:mm')).toBe('14:00');
       expect(dayjs(event.end).format('HH:mm')).toBe('15:00');
@@ -180,11 +210,17 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '00:00', activity: 'Sleep' },
+        { hour: '00:30', activity: 'Sleep' },
         { hour: '01:00', activity: 'Sleep' },
+        { hour: '01:30', activity: 'Sleep' },
         { hour: '02:00', activity: 'Sleep' },
+        { hour: '02:30', activity: 'Sleep' },
         { hour: '03:00', activity: 'Sleep' },
+        { hour: '03:30', activity: 'Sleep' },
         { hour: '04:00', activity: 'Sleep' },
+        { hour: '04:30', activity: 'Sleep' },
         { hour: '05:00', activity: 'Sleep' },
+        { hour: '05:30', activity: 'Sleep' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -194,7 +230,9 @@ describe('Calendar Store - DayTracker', () => {
 
       for (let i = 0; i <= 5; i++) {
         const hour = `${i.toString().padStart(2, '0')}:00`;
+        const hour30 = `${i.toString().padStart(2, '0')}:30`;
         expect(dayData.hours.find((h) => h.hour === hour)?.activity).toBe('Sleep');
+        expect(dayData.hours.find((h) => h.hour === hour30)?.activity).toBe('Sleep');
       }
     });
 
@@ -204,7 +242,9 @@ describe('Calendar Store - DayTracker', () => {
       // Create first event
       useStore.getState().createDayTrackerEvent(date, [
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
         { hour: '11:00', activity: 'Work' },
+        { hour: '11:30', activity: 'Work' },
       ]);
 
       let state = useStore.getState();
@@ -214,8 +254,11 @@ describe('Calendar Store - DayTracker', () => {
       // Update with new event
       useStore.getState().createDayTrackerEvent(date, [
         { hour: '10:00', activity: 'Meeting' },
+        { hour: '10:30', activity: 'Meeting' },
         { hour: '11:00', activity: 'Meeting' },
+        { hour: '11:30', activity: 'Meeting' },
         { hour: '12:00', activity: 'Meeting' },
+        { hour: '12:30', activity: 'Meeting' },
       ]);
 
       state = useStore.getState();
@@ -237,6 +280,7 @@ describe('Calendar Store - DayTracker', () => {
       // Create first event with a specific color
       useStore.getState().createDayTrackerEvent(date, [
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
       ]);
 
       let state = useStore.getState();
@@ -246,7 +290,9 @@ describe('Calendar Store - DayTracker', () => {
       // Update event but keep same activity name
       useStore.getState().createDayTrackerEvent(date, [
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
         { hour: '11:00', activity: 'Work' },
+        { hour: '11:30', activity: 'Work' },
       ]);
 
       state = useStore.getState();
@@ -270,8 +316,8 @@ describe('Calendar Store - DayTracker', () => {
       expect(events.length).toBe(1);
 
       // Clear all activities
-      const allHours = Array.from({ length: 24 }, (_, i) => ({
-        hour: `${i.toString().padStart(2, '0')}:00`,
+      const allHours = Array.from({ length: 48 }, (_, i) => ({
+        hour: `${Math.floor(i / 2).toString().padStart(2, '0')}:${(i % 2 === 0 ? '00' : '30')}`,
         activity: null,
       }));
       useStore.getState().createDayTrackerEvent(date, allHours);
@@ -290,12 +336,12 @@ describe('Calendar Store - DayTracker', () => {
   });
 
   describe('selectDayData', () => {
-    it('should return all 24 hours for a day', () => {
+    it('should return all 48 30-minute blocks for a day', () => {
       const date = '2024-01-01';
       const state = useStore.getState();
       const dayData = selectDayData(date)(state);
 
-      expect(dayData.hours.length).toBe(24);
+      expect(dayData.hours.length).toBe(48);
       expect(dayData.date).toBe(date);
     });
 
@@ -349,6 +395,7 @@ describe('Calendar Store - DayTracker', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '00:00', activity: 'Midnight' },
+        { hour: '00:30', activity: 'Midnight' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -357,12 +404,14 @@ describe('Calendar Store - DayTracker', () => {
       const dayData = selectDayData(date)(state);
 
       expect(dayData.hours.find((h) => h.hour === '00:00')?.activity).toBe('Midnight');
+      expect(dayData.hours.find((h) => h.hour === '00:30')?.activity).toBe('Midnight');
     });
 
     it('should handle event at 23:00 (last hour of day)', () => {
       const date = '2024-01-01';
       const hours = [
         { hour: '23:00', activity: 'Late Night' },
+        { hour: '23:30', activity: 'Late Night' },
       ];
 
       useStore.getState().createDayTrackerEvent(date, hours);
@@ -371,11 +420,12 @@ describe('Calendar Store - DayTracker', () => {
       const dayData = selectDayData(date)(state);
 
       expect(dayData.hours.find((h) => h.hour === '23:00')?.activity).toBe('Late Night');
+      expect(dayData.hours.find((h) => h.hour === '23:30')?.activity).toBe('Late Night');
       
       const events = selectDayTrackerEvents(state);
       const eventEnd = dayjs(events[0].end);
       
-      // Should end at 00:00 next day
+      // Should end at 00:00 next day (23:30 + 30 minutes)
       expect(eventEnd.format('YYYY-MM-DD HH:mm')).toBe('2024-01-02 00:00');
     });
 
@@ -383,13 +433,17 @@ describe('Calendar Store - DayTracker', () => {
       // Day 1
       useStore.getState().createDayTrackerEvent('2024-01-01', [
         { hour: '22:00', activity: 'Work' },
+        { hour: '22:30', activity: 'Work' },
         { hour: '23:00', activity: 'Work' },
+        { hour: '23:30', activity: 'Work' },
       ]);
 
       // Day 2
       useStore.getState().createDayTrackerEvent('2024-01-02', [
         { hour: '00:00', activity: 'Sleep' },
+        { hour: '00:30', activity: 'Sleep' },
         { hour: '01:00', activity: 'Sleep' },
+        { hour: '01:30', activity: 'Sleep' },
       ]);
 
       const state = useStore.getState();
@@ -416,35 +470,24 @@ describe('Calendar Store - DayTracker', () => {
     it('should calculate daily summary correctly', () => {
       const today = dayjs().format('YYYY-MM-DD');
       
-      // Create events for today
+      // Create events for today (using 30-minute blocks)
       useStore.getState().createDayTrackerEvent(today, [
         { hour: '09:00', activity: 'Work' },
+        { hour: '09:30', activity: 'Work' },
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
         { hour: '11:00', activity: 'Work' },
+        { hour: '11:30', activity: 'Work' },
         { hour: '12:00', activity: 'Lunch' },
+        { hour: '12:30', activity: 'Lunch' },
         { hour: '13:00', activity: 'Work' },
+        { hour: '13:30', activity: 'Work' },
         { hour: '14:00', activity: 'Work' },
+        { hour: '14:30', activity: 'Work' },
       ]);
 
       const state = useStore.getState();
-      
-      // Debug
-      const dayTrackerEvents = selectDayTrackerEvents(state);
-      console.log('Today:', today);
-      console.log('Day tracker events:', dayTrackerEvents.length);
-      dayTrackerEvents.forEach(e => {
-        const eventStart = dayjs(e.start);
-        const eventDate = eventStart.format('YYYY-MM-DD');
-        console.log('Event:', e.title, 'Start:', e.start, 'Date:', eventDate, 'Match:', eventDate === today, 'Comparison:', eventDate >= today && eventDate <= today);
-      });
-      
-      console.log('About to call selectSummary');
-      console.log('State events:', state.events.length);
-      console.log('State labels:', state.labels);
-      const summarySelector = selectSummary('daily');
-      console.log('Got summary selector');
-      const summary = summarySelector(state);
-      console.log('Summary:', summary);
+      const summary = selectSummary('daily')(state);
 
       expect(summary.totalHours).toBe(6);
       expect(summary.activities.length).toBe(2);
@@ -461,12 +504,14 @@ describe('Calendar Store - DayTracker', () => {
     it('should calculate weekly summary correctly', () => {
       const today = dayjs();
       
-      // Create events for multiple days in the past week
+      // Create events for multiple days in the past week (using 30-minute blocks)
       for (let i = 0; i < 7; i++) {
         const date = today.subtract(i, 'day').format('YYYY-MM-DD');
         useStore.getState().createDayTrackerEvent(date, [
           { hour: '09:00', activity: 'Work' },
+          { hour: '09:30', activity: 'Work' },
           { hour: '10:00', activity: 'Work' },
+          { hour: '10:30', activity: 'Work' },
         ]);
       }
 
@@ -482,26 +527,34 @@ describe('Calendar Store - DayTracker', () => {
     it('should handle events that span across midnight', () => {
       const today = dayjs().format('YYYY-MM-DD');
       
-      // Create a sleep event from 23:00 to 07:00 next day
+      // Create a sleep event from 23:00 to 07:00 next day (using 30-minute blocks)
       useStore.getState().createDayTrackerEvent(today, [
         { hour: '23:00', activity: 'Sleep' },
+        { hour: '23:30', activity: 'Sleep' },
       ]);
       
       const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD');
       useStore.getState().createDayTrackerEvent(tomorrow, [
         { hour: '00:00', activity: 'Sleep' },
+        { hour: '00:30', activity: 'Sleep' },
         { hour: '01:00', activity: 'Sleep' },
+        { hour: '01:30', activity: 'Sleep' },
         { hour: '02:00', activity: 'Sleep' },
+        { hour: '02:30', activity: 'Sleep' },
         { hour: '03:00', activity: 'Sleep' },
+        { hour: '03:30', activity: 'Sleep' },
         { hour: '04:00', activity: 'Sleep' },
+        { hour: '04:30', activity: 'Sleep' },
         { hour: '05:00', activity: 'Sleep' },
+        { hour: '05:30', activity: 'Sleep' },
         { hour: '06:00', activity: 'Sleep' },
+        { hour: '06:30', activity: 'Sleep' },
       ]);
 
       const state = useStore.getState();
       const summary = selectSummary('daily')(state);
 
-      // Should only count today's hours
+      // Should only count today's hours (2 blocks = 1 hour)
       expect(summary.totalHours).toBe(1);
       expect(summary.activities[0].activity).toBe('Sleep');
       expect(summary.activities[0].hours).toBe(1);
@@ -520,25 +573,28 @@ describe('Calendar Store - DayTracker', () => {
       const yesterday = today.subtract(1, 'day').format('YYYY-MM-DD');
       const todayStr = today.format('YYYY-MM-DD');
       
-      // Create event for yesterday
+      // Create event for yesterday (using 30-minute blocks)
       useStore.getState().createDayTrackerEvent(yesterday, [
         { hour: '09:00', activity: 'Work' },
+        { hour: '09:30', activity: 'Work' },
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
       ]);
       
-      // Create event for today
+      // Create event for today (using 30-minute blocks)
       useStore.getState().createDayTrackerEvent(todayStr, [
         { hour: '14:00', activity: 'Meeting' },
+        { hour: '14:30', activity: 'Meeting' },
       ]);
 
       const state = useStore.getState();
       const dailySummary = selectSummary('daily')(state);
 
-      // Daily summary should only include today's events
+      // Daily summary should only include today's events (2 blocks = 1 hour)
       expect(dailySummary.totalHours).toBe(1);
       expect(dailySummary.activities[0].activity).toBe('Meeting');
       
-      // Weekly summary should include both
+      // Weekly summary should include both (2 hours + 1 hour = 3 hours)
       const weeklySummary = selectSummary('weekly')(state);
       expect(weeklySummary.totalHours).toBe(3);
     });
@@ -548,13 +604,21 @@ describe('Calendar Store - DayTracker', () => {
       
       useStore.getState().createDayTrackerEvent(today, [
         { hour: '09:00', activity: 'Work' },
+        { hour: '09:30', activity: 'Work' },
         { hour: '10:00', activity: 'Work' },
+        { hour: '10:30', activity: 'Work' },
         { hour: '11:00', activity: 'Work' },
+        { hour: '11:30', activity: 'Work' },
         { hour: '12:00', activity: 'Lunch' },
+        { hour: '12:30', activity: 'Lunch' },
         { hour: '13:00', activity: 'Meeting' },
+        { hour: '13:30', activity: 'Meeting' },
         { hour: '14:00', activity: 'Meeting' },
+        { hour: '14:30', activity: 'Meeting' },
         { hour: '15:00', activity: 'Meeting' },
+        { hour: '15:30', activity: 'Meeting' },
         { hour: '16:00', activity: 'Meeting' },
+        { hour: '16:30', activity: 'Meeting' },
       ]);
 
       const state = useStore.getState();
