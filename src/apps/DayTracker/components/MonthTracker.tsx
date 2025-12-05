@@ -33,11 +33,12 @@ export function MonthTracker() {
     return daysList;
   }, [today]);
 
-  // Calculate total hours and day count for multi-day selection
+  // Calculate total 30-minute blocks and day count for multi-day selection
   const selectionSummary = useMemo(() => {
-    const totalHours = Array.from(activeDays.values()).reduce((sum, hours) => sum + hours.size, 0);
+    const totalBlocks = Array.from(activeDays.values()).reduce((sum, hours) => sum + hours.size, 0);
+    const totalHours = totalBlocks / 2; // Convert 30-minute blocks to hours
     const dayCount = activeDays.size;
-    return { totalHours, dayCount };
+    return { totalBlocks, totalHours, dayCount };
   }, [activeDays]);
 
   // Auto-scroll to today on mount
@@ -147,14 +148,14 @@ export function MonthTracker() {
         </div>
       </div>
 
-      {selectionSummary.totalHours > 0 && (
+      {selectionSummary.totalBlocks > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-10">
           <Button
             size="lg"
             onClick={() => setShowActivitySelector(true)}
             className="shadow-lg"
           >
-            Assign Activity ({selectionSummary.totalHours} hours across {selectionSummary.dayCount} {selectionSummary.dayCount === 1 ? 'day' : 'days'})
+            Assign Activity ({selectionSummary.totalHours} {selectionSummary.totalHours === 1 ? 'hour' : 'hours'} across {selectionSummary.dayCount} {selectionSummary.dayCount === 1 ? 'day' : 'days'})
           </Button>
         </div>
       )}

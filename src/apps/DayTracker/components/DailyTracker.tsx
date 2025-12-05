@@ -35,14 +35,16 @@ export const DailyTracker = forwardRef<DailyTrackerHandle, DailyTrackerProps>(
       return generateHourBlocks();
     }, []);
 
-    // Calculate current active hour
+    // Calculate current active 30-minute block
     const isToday = useMemo(() => {
       return dayjs(date).isSame(dayjs(now), 'day');
     }, [date, now]);
     const currentHour = useMemo(() => {
       if (!isToday) return null;
       const hour = dayjs(now).hour();
-      return `${hour.toString().padStart(2, '0')}:00`;
+      const minute = dayjs(now).minute();
+      const minuteBlock = minute < 30 ? 0 : 30;
+      return `${hour.toString().padStart(2, '0')}:${minuteBlock.toString().padStart(2, '0')}`;
     }, [now, isToday]);
 
     const handleHourClick = (hour: string) => {

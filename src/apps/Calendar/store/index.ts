@@ -221,17 +221,23 @@ export const useStore = create<StoreType>()(
 
                   const [endHour, endMin] = group.endHour.split(':').map(Number);
                   
-                  // Calculate end time (add 1 hour to endHour to make it exclusive)
-                  const endTimeHour = (endHour + 1) % 24;
-                  const endTimeMin = endMin;
+                  // Calculate end time (add 30 minutes to make it exclusive)
+                  let endTimeHour = endHour;
+                  let endTimeMin = endMin + 30;
+                  
+                  // Handle minute overflow
+                  if (endTimeMin >= 60) {
+                    endTimeMin = endTimeMin % 60;
+                    endTimeHour = (endTimeHour + 1) % 24;
+                  }
 
                   const startDateTime = dayjs(`${date} ${group.startHour}`).toISOString();
                   
-                  // If end time wraps around (endTimeHour === 0 means we went from 23:00 to 00:00), add a day
+                  // If end time wraps around (endTimeHour === 0 and we went from 23:30 to 00:00), add a day
                   // Also check if end time on the same day would be before start time (indicating wrap-around)
                   const endTimeSameDay = dayjs(`${date} ${endTimeHour.toString().padStart(2, '0')}:${endTimeMin.toString().padStart(2, '0')}`);
                   const startTime = dayjs(`${date} ${group.startHour}`);
-                  const needsNextDay = endTimeHour === 0 || endTimeSameDay.isBefore(startTime);
+                  const needsNextDay = (endHour === 23 && endMin === 30) || endTimeSameDay.isBefore(startTime);
                   
                   const endDate = needsNextDay
                     ? dayjs(date).add(1, 'day').format('YYYY-MM-DD')

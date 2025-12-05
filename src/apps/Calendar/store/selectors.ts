@@ -8,26 +8,45 @@ type StoreType = {
   hiddenLabelIds: string[];
 };
 
-// Helper function to convert calendar event times to hour blocks
+// Helper function to convert calendar event times to 30-minute blocks
 function eventToHourBlocks(start: string, end: string): string[] {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
-  const hours: string[] = [];
+  const blocks: string[] = [];
   
-  // Get all hours between start and end (end is exclusive, but we need to handle end-of-day properly)
-  let current = startDate.startOf('hour');
-  const endHourDate = endDate.startOf('hour');
+  // Round down to nearest 30-minute mark for start
+  const startMinutes = startDate.minute();
+  const startRounded = startDate
+    .minute(startMinutes < 30 ? 0 : 30)
+    .second(0)
+    .millisecond(0);
   
-  // If end time is at the start of an hour, it's exclusive
-  // If end time has minutes/seconds, we need to include that hour
-  const shouldIncludeEndHour = endDate.minute() > 0 || endDate.second() > 0 || endDate.millisecond() > 0;
+  // Round up to nearest 30-minute mark for end (to include the block containing the end time)
+  const endMinutes = endDate.minute();
+  const endSeconds = endDate.second();
+  const endMilliseconds = endDate.millisecond();
+  let endRounded = endDate
+    .second(0)
+    .millisecond(0);
   
-  while (current.isBefore(endHourDate, 'hour') || (shouldIncludeEndHour && current.isSame(endHourDate, 'hour'))) {
-    hours.push(current.format('HH:mm'));
-    current = current.add(1, 'hour');
+  // If end time has minutes >= 30, round up to next hour
+  // If end time has minutes < 30 but not exactly 0, round up to :30
+  // If end time is exactly on a 30-minute mark with no seconds/milliseconds, include that block
+  if (endMinutes > 30 || (endMinutes === 30 && (endSeconds > 0 || endMilliseconds > 0))) {
+    endRounded = endRounded.add(1, 'hour').minute(0);
+  } else if (endMinutes > 0 || endSeconds > 0 || endMilliseconds > 0) {
+    endRounded = endRounded.minute(30);
   }
   
-  return hours;
+  let current = startRounded;
+  
+  // Include blocks from start (inclusive) to end (exclusive)
+  while (current.isBefore(endRounded)) {
+    blocks.push(current.format('HH:mm'));
+    current = current.add(30, 'minute');
+  }
+  
+  return blocks;
 }
 
 // Selector functions - these are reactive when used with useStore
@@ -86,7 +105,7 @@ export const selectDayData = (date: string) => (state: StoreType) => {
     }
   });
 
-  // Return day with all 24 hours, filling in missing ones with null
+  // Return day with all 48 30-minute blocks, filling in missing ones with null
   return {
     date,
     hours: allHourBlocks.map((hour) => {
@@ -137,13 +156,13 @@ export const selectSummary = (period: 'daily' | 'weekly' | 'monthly' | '3months'
       return eventDate >= startDate && eventDate <= endDate;
     });
 
-    // Group by activity (title) and count hours
+    // Group by activity (title) and count 30-minute blocks (convert to hours)
     const activityHours = new Map<string, { hours: number; color: string }>();
     let totalHours = 0;
 
     filteredEvents.forEach((event) => {
-      const hours = eventToHourBlocks(event.start, event.end);
-      const hoursCount = hours.length;
+      const blocks = eventToHourBlocks(event.start, event.end);
+      const hoursCount = blocks.length / 2; // Convert 30-minute blocks to hours
       
       if (hoursCount > 0) {
         const current = activityHours.get(event.title) || { hours: 0, color: event.color };
