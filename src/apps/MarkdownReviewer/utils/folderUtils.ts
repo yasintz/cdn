@@ -11,7 +11,7 @@ export async function buildFileTree(
 ): Promise<FileTreeNode[]> {
   const nodes: FileTreeNode[] = [];
 
-  for await (const [name, handle] of directoryHandle.entries()) {
+  for await (const [name, handle] of (directoryHandle as any).entries()) {
     if (handle.kind === 'directory') {
       const path = basePath ? `${basePath}/${name}` : name;
       const children = await buildFileTree(handle, path);
