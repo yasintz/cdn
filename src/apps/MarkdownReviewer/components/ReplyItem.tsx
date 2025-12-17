@@ -8,7 +8,6 @@ interface Reply {
 
 interface ReplyItemProps {
   reply: Reply;
-  commentId: string;
   isEditing: boolean;
   isViewingHistory: boolean;
   editText: string;
@@ -21,7 +20,6 @@ interface ReplyItemProps {
 
 export function ReplyItem({
   reply,
-  commentId,
   isEditing,
   isViewingHistory,
   editText,
