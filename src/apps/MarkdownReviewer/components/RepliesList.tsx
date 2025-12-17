@@ -43,7 +43,6 @@ export function RepliesList({
         <ReplyItem
           key={reply.id}
           reply={reply}
-          commentId={commentId}
           isEditing={editingCommentId === commentId && editingReplyId === reply.id}
           isViewingHistory={isViewingHistory}
           editText={editText}
