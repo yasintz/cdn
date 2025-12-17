@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { FileTreeNode } from './utils/folderUtils';
 
 export interface CommentReply {
   id: string;
@@ -20,6 +21,7 @@ export interface Comment {
 export interface CommentHistory {
   id: string;
   fileName: string;
+  filePath?: string;
   comments: Comment[];
   savedAt: number;
 }
@@ -36,15 +38,26 @@ interface MarkdownReviewerState {
   commentText: string;
   selectionPosition: { line: number; column: number } | null;
   commentsSidebarCollapsed: boolean;
+  
+  // Folder mode state
+  isFolderMode: boolean;
+  folderHandle: FileSystemDirectoryHandle | null;
+  folderName: string;
+  fileTree: FileTreeNode[];
+  currentFilePath: string | null;
+  fileComments: { [filePath: string]: Comment[] };
 
   // Actions
   setMarkdownContent: (content: string, fileName: string) => void;
-  addComment: (comment: Comment) => void;
-  addReplyToComment: (commentId: string, reply: CommentReply) => void;
-  deleteComment: (id: string) => void;
-  deleteReply: (commentId: string, replyId: string) => void;
-  updateComment: (id: string, text: string) => void;
-  updateReply: (commentId: string, replyId: string, text: string) => void;
+  setFolderMode: (folderHandle: FileSystemDirectoryHandle | null, folderName: string, fileTree: FileTreeNode[]) => void;
+  setCurrentFile: (filePath: string | null) => void;
+  getCurrentFileComments: () => Comment[];
+  addComment: (comment: Comment, filePath?: string) => void;
+  addReplyToComment: (commentId: string, reply: CommentReply, filePath?: string) => void;
+  deleteComment: (id: string, filePath?: string) => void;
+  deleteReply: (commentId: string, replyId: string, filePath?: string) => void;
+  updateComment: (id: string, text: string, filePath?: string) => void;
+  updateReply: (commentId: string, replyId: string, text: string, filePath?: string) => void;
   setSelectedText: (text: string) => void;
   setShowCommentDialog: (show: boolean) => void;
   setShowExportDialog: (show: boolean) => void;
@@ -74,6 +87,12 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
       commentText: '',
       selectionPosition: null,
       commentsSidebarCollapsed: false,
+      isFolderMode: false,
+      folderHandle: null,
+      folderName: '',
+      fileTree: [],
+      currentFilePath: null,
+      fileComments: {},
 
       setMarkdownContent: (content, fileName) => {
         const state = get();
@@ -81,36 +100,89 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
         // Only save to history if there are comments for the current version
         // When content changes and comments exist, save them to history and clear comments
         let updatedHistory = state.commentHistory;
-        if (state.comments.length > 0) {
+        const currentComments = state.isFolderMode && state.currentFilePath
+          ? state.fileComments[state.currentFilePath] || []
+          : state.comments;
+          
+        if (currentComments.length > 0) {
           // Save current comments to history before updating content
           const historyEntry: CommentHistory = {
             id: Date.now().toString(),
             fileName: state.currentFileName || fileName,
-            comments: state.comments,
+            filePath: state.currentFilePath || undefined,
+            comments: currentComments,
             savedAt: Date.now(),
           };
           updatedHistory = [...state.commentHistory, historyEntry];
         }
 
-        // Update content and clear comments
+        // Update content and clear comments for current file
         // New version will only be saved when user adds comments
+        if (state.isFolderMode && state.currentFilePath) {
+          // In folder mode, clear comments for the current file
+          const updatedFileComments = { ...state.fileComments };
+          updatedFileComments[state.currentFilePath] = [];
+          set({
+            markdownContent: content,
+            currentFileName: fileName,
+            fileComments: updatedFileComments,
+            commentHistory: updatedHistory,
+            selectedHistoryId: null,
+          });
+        } else {
+          // Single file mode
+          set({
+            markdownContent: content,
+            currentFileName: fileName,
+            comments: [],
+            commentHistory: updatedHistory,
+            selectedHistoryId: null,
+          });
+        }
+      },
+
+      setFolderMode: (folderHandle, folderName, fileTree) => {
         set({
-          markdownContent: content,
-          currentFileName: fileName,
-          comments: [],
-          commentHistory: updatedHistory,
-          selectedHistoryId: null,
+          isFolderMode: folderHandle !== null,
+          folderHandle,
+          folderName,
+          fileTree,
+          currentFilePath: null,
+          markdownContent: '',
+          currentFileName: '',
         });
+      },
+
+      setCurrentFile: (filePath) => {
+        const state = get();
+        const fileComments = state.fileComments[filePath || ''] || [];
+        set({
+          currentFilePath: filePath,
+          comments: fileComments, // Set comments for the selected file
+        });
+      },
+
+      getCurrentFileComments: () => {
+        const state = get();
+        if (state.isFolderMode && state.currentFilePath) {
+          return state.fileComments[state.currentFilePath] || [];
+        }
+        return state.comments;
       },
 
       saveCurrentCommentsToHistory: () => {
         const state = get();
-        if (!state.currentFileName || state.comments.length === 0) return;
+        const currentComments = state.isFolderMode && state.currentFilePath
+          ? state.fileComments[state.currentFilePath] || []
+          : state.comments;
+          
+        if (!state.currentFileName || currentComments.length === 0) return;
 
         const historyEntry: CommentHistory = {
           id: Date.now().toString(),
           fileName: state.currentFileName,
-          comments: state.comments,
+          filePath: state.currentFilePath || undefined,
+          comments: currentComments,
           savedAt: Date.now(),
         };
 
@@ -131,55 +203,142 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
 
       setSelectedHistoryId: (id) => set({ selectedHistoryId: id }),
 
-      addComment: (comment) =>
-        set((state) => ({ comments: [...state.comments, comment] })),
+      addComment: (comment, filePath) =>
+        set((state) => {
+          if (state.isFolderMode && filePath) {
+            const fileComments = state.fileComments[filePath] || [];
+            return {
+              fileComments: {
+                ...state.fileComments,
+                [filePath]: [...fileComments, comment],
+              },
+              comments: [...fileComments, comment], // Update current comments
+            };
+          }
+          return { comments: [...state.comments, comment] };
+        }),
 
-      addReplyToComment: (commentId, reply) =>
-        set((state) => ({
-          comments: state.comments.map((c) =>
-            c.id === commentId
-              ? { ...c, replies: [...(c.replies || []), reply] }
-              : c
-          ),
-        })),
+      addReplyToComment: (commentId, reply, filePath) =>
+        set((state) => {
+          const updateComments = (comments: Comment[]) =>
+            comments.map((c) =>
+              c.id === commentId
+                ? { ...c, replies: [...(c.replies || []), reply] }
+                : c
+            );
 
-      deleteComment: (id) =>
-        set((state) => ({
-          comments: state.comments.filter((c) => c.id !== id),
-        })),
+          if (state.isFolderMode && filePath) {
+            const fileComments = state.fileComments[filePath] || [];
+            const updated = updateComments(fileComments);
+            return {
+              fileComments: {
+                ...state.fileComments,
+                [filePath]: updated,
+              },
+              comments: updated, // Update current comments
+            };
+          }
+          return {
+            comments: updateComments(state.comments),
+          };
+        }),
 
-      deleteReply: (commentId, replyId) =>
-        set((state) => ({
-          comments: state.comments.map((c) =>
-            c.id === commentId
-              ? {
-                  ...c,
-                  replies: (c.replies || []).filter((r) => r.id !== replyId),
-                }
-              : c
-          ),
-        })),
+      deleteComment: (id, filePath) =>
+        set((state) => {
+          if (state.isFolderMode && filePath) {
+            const fileComments = state.fileComments[filePath] || [];
+            const updated = fileComments.filter((c) => c.id !== id);
+            return {
+              fileComments: {
+                ...state.fileComments,
+                [filePath]: updated,
+              },
+              comments: updated, // Update current comments
+            };
+          }
+          return {
+            comments: state.comments.filter((c) => c.id !== id),
+          };
+        }),
 
-      updateComment: (id, text) =>
-        set((state) => ({
-          comments: state.comments.map((c) =>
-            c.id === id ? { ...c, text } : c
-          ),
-        })),
+      deleteReply: (commentId, replyId, filePath) =>
+        set((state) => {
+          const updateComments = (comments: Comment[]) =>
+            comments.map((c) =>
+              c.id === commentId
+                ? {
+                    ...c,
+                    replies: (c.replies || []).filter((r) => r.id !== replyId),
+                  }
+                : c
+            );
 
-      updateReply: (commentId, replyId, text) =>
-        set((state) => ({
-          comments: state.comments.map((c) =>
-            c.id === commentId
-              ? {
-                  ...c,
-                  replies: (c.replies || []).map((r) =>
-                    r.id === replyId ? { ...r, text } : r
-                  ),
-                }
-              : c
-          ),
-        })),
+          if (state.isFolderMode && filePath) {
+            const fileComments = state.fileComments[filePath] || [];
+            const updated = updateComments(fileComments);
+            return {
+              fileComments: {
+                ...state.fileComments,
+                [filePath]: updated,
+              },
+              comments: updated, // Update current comments
+            };
+          }
+          return {
+            comments: updateComments(state.comments),
+          };
+        }),
+
+      updateComment: (id, text, filePath) =>
+        set((state) => {
+          const updateComments = (comments: Comment[]) =>
+            comments.map((c) => (c.id === id ? { ...c, text } : c));
+
+          if (state.isFolderMode && filePath) {
+            const fileComments = state.fileComments[filePath] || [];
+            const updated = updateComments(fileComments);
+            return {
+              fileComments: {
+                ...state.fileComments,
+                [filePath]: updated,
+              },
+              comments: updated, // Update current comments
+            };
+          }
+          return {
+            comments: updateComments(state.comments),
+          };
+        }),
+
+      updateReply: (commentId, replyId, text, filePath) =>
+        set((state) => {
+          const updateComments = (comments: Comment[]) =>
+            comments.map((c) =>
+              c.id === commentId
+                ? {
+                    ...c,
+                    replies: (c.replies || []).map((r) =>
+                      r.id === replyId ? { ...r, text } : r
+                    ),
+                  }
+                : c
+            );
+
+          if (state.isFolderMode && filePath) {
+            const fileComments = state.fileComments[filePath] || [];
+            const updated = updateComments(fileComments);
+            return {
+              fileComments: {
+                ...state.fileComments,
+                [filePath]: updated,
+              },
+              comments: updated, // Update current comments
+            };
+          }
+          return {
+            comments: updateComments(state.comments),
+          };
+        }),
 
       setSelectedText: (text) => set({ selectedText: text }),
 
@@ -191,7 +350,19 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
 
       setSelectionPosition: (position) => set({ selectionPosition: position }),
 
-      resetComments: () => set({ comments: [] }),
+      resetComments: () => {
+        const state = get();
+        if (state.isFolderMode && state.currentFilePath) {
+          const updatedFileComments = { ...state.fileComments };
+          updatedFileComments[state.currentFilePath] = [];
+          set({
+            fileComments: updatedFileComments,
+            comments: [],
+          });
+        } else {
+          set({ comments: [] });
+        }
+      },
 
       clearCommentDialog: () =>
         set({
@@ -211,6 +382,12 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
         currentFileName: state.currentFileName,
         comments: state.comments,
         commentHistory: state.commentHistory,
+        isFolderMode: state.isFolderMode,
+        folderName: state.folderName,
+        fileTree: state.fileTree,
+        currentFilePath: state.currentFilePath,
+        fileComments: state.fileComments,
+        // Note: folderHandle cannot be persisted, will need to be re-selected
       }),
     }
   )

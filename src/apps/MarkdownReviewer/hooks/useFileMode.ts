@@ -1,12 +1,15 @@
 import { useState, useCallback } from 'react';
+import { buildFileTree } from '../utils/folderUtils';
+import { FileTreeNode } from '../utils/folderUtils';
 
-type FileMode = 'upload' | 'watch';
+type FileMode = 'upload' | 'watch' | 'folder';
 
 interface UseFileModeResult {
   fileMode: FileMode;
   setFileMode: (mode: FileMode) => void;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectFileForWatch: () => Promise<void>;
+  handleSelectFolder: () => Promise<void>;
   showFileList: boolean;
   setShowFileList: (show: boolean) => void;
   handleSelectNewFile: () => Promise<void>;
@@ -15,6 +18,7 @@ interface UseFileModeResult {
 export function useFileMode(
   onFileSelected: (content: string, fileName: string) => void,
   onWatchStart: (handle: FileSystemFileHandle) => Promise<void>,
+  onFolderSelected: (folderHandle: FileSystemDirectoryHandle, folderName: string, fileTree: FileTreeNode[]) => Promise<void>,
   isWatching: boolean,
   stopWatching: () => Promise<void>
 ): UseFileModeResult {
@@ -69,6 +73,35 @@ export function useFileMode(
     }
   }, [onWatchStart, setFileMode]);
 
+  const handleSelectFolder = useCallback(async () => {
+    try {
+      if (!('showDirectoryPicker' in window)) {
+        alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or another Chromium-based browser.');
+        return;
+      }
+
+      const folderHandle = await (window as any).showDirectoryPicker();
+      const folderName = folderHandle.name;
+      
+      // Build file tree
+      const fileTree = await buildFileTree(folderHandle);
+      
+      if (fileTree.length === 0) {
+        alert('No markdown files found in the selected folder.');
+        return;
+      }
+
+      await onFolderSelected(folderHandle, folderName, fileTree);
+      setFileMode('folder');
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Error selecting folder:', error);
+        const errorMessage = error.message || 'Failed to select folder. Please try again.';
+        alert(errorMessage);
+      }
+    }
+  }, [onFolderSelected]);
+
   const handleModeChange = useCallback((mode: FileMode) => {
     setFileMode(mode);
     if (mode === 'upload' && isWatching) {
@@ -81,6 +114,7 @@ export function useFileMode(
     setFileMode: handleModeChange,
     handleFileUpload,
     handleSelectFileForWatch,
+    handleSelectFolder,
     showFileList,
     setShowFileList,
     handleSelectNewFile,
