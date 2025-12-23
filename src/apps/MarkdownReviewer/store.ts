@@ -34,7 +34,6 @@ interface MarkdownReviewerState {
   selectedHistoryId: string | null;
   selectedText: string;
   showCommentDialog: boolean;
-  showExportDialog: boolean;
   commentText: string;
   selectionPosition: { line: number; column: number } | null;
   commentsSidebarCollapsed: boolean;
@@ -60,7 +59,6 @@ interface MarkdownReviewerState {
   updateReply: (commentId: string, replyId: string, text: string, filePath?: string) => void;
   setSelectedText: (text: string) => void;
   setShowCommentDialog: (show: boolean) => void;
-  setShowExportDialog: (show: boolean) => void;
   setCommentText: (text: string) => void;
   setSelectionPosition: (
     position: { line: number; column: number } | null
@@ -83,7 +81,6 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
       selectedHistoryId: null,
       selectedText: '',
       showCommentDialog: false,
-      showExportDialog: false,
       commentText: '',
       selectionPosition: null,
       commentsSidebarCollapsed: false,
@@ -343,8 +340,6 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
       setSelectedText: (text) => set({ selectedText: text }),
 
       setShowCommentDialog: (show) => set({ showCommentDialog: show }),
-
-      setShowExportDialog: (show) => set({ showExportDialog: show }),
 
       setCommentText: (text) => set({ commentText: text }),
 

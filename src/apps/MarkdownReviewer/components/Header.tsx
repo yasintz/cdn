@@ -15,7 +15,6 @@ interface HeaderProps {
   handleSelectFileForWatch: () => void;
   stopWatching: () => void;
   handleCloseFolder: () => void;
-  handleExportComments: () => void;
 }
 
 export function Header({
@@ -32,7 +31,6 @@ export function Header({
   handleSelectFileForWatch,
   stopWatching,
   handleCloseFolder,
-  handleExportComments,
 }: HeaderProps) {
   return (
     <div className="bg-white px-8 py-6 border-b border-gray-200 shadow-sm">
@@ -144,15 +142,6 @@ export function Header({
                 </div>
               )}
             </div>
-          )}
-          {commentsCount > 0 && (
-            <Button
-              onClick={handleExportComments}
-              variant="default"
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Export Comments ({commentsCount})
-            </Button>
           )}
         </div>
       </div>

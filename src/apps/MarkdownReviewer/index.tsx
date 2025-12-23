@@ -1,14 +1,13 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { MarkdownViewer } from '@yasintz/md-viewer';
 import '@yasintz/md-viewer/styles';
-import type { Comment, CommentReply } from '@yasintz/md-viewer';
+import type { Comment, CommentReply, ComponentVisibilityConfig } from '@yasintz/md-viewer';
 import { useMarkdownReviewerStore } from './store';
 import { useFileWatcher } from './hooks/useFileWatcher';
 import { useFolderWatcher } from './hooks/useFolderWatcher';
 import { useFileMode } from './hooks/useFileMode';
 import { FileListDialog } from './components/FileListDialog';
 import { Header } from './components/Header';
-import { ExportCommentsDialog } from './components/ExportCommentsDialog';
 
 export default function MarkdownReviewer() {
   console.log('MarkdownReviewer');
@@ -20,7 +19,6 @@ export default function MarkdownReviewer() {
     comments: rawComments,
     commentHistory,
     selectedHistoryId,
-    showExportDialog,
     isFolderMode,
     folderHandle: storeFolderHandle,
     folderName,
@@ -35,7 +33,6 @@ export default function MarkdownReviewer() {
     deleteReply,
     updateComment,
     updateReply,
-    setShowExportDialog,
     getCurrentFileComments,
   } = store;
 
@@ -191,14 +188,34 @@ export default function MarkdownReviewer() {
     deleteReply(commentId, replyId, currentFilePath || undefined);
   };
 
-  const handleExportComments = (commentsToExport: Comment[]) => {
-    setShowExportDialog(true);
-  };
-
   const handleCloseFolder = () => {
     folderWatcher.stopWatching();
     setFolderMode(null, '', []);
     setFileMode('upload');
+  };
+
+  // Panel visibility state
+  const [fileTreeOpen, setFileTreeOpen] = useState(true);
+  const [tableOfContentsOpen, setTableOfContentsOpen] = useState(true);
+  const [commentsSidebarOpen, setCommentsSidebarOpen] = useState(true);
+
+  // Panel visibility configs
+  const fileTreeConfig: ComponentVisibilityConfig = {
+    open: fileTreeOpen,
+    onOpenChange: setFileTreeOpen,
+    showCloseIcon: true,
+  };
+
+  const tableOfContentsConfig: ComponentVisibilityConfig = {
+    open: tableOfContentsOpen,
+    onOpenChange: setTableOfContentsOpen,
+    showCloseIcon: true,
+  };
+
+  const commentsSidebarConfig: ComponentVisibilityConfig = {
+    open: commentsSidebarOpen,
+    onOpenChange: setCommentsSidebarOpen,
+    showCloseIcon: true,
   };
 
   return (
@@ -217,7 +234,6 @@ export default function MarkdownReviewer() {
         handleSelectFileForWatch={handleSelectFileForWatch}
         stopWatching={stopWatching}
         handleCloseFolder={handleCloseFolder}
-        handleExportComments={() => handleExportComments(comments)}
       />
 
       <MarkdownViewer
@@ -232,13 +248,9 @@ export default function MarkdownReviewer() {
         onReplyDelete={handleReplyDelete}
         selectedFilePath={currentFilePath}
         onFileSelect={handleFileSelect}
-        onExportComments={handleExportComments}
-      />
-
-      <ExportCommentsDialog
-        open={showExportDialog}
-        onOpenChange={setShowExportDialog}
-        comments={comments}
+        fileTreeConfig={fileTreeConfig}
+        tableOfContentsConfig={tableOfContentsConfig}
+        commentsSidebarConfig={commentsSidebarConfig}
       />
 
       <FileListDialog
