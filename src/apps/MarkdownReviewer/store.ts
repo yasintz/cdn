@@ -94,6 +94,18 @@ export const useMarkdownReviewerStore = create<MarkdownReviewerState>()(
       setMarkdownContent: (content, fileName) => {
         const state = get();
 
+        // Check if content actually changed - if not, don't clear comments
+        const contentChanged = content !== state.markdownContent || fileName !== state.currentFileName;
+        
+        if (!contentChanged) {
+          // Content hasn't changed, just update the state without clearing comments
+          set({
+            markdownContent: content,
+            currentFileName: fileName,
+          });
+          return;
+        }
+
         // Only save to history if there are comments for the current version
         // When content changes and comments exist, save them to history and clear comments
         let updatedHistory = state.commentHistory;
