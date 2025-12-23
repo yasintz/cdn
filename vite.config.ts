@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { visualizer } from 'rollup-plugin-visualizer';
+import tailwindcss from '@tailwindcss/vite';
 import { typeToSchemaPlugin } from './vite-plugins/json-schema-generator';
 import { generateRoutesPlugin } from './vite-plugins/generate-routes';
 
@@ -10,6 +11,7 @@ const isAnalyze = process.argv.includes('--analyze');
 
 export default defineConfig({
   plugins: [
+    tailwindcss(),
     typeToSchemaPlugin(),
     generateRoutesPlugin(),
     react(),
