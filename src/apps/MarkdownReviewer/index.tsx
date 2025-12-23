@@ -228,7 +228,6 @@ export default function MarkdownReviewer() {
         folderName={folderName}
         markdownContent={markdownContent}
         currentFileName={currentFileName}
-        commentsCount={comments.length}
         handleFileUpload={handleFileUpload}
         handleSelectFolder={handleSelectFolder}
         handleSelectFileForWatch={handleSelectFileForWatch}

@@ -9,7 +9,6 @@ interface HeaderProps {
   folderName: string;
   markdownContent: string | null;
   currentFileName: string | null;
-  commentsCount: number;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectFolder: () => void;
   handleSelectFileForWatch: () => void;
@@ -25,7 +24,6 @@ export function Header({
   folderName,
   markdownContent,
   currentFileName,
-  commentsCount,
   handleFileUpload,
   handleSelectFolder,
   handleSelectFileForWatch,
